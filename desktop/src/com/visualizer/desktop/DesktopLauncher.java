@@ -41,7 +41,7 @@ public class DesktopLauncher {
 					System.out.println("dupa1");
 				} } );
 			button1.setBounds(0, 0, 100, 20);
-		//	add(button1);
+			add(button1);
 			
 			button2 = new JButton( "load file2" );
 			button2.addActionListener( new ActionListener() {

@@ -1,127 +1,151 @@
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Dimension;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+package com.visualizer.desktop;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
+import com.badlogic.gdx.Graphics;
+import com.badlogic.gdx.backends.lwjgl.LwjglAWTCanvas;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl.LwjglCanvas;
+import com.visualizer.MainEngine;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
-public class LWJGLTester {
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-    private volatile boolean isRunning = false;
+public class DesktopLauncher {
+	private static class LWJGLTester {
 
-    /*
-     * The question asker seemed to desire that the JFrame be 800x600 and
-     * that the Display be 300x300.  Regardless of the desired sizes,
-     * I think the important thing is to set the Canvas and Display to the same sizes.
-     */
-    private int frameWidth = 800;
-    private int frameHeight = 600;
-    private int displayWidth = 300;
-    private int displayHeight = 300;
+		private volatile boolean isRunning = false;
 
-    private Thread glThread;
+		/*
+		 * The question asker seemed to desire that the JFrame be 800x600 and
+		 * that the Display be 300x300.  Regardless of the desired sizes,
+		 * I think the important thing is to set the Canvas and Display to the same sizes.
+		 */
+		private int frameWidth = 800;
+		private int frameHeight = 600;
+		private int displayWidth = 300;
+		private int displayHeight = 300;
 
-    public static void main(String[] args) {
-        new LWJGLTester().runTester();
-    }
+		private Thread glThread;
+		private JFrame frame;
 
-    private void runTester() {
-        final JFrame frame = new JFrame("LWJGL in Swing");
-        frame.setSize(frameWidth, frameHeight);
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent we){
-                int result = JOptionPane.showConfirmDialog(frame, "Do you want to quit the Application?");
-                if(result == JOptionPane.OK_OPTION){
-                    frame.setVisible(false);
-                    frame.dispose(); //canvas's removeNotify() will be called
-                }
-            }
-        });
+		public static void main(String[] args) {
+			new LWJGLTester().runTester();
+		}
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
+		private void runTester() {
+			frame = new JFrame("LWJGL in Swing");
+			frame.setSize(frameWidth, frameHeight);
+			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+			frame.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent we){
+					int result = JOptionPane.showConfirmDialog(frame, "Do you want to quit the Application?");
+					if(result == JOptionPane.OK_OPTION){
+						frame.setVisible(false);
+						frame.dispose(); //canvas's removeNotify() will be called
+					}
+				}
+			});
 
-        JButton button = new JButton("BUTTON");
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(button);
-        mainPanel.add(buttonPanel, BorderLayout.NORTH);
+			JPanel mainPanel = new JPanel(new BorderLayout());
 
-        Canvas canvas = new Canvas() {
-            @Override
-            public void addNotify() {
-                super.addNotify();
-                startGL();
-            }
+			JButton button = new JButton("BUTTON");
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.add(button);
+			mainPanel.add(buttonPanel, BorderLayout.NORTH);
 
-            @Override
-            public void removeNotify() {
-                stopGL();
-                super.removeNotify();
-            }
-        };
-        canvas.setPreferredSize(new Dimension(displayWidth, displayHeight));
-        canvas.setIgnoreRepaint(true);
+			Canvas canvas = new Canvas() {
+				@Override
+				public void addNotify() {
+					super.addNotify();
+					startGL();
+				}
 
-        try {
-            Display.setParent(canvas);
-        } catch (LWJGLException e) {
-            //handle exception
-            e.printStackTrace();
-        }
-        JPanel canvasPanel = new JPanel();
-        canvasPanel.add(canvas);
-        mainPanel.add(canvasPanel, BorderLayout.SOUTH);
+				@Override
+				public void removeNotify() {
+					stopGL();
+					super.removeNotify();
+				}
+			};
+			canvas.setPreferredSize(new Dimension(displayWidth, displayHeight));
+			canvas.setIgnoreRepaint(true);
 
-        frame.getContentPane().add(mainPanel);
+			try {
+				Display.setParent(canvas);
+			} catch (LWJGLException e) {
+				//handle exception
+				e.printStackTrace();
+			}
+			JPanel canvasPanel = new JPanel();
+			canvasPanel.add(canvas);
+			mainPanel.add(canvasPanel, BorderLayout.SOUTH);
 
-        //frame.pack();
-        frame.setVisible(true);
-    }
+			frame.getContentPane().add(mainPanel);
 
-    private void startGL() {
-        glThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                isRunning = true;
-                try {
-                    Display.setDisplayMode(new DisplayMode(displayWidth, displayHeight));
-                    Display.create();
-                } catch (LWJGLException e) {
-                    //handle exception
-                    e.printStackTrace();
-                }
+			//frame.pack();
+			frame.setVisible(true);
+		}
 
-                // init OpenGL here
+		private void startGL() {
+			glThread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					isRunning = true;
+					try {
+						Display.setDisplayMode(new DisplayMode(displayWidth, displayHeight));
+						Display.create();
+					} catch (LWJGLException e) {
+						//handle exception
+						e.printStackTrace();
+					}
 
-                while(isRunning) {
-                    // render OpenGL here
-                    Display.update();
-                }
+					LwjglApplicationConfiguration config;
+					config = new LwjglApplicationConfiguration();
+					LwjglAWTCanvas canvas = new LwjglAWTCanvas(new MainEngine());
+					frame.add(canvas.getCanvas(), BorderLayout.CENTER);
 
-                Display.destroy();
-            }
-        }, "LWJGL Thread");
+					while(isRunning) {
+						// render OpenGL here
+						Display.update();
+					}
 
-        glThread.start();
-    }
+					Display.destroy();
+				}
+			}, "LWJGL Thread");
 
-    private void stopGL() {
-        isRunning = false;
-        try {
-            glThread.join();
-        } catch (InterruptedException e) {
-            //handle exception
-            e.printStackTrace();
-        }
-    }
+			glThread.start();
+		}
 
+		private void stopGL() {
+			isRunning = false;
+			try {
+				glThread.join();
+			} catch (InterruptedException e) {
+				//handle exception
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public static void main (String[] arg) {
+		new LWJGLTester().runTester();
+	/*	SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				MainWindow window = new MainWindow();
+			}
+		}); //*/
+	}
+
+//		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+//		new LwjglApplication(new MyGdxGame(), config);
+//	}
 }
