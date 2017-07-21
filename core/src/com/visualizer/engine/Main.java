@@ -76,5 +76,6 @@ public class Main implements ApplicationListener {
 	public void resize(int width, int height) {
 		viewport.update(width, height);
 		controller.resize(width, height);
+		//System.out.println(width + " " + height);
 	}
 }

@@ -8,9 +8,12 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 public class ModelSubframe extends JInternalFrame {
-	private static final int yStart = 30;
-	private static final int xOffset = 30, yOffset = 30;
+	private static final int xStart = -30, yStart = 0;
+	private static final int xOffset = 30, yOffset = 0;
 	private static int frameCounter = 0;
+	
+	private Main engine;
+	private LwjglAWTCanvas canvas;
 	
 	public ModelSubframe(String name, int width, int height) {
 		super(name + " ("+(++frameCounter)+')', true, true, true, true);
@@ -40,17 +43,17 @@ public class ModelSubframe extends JInternalFrame {
 		});
 		
 		setSize(width, height);
-		setLocation(xOffset*frameCounter, yStart + yOffset*frameCounter);
+		setLocation(xStart + xOffset*frameCounter, yStart + yOffset*frameCounter);
 		try {
 			setSelected(true); }
 		catch(java.beans.PropertyVetoException e) {
 			e.printStackTrace(); }
 		
-		LwjglAWTCanvas canvas = new LwjglAWTCanvas(new Main());
-		add(canvas.getCanvas());
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				engine = new Main();
+				canvas = new LwjglAWTCanvas(engine);
+				add(canvas.getCanvas()); } });
 		
-		setVisible(true);
-		//...Then set the window size or call pack...
-		//Set the window's location.
-	}
+		setVisible(true); }
 }
