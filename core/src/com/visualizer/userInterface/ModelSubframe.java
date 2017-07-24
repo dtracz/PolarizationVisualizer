@@ -15,7 +15,7 @@ public class ModelSubframe extends JInternalFrame {
 	private Main engine;
 	private LwjglAWTCanvas canvas;
 	
-	public ModelSubframe(String name, int width, int height) {
+	public ModelSubframe(String name, int width, int height, final String sourcePath) {
 		super(name + " ("+(++frameCounter)+')', true, true, true, true);
 		
 		addInternalFrameListener(new InternalFrameListener() {
@@ -51,7 +51,7 @@ public class ModelSubframe extends JInternalFrame {
 		
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				engine = new Main();
+				engine = new Main(sourcePath);
 				canvas = new LwjglAWTCanvas(engine);
 				add(canvas.getCanvas()); } });
 		

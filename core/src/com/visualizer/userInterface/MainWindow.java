@@ -11,6 +11,17 @@ public class MainWindow extends JFrame {
 	
 	private JDesktopPane desktop;
 	
+	private String selectFile() throws FileNotFoundException {
+		final JFileChooser jFC = new JFileChooser();
+		jFC.setCurrentDirectory(new File("."));                                             // set default Directory!!!
+		int parent = jFC.showOpenDialog(new JFrame());
+		File file;
+		if(parent == JFileChooser.APPROVE_OPTION) {
+			file = jFC.getSelectedFile(); }
+		else {
+			throw new FileNotFoundException("No file selected"); }
+		return file.getAbsolutePath(); }
+	
 	private void createMenu() {
 		JMenuBar menuBar = new JMenuBar();
 		
@@ -21,7 +32,7 @@ public class MainWindow extends JFrame {
 		itemImport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				try {
-					String str = selectFile(); }
+					addModel(selectFile()); }
 				catch(FileNotFoundException fnfe) {
 					fnfe.printStackTrace(); } } });
 		JMenuItem itemExportAs = new JMenuItem("Export as...");
@@ -52,19 +63,9 @@ public class MainWindow extends JFrame {
 			instance = new MainWindow(1280, 720); }
 		return instance; }
 		
-	public void addModel() {
-		ModelSubframe subframe1 = new ModelSubframe("subframe_", 800, 600);
-		desktop.add(subframe1);
+	public void addModel(String sourcePath) {
+		ModelSubframe subframe = new ModelSubframe("subframe", 800, 600, sourcePath);
+		desktop.add(subframe);
 	}
-	
-	private String selectFile() throws FileNotFoundException {
-		final JFileChooser jFC = new JFileChooser();
-		jFC.setCurrentDirectory(new File("."));                                             // set default Directory!!!
-		int parent = jFC.showOpenDialog(new JFrame());
-		File file;
-		if(parent == JFileChooser.APPROVE_OPTION) {
-			file = jFC.getSelectedFile(); }
-		else {
-			throw new FileNotFoundException("No file selected"); }
-		return file.getAbsolutePath(); }
+
 }

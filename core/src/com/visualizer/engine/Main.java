@@ -9,12 +9,16 @@ import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.*;
 
+import java.io.File;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
 public class Main implements ApplicationListener {
+	private String sourcePath;
+	
 	private Environment environment;
 	private Viewport viewport;
 	
@@ -23,8 +27,36 @@ public class Main implements ApplicationListener {
 	private AllModels modelBatch;
 	//private ModelBuilder modelBuilder;
 	
+	private void atomFactory() {
+		System.out.println("DUPPA");
+		Scanner scanner;
+		try {
+			scanner = new Scanner(new File(sourcePath));
+			Queue<String> names = new LinkedList<String>();
+			Queue<Vector3> sizes = new LinkedList<Vector3>();
+			Queue<Matrix4> transforms = new LinkedList<Matrix4>();
+			final Vector3 ONES = new Vector3(1,1,1);
+			while (scanner.hasNext()) {
+				names.add(scanner.next());
+				sizes.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
+				Vector3 postion = new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
+				Quaternion rotation = new Quaternion(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
+				transforms.add(new Matrix4(postion, rotation, ONES));
+			}
+			while(!transforms.isEmpty()) {
+				modelBatch.addAtom(names.poll(), sizes.poll(), transforms.poll(), Color.RED, 40);
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace(); }
+		
+	}
+	
+	public Main(String filePath) {
+		sourcePath = filePath; }
+	
 	@Override
-	public void create () {
+	public void create() {
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.5f, 0.5f, 0.5f, 1f));
 		environment.add(new PointLight().set(0.8f, 0.8f, 0.8f, -10f, -10f, 10f, 200f));
@@ -45,11 +77,12 @@ public class Main implements ApplicationListener {
 		
 		/*-----------------------------------------------------------------------------------------------------------*/
 		
-		modelBatch.addAtom(4,5,6, new Matrix4(new Vector3(0,0,0), new Quaternion(), new Vector3(1,1,1)), Color.RED, 40);
+		atomFactory();
+		//modelBatch.addAtom(4,5,6, new Matrix4(new Vector3(0,0,0), new Quaternion(), new Vector3(1,1,1)), Color.RED, 40);
 	}
 	
 	@Override
-	public void render () {
+	public void render() {
 		Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 	//	viewport.apply();

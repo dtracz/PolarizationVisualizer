@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 
 import java.util.*;
 
@@ -23,9 +24,12 @@ public class AllModels extends ModelBatch {
         atoms = new HashSet<Atom>();
         axes = new Axes(builder, 5);
     }
-
+    
     public void addAtom(float w, float h, float d, Matrix4 transform, Color color, int divisions) {
         atoms.add(new Atom(builder, w, h, d, transform, color, divisions)); }
+        
+    public void addAtom(String name, Vector3 sizes, Matrix4 transform, Color color, int divisions) {
+        atoms.add(new Atom(builder, sizes.x, sizes.y, sizes.z, transform, color, divisions)); }
 
     public void addAtom(Atom atom) {
         atoms.add(atom); }
