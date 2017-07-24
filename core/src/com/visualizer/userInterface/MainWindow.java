@@ -1,6 +1,7 @@
 package com.visualizer.userInterface;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -23,11 +24,9 @@ public class MainWindow extends JFrame {
 		return file.getAbsolutePath(); }
 	
 	private void createMenu() {
-		JMenuBar menuBar = new JMenuBar();
+		JMenuBar bar = new JMenuBar();
 		
 		JMenu menuFile = new JMenu("File");
-		menuBar.add(menuFile);
-		
 		JMenuItem itemImport = new JMenuItem("Import...");
 		itemImport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
@@ -44,8 +43,16 @@ public class MainWindow extends JFrame {
 		menuFile.add(itemExportAs);
 		menuFile.addSeparator();
 		menuFile.add(itemExit);
+		bar.add(menuFile);
 		
-		setJMenuBar(menuBar);
+		JMenu menuView = new JMenu("View");
+		JMenuItem itemMode = new JMenuItem("Mode 2D/3D");
+		menuView.add(itemMode);
+		JMenuItem itemCamera = new JMenuItem("set Camera");
+		menuView.add(itemCamera);
+		bar.add(menuView);
+		
+		setJMenuBar(bar);
 	}
 	
 	protected MainWindow(int width, int height) {
@@ -55,6 +62,12 @@ public class MainWindow extends JFrame {
 		
 		setSize(width, height);
 		createMenu();
+		
+		JPanel settingsPanel = new JPanel();
+		settingsPanel.setBackground(Color.GRAY);
+		settingsPanel.setBounds((int)(width*3/4), 0, (int)(width*1/4), height);
+		add(settingsPanel);
+		
 		setVisible(true);
 	}
 	

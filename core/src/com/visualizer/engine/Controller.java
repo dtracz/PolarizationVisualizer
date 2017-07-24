@@ -11,11 +11,13 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
  */
 public class Controller implements InputProcessor {
     private CameraHandler cameraHandler;
-    boolean mode2d;
+    private boolean mode2d;
+    private float m2dFactor;
     AllModels modelBatch;
     private Mouse mouse;
     private float angleSpeed;
     private float moveSpeed;
+    private final float scrollParam;
 
 
     public Controller(Mouse mouse, Camera camera, AllModels modelBatch) {
@@ -23,8 +25,10 @@ public class Controller implements InputProcessor {
         this.mouse = mouse;
         this.modelBatch = modelBatch;
         mode2d = false;
+        m2dFactor = 30;
         angleSpeed = 1f;
-        moveSpeed = 1f; }
+        moveSpeed = 1f;
+        scrollParam = 0.95f; }
 
     public void resize(int width, int height) {
         cameraHandler.update();
@@ -42,10 +46,10 @@ public class Controller implements InputProcessor {
         else return;
         if(mode2d) {
             cameraHandler.setCamera(new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), 500);
-            modelBatch.scaleAll(16); }
+            modelBatch.scaleAll(m2dFactor); }
         else {
             cameraHandler.setCamera(new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), -500);
-            modelBatch.scaleAll(1f/16f); }
+            modelBatch.scaleAll(1f/m2dFactor); }
     }
 
 	/*---InputProcessor-------------------------------------------------------------------------------*/
@@ -108,10 +112,14 @@ public class Controller implements InputProcessor {
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         return false; }
-
+    
     @Override
     public boolean scrolled(int amount) {
-        System.out.println(amount);
-        cameraHandler.move(amount*moveSpeed);
+        float param = amount==1f ? moveSpeed*scrollParam : 1/(moveSpeed*scrollParam);
+        if(mode2d) {
+            modelBatch.scaleAll(param); }
+        else { }
+            m2dFactor *= param;
+            cameraHandler.move(amount*moveSpeed);
         return true; }
 }

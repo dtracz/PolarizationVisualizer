@@ -25,10 +25,8 @@ public class Main implements ApplicationListener {
 	private Controller controller;
 	
 	private AllModels modelBatch;
-	//private ModelBuilder modelBuilder;
 	
 	private void atomFactory() {
-		System.out.println("DUPPA");
 		Scanner scanner;
 		try {
 			scanner = new Scanner(new File(sourcePath));
@@ -39,9 +37,9 @@ public class Main implements ApplicationListener {
 			while (scanner.hasNext()) {
 				names.add(scanner.next());
 				sizes.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
-				Vector3 postion = new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
+				Vector3 position = new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
 				Quaternion rotation = new Quaternion(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
-				transforms.add(new Matrix4(postion, rotation, ONES));
+				transforms.add(new Matrix4(position, rotation, ONES));
 			}
 			while(!transforms.isEmpty()) {
 				modelBatch.addAtom(names.poll(), sizes.poll(), transforms.poll(), Color.RED, 40);
@@ -58,7 +56,7 @@ public class Main implements ApplicationListener {
 	@Override
 	public void create() {
 		environment = new Environment();
-		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.5f, 0.5f, 0.5f, 1f));
+		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f));
 		environment.add(new PointLight().set(0.8f, 0.8f, 0.8f, -10f, -10f, 10f, 200f));
 		
 		//modelBuilder = new ModelBuilder();

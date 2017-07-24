@@ -27,6 +27,7 @@ public class ModelSubframe extends JInternalFrame {
 			
 			@Override
 			public void internalFrameClosed(InternalFrameEvent e) {
+				engine.dispose();
 				--frameCounter; }
 			
 			@Override
