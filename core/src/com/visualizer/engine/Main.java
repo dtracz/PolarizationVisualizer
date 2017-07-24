@@ -28,7 +28,6 @@ public class Main implements ApplicationListener {
 	//private ModelBuilder modelBuilder;
 	
 	private void atomFactory() {
-		System.out.println("DUPPA");
 		Scanner scanner;
 		try {
 			scanner = new Scanner(new File(sourcePath));
