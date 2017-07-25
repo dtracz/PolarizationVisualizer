@@ -16,8 +16,9 @@ import java.util.*;
  */
 public class AllModels extends ModelBatch {
     ModelBuilder builder;
-    Axes axes;
-    Set<Atom> atoms;
+    
+    public Axes axes;
+    public Set<Atom> atoms;
 
     public AllModels(ModelBuilder builder) {
         this.builder = builder;
@@ -46,7 +47,8 @@ public class AllModels extends ModelBatch {
         for(ModelInstance axis: axes.instances) {
             this.render(axis, environment); }
         for(Atom atom: atoms) {
-            this.render(atom.getInstance(), environment); }
+            if(atom.renderable) {
+                this.render(atom.getInstance(), environment); } }
         this.end();
     }
 }

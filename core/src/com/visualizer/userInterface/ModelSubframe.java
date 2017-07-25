@@ -1,6 +1,8 @@
 package com.visualizer.userInterface;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglAWTCanvas;
+import com.visualizer.engine.AllModels;
+import com.visualizer.engine.Controller;
 import com.visualizer.engine.Main;
 
 import javax.swing.*;
@@ -15,9 +17,11 @@ public class ModelSubframe extends JInternalFrame {
 	private Main engine;
 	private LwjglAWTCanvas canvas;
 	
+	
 	public ModelSubframe(String name, int width, int height, final String sourcePath) {
 		super(name + " ("+(++frameCounter)+')', true, true, true, true);
 		
+		final ModelSubframe self = this;
 		addInternalFrameListener(new InternalFrameListener() {
 			@Override
 			public void internalFrameOpened(InternalFrameEvent e) { }
@@ -37,7 +41,8 @@ public class ModelSubframe extends JInternalFrame {
 			public void internalFrameDeiconified(InternalFrameEvent e) { }
 			
 			@Override
-			public void internalFrameActivated(InternalFrameEvent e) { }
+			public void internalFrameActivated(InternalFrameEvent e) {
+				MainWindow.getInstance().setTopSubframe(self); }
 			
 			@Override
 			public void internalFrameDeactivated(InternalFrameEvent e) { }
@@ -57,4 +62,16 @@ public class ModelSubframe extends JInternalFrame {
 				add(canvas.getCanvas()); } });
 		
 		setVisible(true); }
+		
+		public Controller getController() {
+		//	while(engine.controller == null) {
+		//		try { Thread.sleep(100); }
+		//		catch(Exception e) { } }
+			return engine.controller; }
+			
+		public AllModels getModels() {
+		//	while(engine.modelBatch == null) {
+		//		try { Thread.sleep(100); }
+		//		catch(Exception e) { } }
+			return engine.modelBatch; }
 }

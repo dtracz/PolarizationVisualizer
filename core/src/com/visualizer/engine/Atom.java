@@ -19,13 +19,17 @@ public class Atom {
     BlendingAttribute blendingAttribute;
     Model atom;
     ModelInstance instance;
+    
+    public String name = "";
+    public boolean renderable;
 
     public Atom(ModelBuilder builder, float w, float h, float d, Matrix4 transform, Color color, int divisions) {
         this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
         this.atom = builder.createSphere(w, h, d, divisions, divisions,
                 new Material(ColorAttribute.createDiffuse(color), blendingAttribute),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal );
-        this.instance = new ModelInstance(atom, transform); }
+        this.instance = new ModelInstance(atom, transform);
+        renderable = true; }
 
     public void changeOpacity(float opacity) {
         instance.materials.get(0).set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, opacity)); }

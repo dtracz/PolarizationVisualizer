@@ -22,9 +22,8 @@ public class Main implements ApplicationListener {
 	private Environment environment;
 	private Viewport viewport;
 	
-	private Controller controller;
-	
-	private AllModels modelBatch;
+	public Controller controller;
+	public AllModels modelBatch;
 	
 	private void atomFactory() {
 		Scanner scanner;
@@ -55,6 +54,7 @@ public class Main implements ApplicationListener {
 	
 	@Override
 	public void create() {
+		System.out.println("!!!");
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f));
 		environment.add(new PointLight().set(0.8f, 0.8f, 0.8f, -10f, -10f, 10f, 200f));

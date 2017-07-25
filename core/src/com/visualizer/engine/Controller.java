@@ -13,7 +13,7 @@ public class Controller implements InputProcessor {
     private CameraHandler cameraHandler;
     private boolean mode2d;
     private float m2dFactor;
-    AllModels modelBatch;
+    private AllModels modelBatch;
     private Mouse mouse;
     private float angleSpeed;
     private float moveSpeed;
