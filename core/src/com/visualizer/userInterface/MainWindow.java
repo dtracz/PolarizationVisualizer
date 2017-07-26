@@ -22,7 +22,7 @@ public class MainWindow extends JFrame {
 	private Map<ModelSubframe, ControlPanel> projects;
 	private ModelSubframe topSubframe;
 	private ControlPanel currControlPanel;
-	private Controller currController;
+	//private Controller currController;
 	
 	private String selectFile() throws FileNotFoundException {
 		final JFileChooser jFC = new JFileChooser();
@@ -59,11 +59,19 @@ public class MainWindow extends JFrame {
 		
 		JMenu menuView = new JMenu("View");
 		JMenuItem itemMode = new JMenuItem("Mode 2D/3D");
-		menuView.add(itemMode);
 		JMenuItem itemCamera = new JMenuItem("Set Camera");
-		menuView.add(itemCamera);
 		JMenuItem itemControl = new JMenuItem("Show control panel");
+		itemControl.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ev) {
+				if(topSubframe != null) {
+				
+				}
+			}
+		});
+		menuView.add(itemMode);
 		menuView.add(itemCamera);
+		menuView.add(itemControl);
 		bar.add(menuView);
 		
 		setJMenuBar(bar);
@@ -81,23 +89,16 @@ public class MainWindow extends JFrame {
 			@Override
 			public void componentResized(ComponentEvent e) {
 				if(currControlPanel != null) {
-					currControlPanel.updateBounds(getWidth(), getHeight()); }
-			}
+					currControlPanel.updateBounds(getWidth(), getHeight()); } }
 			
 			@Override
-			public void componentMoved(ComponentEvent e) {
-			
-			}
+			public void componentMoved(ComponentEvent e) { }
 			
 			@Override
-			public void componentShown(ComponentEvent e) {
-			
-			}
+			public void componentShown(ComponentEvent e) { }
 			
 			@Override
-			public void componentHidden(ComponentEvent e) {
-			
-			}
+			public void componentHidden(ComponentEvent e) { }
 		});
 		setVisible(true);
 	}
@@ -107,9 +108,10 @@ public class MainWindow extends JFrame {
 			instance = new MainWindow(1280, 720); }
 		return instance; }
 		
-	public void addModel(String sourcePath) {
+	public ModelSubframe addModel(String sourcePath) {
 		ModelSubframe subframe = new ModelSubframe("subframe", 800, 600, sourcePath);
-		desktop.add(subframe); }
+		desktop.add(subframe);
+		return subframe; }
 		
 	public ControlPanel addControlPanel(ModelSubframe subframe) {
 		ControlPanel controlPanel;
@@ -118,7 +120,7 @@ public class MainWindow extends JFrame {
 		else {
 			controlPanel = new ControlPanel(subframe.getModels(), subframe.getController());
 			add(controlPanel);
-			controlPanel.setVisible(true);
+			controlPanel.updateBounds(getWidth(), getHeight());
 			projects.put(subframe, controlPanel); }
 		return controlPanel; }
 
@@ -135,7 +137,8 @@ public class MainWindow extends JFrame {
 		if(currControlPanel != null) {
 			currControlPanel.setVisible(false); }
 		currControlPanel = controlPanel;
-		currControlPanel.setVisible(true); }
+		currControlPanel.setVisible(true);
+		}
 	
 	
 }

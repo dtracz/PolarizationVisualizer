@@ -18,19 +18,19 @@ public class AllModels extends ModelBatch {
     ModelBuilder builder;
     
     public Axes axes;
-    public Set<Atom> atoms;
+    public List<Atom> atoms;
 
     public AllModels(ModelBuilder builder) {
         this.builder = builder;
-        atoms = new HashSet<Atom>();
+        atoms = new LinkedList<Atom>();
         axes = new Axes(builder, 5);
     }
     
-    public void addAtom(float w, float h, float d, Matrix4 transform, Color color, int divisions) {
-        atoms.add(new Atom(builder, w, h, d, transform, color, divisions)); }
+    public void addAtom(String name, float w, float h, float d, Matrix4 transform, Color color, int divisions) {
+        atoms.add(new Atom(builder, name, w, h, d, transform, color, divisions)); }
         
     public void addAtom(String name, Vector3 sizes, Matrix4 transform, Color color, int divisions) {
-        atoms.add(new Atom(builder, sizes.x, sizes.y, sizes.z, transform, color, divisions)); }
+        atoms.add(new Atom(builder, name, sizes.x, sizes.y, sizes.z, transform, color, divisions)); }
 
     public void addAtom(Atom atom) {
         atoms.add(atom); }

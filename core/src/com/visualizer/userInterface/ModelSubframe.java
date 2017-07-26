@@ -42,7 +42,9 @@ public class ModelSubframe extends JInternalFrame {
 			
 			@Override
 			public void internalFrameActivated(InternalFrameEvent e) {
-				MainWindow.getInstance().setTopSubframe(self); }
+				MainWindow main = MainWindow.getInstance();
+				main.setTopSubframe(self);
+				main.setCurrControlPanel(main.addControlPanel(self)); }
 			
 			@Override
 			public void internalFrameDeactivated(InternalFrameEvent e) { }

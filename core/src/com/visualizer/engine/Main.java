@@ -17,7 +17,7 @@ import java.util.Queue;
 import java.util.Scanner;
 
 public class Main implements ApplicationListener {
-	private String sourcePath;
+	public String sourcePath;
 	
 	private Environment environment;
 	private Viewport viewport;
@@ -54,7 +54,7 @@ public class Main implements ApplicationListener {
 	
 	@Override
 	public void create() {
-		System.out.println("!!!");
+		System.out.println("!!! MAIN::create()");
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f));
 		environment.add(new PointLight().set(0.8f, 0.8f, 0.8f, -10f, -10f, 10f, 200f));
