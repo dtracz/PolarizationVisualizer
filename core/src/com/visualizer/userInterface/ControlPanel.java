@@ -17,48 +17,30 @@ import java.util.Locale;
 import java.util.Set;
 
 public class ControlPanel extends JScrollPane {
-	private class AtomicControlPanel extends JPanel {
-		AtomicControlPanel(final Atom atom) {
-			setBackground(Color.LIGHT_GRAY);
-			JLabel name = new JLabel(atom.name + " : ");
-			add(name);
-			JCheckBox box = new JCheckBox("on/off");
-			box.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					atom.renderable = (e.getStateChange() == ItemEvent.SELECTED); } });
-			box.setSelected(true);
-			add(box);
-			JButton params = new JButton("param.");
-			add(params);
-		}
-		
-	}
+	private AllModels models;
+	private Controller controller;
 	
 	private JPanel viewPanel;
-	
 	private int xSize;
-	private int minYSize;
 	
-	private Controller controller;
-	private AllModels models;
+	private JPanel addAtomController(final Atom atom) {
+		JPanel atomicControlPanel = new JPanel();
+		atomicControlPanel.setBackground(Color.LIGHT_GRAY);
+		JLabel name = new JLabel(atom.name + " : ");
+		atomicControlPanel.add(name);
+		JCheckBox checkBox = new JCheckBox("on/off");
+		checkBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				atom.renderable = (e.getStateChange() == ItemEvent.SELECTED); } });
+		checkBox.setSelected(true);
+		atomicControlPanel.add(checkBox);
+		JButton params = new JButton("param.");
+		atomicControlPanel.add(params);
+		return atomicControlPanel; }
 	
-	//private Set<JPanel> buttons;
-	
-	public ControlPanel(AllModels allModels, Controller controller) {
-		viewPanel = new JPanel(new GridLayout(allModels.atoms.size()+1, 1));
-		
-		viewPanel.setBackground(Color.GRAY);
-		this.controller = controller;
-		this.models = allModels;
-		System.out.println("ControlPanel::ControlPanel()");
-		
-		xSize = 220;
-		minYSize = 40;
-		
-		//*
+	private JPanel addOpacityPanel() {
 		JPanel opacityPanel = new JPanel();
-		//opacityPanel.setBackground(Color.WHITE);
 		JLabel name = new JLabel("Opacity:");
 		opacityPanel.add(name);
 		final JSlider slider = new JSlider(0, 100, 100);
@@ -67,39 +49,38 @@ public class ControlPanel extends JScrollPane {
 		slider.setMinorTickSpacing(10);
 		slider.setPaintTicks(true);
 		slider.setPaintLabels(false);
-		final JLabel sliderLabel = new JLabel(" 1.00");
+		final JLabel sliderLabel = new JLabel("1.00");
 		slider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				sliderLabel.setText(String.format(Locale.ROOT," %.2f", (float)slider.getValue()/100));
+				sliderLabel.setText(String.format(Locale.ROOT,"%.2f", (float)slider.getValue()/100));
 				for(Atom atom: models.atoms) {
-					atom.changeOpacity((float)slider.getValue()/100); }
-			} });
+					atom.changeOpacity((float)slider.getValue()/100); } } });
 		opacityPanel.add(slider);
 		opacityPanel.add(sliderLabel);
-		opacityPanel.setPreferredSize(new Dimension(200, 40));
-		viewPanel.add(opacityPanel);
-		//*/
+		opacityPanel.setPreferredSize(new Dimension(220, 40));
+		return opacityPanel; }
+	
+	public ControlPanel(AllModels allModels, Controller controller) {
+		this.controller = controller;
+		this.models = allModels;
+		xSize = 240;
+		
+		viewPanel = new JPanel();
+		viewPanel.setBackground(Color.GRAY);
+		
+		Box box = Box.createVerticalBox();
+		box.add(addOpacityPanel());
 		for(Atom atom: models.atoms) {
-			AtomicControlPanel atomController = new AtomicControlPanel(atom);
-			atomController.setPreferredSize(new Dimension(200, 40));
-			viewPanel.add(atomController);
-			//xSize = atomController.getWidth() > xSize ? atomController.getWidth() : xSize;
-			minYSize += 40; }
-		//setPreferredSize(new Dimension(xSize, minYSize));
-		setViewportView(viewPanel);
-		}
+			box.add(addAtomController(atom)); }
+		
+		viewPanel.setPreferredSize(new Dimension(xSize-20, models.atoms.size()*40 + 40));
+		viewPanel.add(box);
+		setViewportView(viewPanel); }
 	
 	public void updateBounds(int width, int height) {
 		width = width<xSize ? xSize : width;
-		height = height<minYSize ? minYSize : height;
-		setBounds(width-xSize, 0, xSize, height-20);
-		//for()
-	}
+		//height = height<minYSize ? minYSize : height;
+		setBounds(width-xSize, 0, xSize, height-20); }
 	
-	private void setOpacityAll(float opacity) {
-		for(Atom atom: models.atoms) {
-			atom.changeOpacity(opacity/100);
-		}
-	}
 }
