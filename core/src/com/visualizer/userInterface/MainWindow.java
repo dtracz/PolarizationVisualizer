@@ -59,6 +59,12 @@ public class MainWindow extends JFrame {
 		
 		JMenu menuView = new JMenu("View");
 		JMenuItem itemMode = new JMenuItem("Mode 2D/3D");
+		itemMode.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			
+			}
+		});
 		JMenuItem itemCamera = new JMenuItem("Set Camera");
 		JMenuItem itemControl = new JMenuItem("Show control panel");
 		itemControl.addActionListener(new ActionListener() {
@@ -118,7 +124,7 @@ public class MainWindow extends JFrame {
 		if(projects.containsKey(subframe)) {
 			controlPanel = projects.get(subframe); }
 		else {
-			controlPanel = new ControlPanel(subframe.getModels(), subframe.getController());
+			controlPanel = new ControlPanel(subframe);
 			add(controlPanel);
 			controlPanel.updateBounds(getWidth(), getHeight());
 			projects.put(subframe, controlPanel); }

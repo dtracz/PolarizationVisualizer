@@ -1,24 +1,18 @@
 package com.visualizer.userInterface;
 
-import com.visualizer.engine.AllModels;
 import com.visualizer.engine.Atom;
-import com.visualizer.engine.Controller;
+import com.visualizer.engine.MainEngine;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 
 public class ControlPanel extends JScrollPane {
-	private AllModels models;
-	private Controller controller;
+	private MainEngine engine;
 	
 	private JPanel viewPanel;
 	private int xSize;
@@ -54,16 +48,15 @@ public class ControlPanel extends JScrollPane {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				sliderLabel.setText(String.format(Locale.ROOT,"%.2f", (float)slider.getValue()/100));
-				for(Atom atom: models.atoms) {
+				for(Atom atom: engine.models) {
 					atom.changeOpacity((float)slider.getValue()/100); } } });
 		opacityPanel.add(slider);
 		opacityPanel.add(sliderLabel);
 		opacityPanel.setPreferredSize(new Dimension(220, 40));
 		return opacityPanel; }
 	
-	public ControlPanel(AllModels allModels, Controller controller) {
-		this.controller = controller;
-		this.models = allModels;
+	public ControlPanel(ModelSubframe subframe) {
+		engine = subframe.getEngine();
 		xSize = 240;
 		
 		viewPanel = new JPanel();
@@ -71,10 +64,10 @@ public class ControlPanel extends JScrollPane {
 		
 		Box box = Box.createVerticalBox();
 		box.add(addOpacityPanel());
-		for(Atom atom: models.atoms) {
+		for(Atom atom: engine.models) {
 			box.add(addAtomController(atom)); }
 		
-		viewPanel.setPreferredSize(new Dimension(xSize-20, models.atoms.size()*40 + 40));
+		viewPanel.setPreferredSize(new Dimension(xSize-20, engine.models.size()*40 + 40));
 		viewPanel.add(box);
 		setViewportView(viewPanel); }
 	

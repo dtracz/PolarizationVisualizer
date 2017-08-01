@@ -13,14 +13,14 @@ public class Controller implements InputProcessor {
     private CameraHandler cameraHandler;
     private boolean mode2d;
     private float m2dFactor;
-    private AllModels modelBatch;
+    private AtomBatch modelBatch;
     private Mouse mouse;
     private float angleSpeed;
     private float moveSpeed;
     private final float scrollParam;
 
 
-    public Controller(Mouse mouse, Camera camera, AllModels modelBatch) {
+    public Controller(Mouse mouse, Camera camera, AtomBatch modelBatch) {
         cameraHandler = new CameraHandler(camera);
         this.mouse = mouse;
         this.modelBatch = modelBatch;
@@ -40,6 +40,9 @@ public class Controller implements InputProcessor {
     public void updateCamera() {
         cameraHandler.update(); }
 
+    public void changeMode() {
+        setMode(!mode2d); }
+        
     public void setMode(boolean m2d) {
         if(mode2d^m2d) {
             mode2d = m2d; }

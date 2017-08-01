@@ -14,13 +14,13 @@ import java.util.*;
 /**
  * Created by dawid on 11.07.17.
  */
-public class AllModels extends ModelBatch {
+public class AtomBatch extends ModelBatch implements Iterable<Atom> {
     ModelBuilder builder;
     
     public Axes axes;
     public List<Atom> atoms;
 
-    public AllModels(ModelBuilder builder) {
+    public AtomBatch(ModelBuilder builder) {
         this.builder = builder;
         atoms = new LinkedList<Atom>();
         axes = new Axes(builder, 5);
@@ -35,6 +35,13 @@ public class AllModels extends ModelBatch {
     public void addAtom(Atom atom) {
         atoms.add(atom); }
 
+    @Override
+    public Iterator<Atom> iterator() {
+        return atoms.iterator(); }
+    
+    public int size() {
+        return atoms.size(); }
+    
     public void scaleAll(float factor) {
         for(Atom atom: atoms) {
             atom.scale(factor);

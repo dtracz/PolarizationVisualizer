@@ -16,14 +16,14 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class Main implements ApplicationListener {
+public class MainEngine implements ApplicationListener {
 	public String sourcePath;
 	
 	private Environment environment;
 	private Viewport viewport;
 	
 	public Controller controller;
-	public AllModels modelBatch;
+	public AtomBatch models;
 	
 	private void atomFactory() {
 		Scanner scanner;
@@ -41,7 +41,7 @@ public class Main implements ApplicationListener {
 				transforms.add(new Matrix4(position, rotation, ONES));
 			}
 			while(!transforms.isEmpty()) {
-				modelBatch.addAtom(names.poll(), sizes.poll(), transforms.poll(), Color.RED, 40);
+				models.addAtom(names.poll(), sizes.poll(), transforms.poll(), Color.RED, 40);
 			}
 		}
 		catch(Exception e) {
@@ -49,7 +49,7 @@ public class Main implements ApplicationListener {
 		
 	}
 	
-	public Main(String filePath) {
+	public MainEngine(String filePath) {
 		sourcePath = filePath; }
 	
 	@Override
@@ -60,8 +60,8 @@ public class Main implements ApplicationListener {
 		environment.add(new PointLight().set(0.8f, 0.8f, 0.8f, -10f, -10f, 10f, 200f));
 		
 		//modelBuilder = new ModelBuilder();
-		//modelBatch = new ModelBatch();
-		modelBatch = new AllModels(new ModelBuilder());
+		//models = new ModelBatch();
+		models = new AtomBatch(new ModelBuilder());
 		
 		Camera camera = new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		//Camera camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -69,14 +69,14 @@ public class Main implements ApplicationListener {
 		//camera.near = 0.1f;
 		//camera.far = 30f;
 		
-		controller = new Controller(new Mouse(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), camera, modelBatch);
+		controller = new Controller(new Mouse(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), camera, models);
 		viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), controller.getCamera());
 		Gdx.input.setInputProcessor(controller);
 		
 		/*-----------------------------------------------------------------------------------------------------------*/
 		
 		atomFactory();
-		//modelBatch.addAtom(4,5,6, new Matrix4(new Vector3(0,0,0), new Quaternion(), new Vector3(1,1,1)), Color.RED, 40);
+		//models.addAtom(4,5,6, new Matrix4(new Vector3(0,0,0), new Quaternion(), new Vector3(1,1,1)), Color.RED, 40);
 	}
 	
 	@Override
@@ -85,7 +85,7 @@ public class Main implements ApplicationListener {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 	//	viewport.apply();
 		controller.updateCamera();
-		modelBatch.renderAll(controller.getCamera(), environment);
+		models.renderAll(controller.getCamera(), environment);
 	}
 	
 	@Override
