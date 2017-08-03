@@ -49,31 +49,33 @@ public class ControlPanel extends JScrollPane {
 			public void stateChanged(ChangeEvent e) {
 				sliderLabel.setText(String.format(Locale.ROOT,"%.2f", (float)slider.getValue()/100));
 				for(Atom atom: engine.models) {
-					atom.changeOpacity((float)slider.getValue()/100); } } });
+					atom.changeOpacity((float)slider.getValue()/100); }
+				MainWindow.getInstance().validate(); } });
 		opacityPanel.add(slider);
 		opacityPanel.add(sliderLabel);
 		opacityPanel.setPreferredSize(new Dimension(220, 40));
 		return opacityPanel; }
 	
-	public ControlPanel(ModelSubframe subframe) {
-		engine = subframe.getEngine();
-		xSize = 240;
+	public ControlPanel(ModelSubframe subframe, int xSize) {
+		engine = subframe.engine;
+		this.xSize = xSize;
 		
 		viewPanel = new JPanel();
 		viewPanel.setBackground(Color.GRAY);
 		
 		Box box = Box.createVerticalBox();
 		box.add(addOpacityPanel());
+
 		for(Atom atom: engine.models) {
 			box.add(addAtomController(atom)); }
 		
-		viewPanel.setPreferredSize(new Dimension(xSize-20, engine.models.size()*40 + 40));
+		viewPanel.setPreferredSize(new Dimension(xSize, engine.models.size()*40 + 40));
 		viewPanel.add(box);
 		setViewportView(viewPanel); }
 	
-	public void updateBounds(int width, int height) {
+	/*public void updateBounds(int width, int height) {
 		width = width<xSize ? xSize : width;
 		//height = height<minYSize ? minYSize : height;
 		setBounds(width-xSize, 0, xSize, height-20); }
-	
+	//*/
 }

@@ -39,7 +39,6 @@ public class CameraHandler {
         return camera; }
 
     public void setCamera(Camera newCamera, float distanceChange) {
-        //System.out.println(camera.position.toString());
         if(newCamera instanceof OrthographicCamera) {
             ((OrthographicCamera) newCamera).setToOrtho(true); }
         for(Field field: Camera.class.getFields()) {
@@ -53,10 +52,7 @@ public class CameraHandler {
             catch(IllegalAccessException iae) {
                 iae.printStackTrace(); } }
         newCamera.position.add(camera.position.nor().scl(distanceChange));
-        camera = newCamera;
-        //System.out.println(camera.position.toString());
-        //System.gc();
-    }
+        camera = newCamera; }
 
     public void rotArZ(float dir) {
         camera.rotateAround(center, Vector3.Z, dir);
@@ -95,7 +91,7 @@ public class CameraHandler {
     public void move(float displacement) {
         camera.position.scl( Math.abs(displacement + camera.position.len()) / camera.position.len() + 1e-8f ); }
 
-    public void update() {
+    public void updateCamera() {
         camera.update(); }
 
 //	public void update(boolean updateFrustum) {

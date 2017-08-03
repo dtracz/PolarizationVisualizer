@@ -9,51 +9,25 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 /**
  * Created by dawid on 14.03.17.
  */
-public class Controller implements InputProcessor {
+public class Listener implements InputProcessor {
+    private MainEngine engine;
     private CameraHandler cameraHandler;
-    private boolean mode2d;
-    private float m2dFactor;
-    private AtomBatch modelBatch;
     private Mouse mouse;
+    
     private float angleSpeed;
     private float moveSpeed;
     private final float scrollParam;
 
-
-    public Controller(Mouse mouse, Camera camera, AtomBatch modelBatch) {
-        cameraHandler = new CameraHandler(camera);
-        this.mouse = mouse;
-        this.modelBatch = modelBatch;
-        mode2d = false;
-        m2dFactor = 30;
+    public Listener(CameraHandler handler, MainEngine engine) {
+        this.engine = engine;
+        cameraHandler = handler;
+        mouse = new Mouse(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         angleSpeed = 1f;
         moveSpeed = 1f;
         scrollParam = 0.95f; }
 
     public void resize(int width, int height) {
-        cameraHandler.update();
         mouse.setCenter(width, height); }
-
-    public Camera getCamera() {
-        return cameraHandler.getCamera(); }
-
-    public void updateCamera() {
-        cameraHandler.update(); }
-
-    public void changeMode() {
-        setMode(!mode2d); }
-        
-    public void setMode(boolean m2d) {
-        if(mode2d^m2d) {
-            mode2d = m2d; }
-        else return;
-        if(mode2d) {
-            cameraHandler.setCamera(new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), 500);
-            modelBatch.scaleAll(m2dFactor); }
-        else {
-            cameraHandler.setCamera(new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), -500);
-            modelBatch.scaleAll(1f/m2dFactor); }
-    }
 
 	/*---InputProcessor-------------------------------------------------------------------------------*/
 
@@ -69,20 +43,12 @@ public class Controller implements InputProcessor {
         if(keycode == Input.Keys.DOWN) {
             cameraHandler.rotUpDown(-1); }
         if(keycode == Input.Keys.NUM_5) {
-            for(Atom at: modelBatch.atoms) {
-                at.changeOpacity(0.5f);
-            }
-        }
+            for(Atom at: engine.models.atoms) {
+                at.changeOpacity(0.5f); } }
         if(keycode == Input.Keys.NUM_6) {
-            modelBatch.scaleAll(2);
-        }
+            engine.models.scaleAll(2); }
         if(keycode == Input.Keys.NUM_7) {
-            setMode(!mode2d);
-        }
-//		if(keycode == Input.Keys.NUM_2) {
-//			cameraHandler.setCamera(new OrthographicCamera(Gdx.graphics.getWidth()/50, Gdx.graphics.getHeight()/50)); }
-//		if(keycode == Input.Keys.NUM_2) {
-//			cameraHandler.setCamera(new PerspectiveCamera(95, Gdx.graphics.getWidth(), Gdx.graphics.getHeight())); }
+            engine.changeMode(); }
         return true; }
 
     @Override
@@ -119,10 +85,9 @@ public class Controller implements InputProcessor {
     @Override
     public boolean scrolled(int amount) {
         float param = amount==1f ? moveSpeed*scrollParam : 1/(moveSpeed*scrollParam);
-        if(mode2d) {
-            modelBatch.scaleAll(param); }
-        else { }
-            m2dFactor *= param;
-            cameraHandler.move(amount*moveSpeed);
+        if(engine.mode2d) {
+            engine.models.scaleAll(param); }
+        engine.m2dFactor *= param;
+        cameraHandler.move(amount*moveSpeed);
         return true; }
 }

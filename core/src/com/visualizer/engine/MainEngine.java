@@ -17,18 +17,24 @@ import java.util.Queue;
 import java.util.Scanner;
 
 public class MainEngine implements ApplicationListener {
-	public String sourcePath;
-	
 	private Environment environment;
 	private Viewport viewport;
+	private CameraHandler cameraHandler;
 	
-	public Controller controller;
+	boolean mode2d;
+	float m2dFactor;
+	
+	public File sourceFile;
+	
+	public Listener listener;
 	public AtomBatch models;
+	
+	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	private void atomFactory() {
 		Scanner scanner;
 		try {
-			scanner = new Scanner(new File(sourcePath));
+			scanner = new Scanner(sourceFile);
 			Queue<String> names = new LinkedList<String>();
 			Queue<Vector3> sizes = new LinkedList<Vector3>();
 			Queue<Matrix4> transforms = new LinkedList<Matrix4>();
@@ -38,19 +44,35 @@ public class MainEngine implements ApplicationListener {
 				sizes.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
 				Vector3 position = new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
 				Quaternion rotation = new Quaternion(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
-				transforms.add(new Matrix4(position, rotation, ONES));
-			}
+				transforms.add(new Matrix4(position, rotation, ONES)); }
 			while(!transforms.isEmpty()) {
-				models.addAtom(names.poll(), sizes.poll(), transforms.poll(), Color.RED, 40);
-			}
-		}
+				models.addAtom(names.poll(), sizes.poll(), transforms.poll(), Color.RED, 40); } }
 		catch(Exception e) {
-			e.printStackTrace(); }
-		
+			e.printStackTrace(); } }
+	
+	public MainEngine(File file) {
+		sourceFile = file;
+		mode2d = false;
+		m2dFactor = 30; }
+	
+	/* - PUBLIC SETTINGS - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	
+	public void changeMode() {
+		setMode(!mode2d); }
+	
+	public void setMode(boolean m2d) {
+		if(mode2d^m2d) {
+			mode2d = m2d; }
+		else return;
+		if(mode2d) {
+			cameraHandler.setCamera(new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), 500);
+			models.scaleAll(m2dFactor); }
+		else {
+			cameraHandler.setCamera(new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), -500);
+			models.scaleAll(1f/m2dFactor); }
 	}
 	
-	public MainEngine(String filePath) {
-		sourcePath = filePath; }
+	/* - APPLICATION LISTENER- - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	@Override
 	public void create() {
@@ -69,11 +91,10 @@ public class MainEngine implements ApplicationListener {
 		//camera.near = 0.1f;
 		//camera.far = 30f;
 		
-		controller = new Controller(new Mouse(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), camera, models);
-		viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), controller.getCamera());
-		Gdx.input.setInputProcessor(controller);
-		
-		/*-----------------------------------------------------------------------------------------------------------*/
+		cameraHandler = new CameraHandler(camera);
+		listener = new Listener(cameraHandler, this);
+		viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
+		Gdx.input.setInputProcessor(listener);
 		
 		atomFactory();
 		//models.addAtom(4,5,6, new Matrix4(new Vector3(0,0,0), new Quaternion(), new Vector3(1,1,1)), Color.RED, 40);
@@ -84,8 +105,8 @@ public class MainEngine implements ApplicationListener {
 		Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 	//	viewport.apply();
-		controller.updateCamera();
-		models.renderAll(controller.getCamera(), environment);
+		cameraHandler.updateCamera();
+		models.renderAll(cameraHandler.getCamera(), environment);
 	}
 	
 	@Override
@@ -106,7 +127,6 @@ public class MainEngine implements ApplicationListener {
 	@Override
 	public void resize(int width, int height) {
 		viewport.update(width, height);
-		controller.resize(width, height);
-		//System.out.println(width + " " + height);
-	}
+		listener.resize(width, height);
+		cameraHandler.updateCamera(); }
 }
