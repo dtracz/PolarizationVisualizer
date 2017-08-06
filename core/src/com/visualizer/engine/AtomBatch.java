@@ -56,6 +56,6 @@ public class AtomBatch extends ModelBatch implements Iterable<Atom> {
         for(Atom atom: atoms) {
             if(atom.renderable) {
                 this.render(atom.getInstance(), environment); } }
-        this.end();
+        //this.end();
     }
 }

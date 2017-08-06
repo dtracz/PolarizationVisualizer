@@ -3,6 +3,7 @@ package com.visualizer.engine;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
@@ -10,13 +11,17 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.*;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.Scanner;
 
 public class MainEngine implements ApplicationListener {
+	public final static Vector3 ONES = new Vector3(1,1,1);
+	
 	private Environment environment;
 	private Viewport viewport;
 	private CameraHandler cameraHandler;
@@ -29,16 +34,20 @@ public class MainEngine implements ApplicationListener {
 	public Listener listener;
 	public AtomBatch models;
 	
+	ModelInstance cylinderInstance;
+	ModelInstance capsuleInstance;
+	Bound bound;
+	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	private void atomFactory() {
 		Scanner scanner;
 		try {
 			scanner = new Scanner(sourceFile);
+			scanner.useLocale(Locale.ROOT);
 			Queue<String> names = new LinkedList<String>();
 			Queue<Vector3> sizes = new LinkedList<Vector3>();
 			Queue<Matrix4> transforms = new LinkedList<Matrix4>();
-			final Vector3 ONES = new Vector3(1,1,1);
 			while (scanner.hasNext()) {
 				names.add(scanner.next());
 				sizes.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
@@ -83,7 +92,8 @@ public class MainEngine implements ApplicationListener {
 		
 		//modelBuilder = new ModelBuilder();
 		//models = new ModelBatch();
-		models = new AtomBatch(new ModelBuilder());
+		ModelBuilder builder = new ModelBuilder();
+		models = new AtomBatch(builder);
 		
 		Camera camera = new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		//Camera camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -98,6 +108,24 @@ public class MainEngine implements ApplicationListener {
 		
 		atomFactory();
 		//models.addAtom(4,5,6, new Matrix4(new Vector3(0,0,0), new Quaternion(), new Vector3(1,1,1)), Color.RED, 40);
+		/*
+		Model capsule = builder.createCapsule(0.2f, 6, 20,
+				new Material(ColorAttribute.createDiffuse(Color.BLUE),  new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1)),
+				VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+		capsuleInstance = new ModelInstance(capsule, new Matrix4(new Vector3(3,0,0),
+				                                                        new Quaternion(new Vector3(1,0,0), 90f),
+				                                                        new Vector3(1,1,1)));
+		*/
+		Model cylinder = builder.createCylinder(0.5f,5,0.5f,8,
+				new Material(ColorAttribute.createDiffuse(Color.BLUE),  new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1)),
+				VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+		cylinderInstance = new ModelInstance(cylinder, new Matrix4(Vector3.Zero, new Quaternion(Vector3.Z, 45f), new Vector3(1,1,1)));
+	
+		Atom at1 = models.atoms.get(1);
+		Atom at2 = models.atoms.get(2);
+		bound = new Bound(at1, at2,0.3f, builder, 16);
+		
+		
 	}
 	
 	@Override
@@ -107,6 +135,9 @@ public class MainEngine implements ApplicationListener {
 	//	viewport.apply();
 		cameraHandler.updateCamera();
 		models.renderAll(cameraHandler.getCamera(), environment);
+	//	models.render(cylinderInstance, environment);
+		for(ModelInstance inst: bound.getInstances()) { models.render(inst, environment); }
+		models.end();
 	}
 	
 	@Override

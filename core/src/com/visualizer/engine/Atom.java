@@ -17,23 +17,28 @@ import com.badlogic.gdx.math.Vector3;
  */
 public class Atom {
     BlendingAttribute blendingAttribute;
+    //Float opacity;
     Model model;
     ModelInstance instance;
     
+    final public String symbol;
     public String name = "";
     public boolean renderable;
 
     public Atom(ModelBuilder builder, String name, float w, float h, float d, Matrix4 transform, Color color, int divisions) {
+        symbol = "";
         this.name = name;
         this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
         this.model = builder.createSphere(w, h, d, divisions, divisions,
                 new Material(ColorAttribute.createDiffuse(color), blendingAttribute),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal );
         this.instance = new ModelInstance(model, transform);
+        //System.out.println(instance.transform.getTranslation(Vector3.Zero));
         renderable = true; }
 
     public void changeOpacity(float opacity) {
-        instance.materials.get(0).set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, opacity)); }
+        blendingAttribute.opacity = opacity;
+        instance.materials.get(0).set(blendingAttribute); }
 
     public void changeColor(Color color) {
         instance.materials.get(0).set(ColorAttribute.createDiffuse(color)); }

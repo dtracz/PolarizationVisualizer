@@ -87,7 +87,7 @@ public class MainWindow extends JFrame {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		desktop = new JDesktopPane();
-		desktop.setBackground(Color.CYAN);
+		//desktop.setBackground(Color.CYAN);
 		desktop.setMaximumSize(new Dimension(400, 300));
 		add(desktop, BorderLayout.CENTER);
 		
