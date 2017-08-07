@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.*;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -32,7 +31,10 @@ public class MainEngine implements ApplicationListener {
 	public File sourceFile;
 	
 	public Listener listener;
-	public AtomBatch models;
+	private ModelBatch modelBatch;
+	
+	public ModelSet models;
+	//public Axes axes;
 	
 	ModelInstance cylinderInstance;
 	ModelInstance capsuleInstance;
@@ -78,7 +80,7 @@ public class MainEngine implements ApplicationListener {
 			models.scaleAll(m2dFactor); }
 		else {
 			cameraHandler.setCamera(new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), -500);
-			models.scaleAll(1f/m2dFactor); }
+			models.scaleAll(1f/m2dFactor);  }
 	}
 	
 	/* - APPLICATION LISTENER- - - - - - - - - - - - - - - - - - - - - - - - */
@@ -93,7 +95,10 @@ public class MainEngine implements ApplicationListener {
 		//modelBuilder = new ModelBuilder();
 		//models = new ModelBatch();
 		ModelBuilder builder = new ModelBuilder();
-		models = new AtomBatch(builder);
+		modelBatch = new ModelBatch();
+		
+		models = new ModelSet(builder);
+		//axes = new Axes(builder, 5);
 		
 		Camera camera = new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		//Camera camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -107,6 +112,10 @@ public class MainEngine implements ApplicationListener {
 		Gdx.input.setInputProcessor(listener);
 		
 		atomFactory();
+		
+		
+		
+		/*------------------------------------------------------------------------------------------------------------*/
 		//models.addAtom(4,5,6, new Matrix4(new Vector3(0,0,0), new Quaternion(), new Vector3(1,1,1)), Color.RED, 40);
 		/*
 		Model capsule = builder.createCapsule(0.2f, 6, 20,
@@ -115,7 +124,7 @@ public class MainEngine implements ApplicationListener {
 		capsuleInstance = new ModelInstance(capsule, new Matrix4(new Vector3(3,0,0),
 				                                                        new Quaternion(new Vector3(1,0,0), 90f),
 				                                                        new Vector3(1,1,1)));
-		*/
+		
 		Model cylinder = builder.createCylinder(0.5f,5,0.5f,8,
 				new Material(ColorAttribute.createDiffuse(Color.BLUE),  new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1)),
 				VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
@@ -124,8 +133,11 @@ public class MainEngine implements ApplicationListener {
 		Atom at1 = models.atoms.get(1);
 		Atom at2 = models.atoms.get(2);
 		bound = new Bound(at1, at2,0.3f, builder, 16);
-		
-		
+		*/
+		models.addBound(1,2);
+		models.addBound(2,3);
+		models.addBound(3,0);
+		models.addBound(0,1);
 	}
 	
 	@Override
@@ -135,9 +147,14 @@ public class MainEngine implements ApplicationListener {
 	//	viewport.apply();
 		cameraHandler.updateCamera();
 		models.renderAll(cameraHandler.getCamera(), environment);
-	//	models.render(cylinderInstance, environment);
-		for(ModelInstance inst: bound.getInstances()) { models.render(inst, environment); }
-		models.end();
+	/*	modelBatch.begin(cameraHandler.getCamera()); {
+			models.renderAll(modelBatch, environment);
+			for(ModelInstance axis: axes.instances) {
+				modelBatch.render(axis, environment); }
+			//	models.render(cylinderInstance, environment);
+			for(ModelInstance inst: bound.getInstances()) { modelBatch.render(inst, environment); } }
+		modelBatch.end();
+	//*/
 	}
 	
 	@Override

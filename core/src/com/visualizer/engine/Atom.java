@@ -40,13 +40,13 @@ public class Atom {
         blendingAttribute.opacity = opacity;
         instance.materials.get(0).set(blendingAttribute); }
 
-    public void changeColor(Color color) {
-        instance.materials.get(0).set(ColorAttribute.createDiffuse(color)); }
+    //public void changeColor(Color color) {
+    //    instance.materials.get(0).set(ColorAttribute.createDiffuse(color)); }
 
     public void scale(float factor) {
         instance.transform.scl(factor); }
 
-    public void translate(float factor) {
+    public void spread(float factor) {
         Vector3 position = instance.transform.getTranslation(Vector3.Zero);
         instance.transform.setTranslation(position.scl(factor)); }
 

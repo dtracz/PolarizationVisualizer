@@ -48,7 +48,7 @@ public class ControlPanel extends JScrollPane {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				sliderLabel.setText(String.format(Locale.ROOT,"%.2f", (float)slider.getValue()/100));
-				for(Atom atom: engine.models) {
+				for(Atom atom: engine.models.atoms) {
 					atom.changeOpacity((float)slider.getValue()/100); }
 				MainWindow.getInstance().validate(); } });
 		opacityPanel.add(slider);
@@ -66,10 +66,10 @@ public class ControlPanel extends JScrollPane {
 		Box box = Box.createVerticalBox();
 		box.add(addOpacityPanel());
 
-		for(Atom atom: engine.models) {
+		for(Atom atom: engine.models.atoms) {
 			box.add(addAtomController(atom)); }
 		
-		viewPanel.setPreferredSize(new Dimension(xSize, engine.models.size()*40 + 40));
+		viewPanel.setPreferredSize(new Dimension(xSize, engine.models.getNumberOfAtoms()*40 + 40));
 		viewPanel.add(box);
 		setViewportView(viewPanel); }
 	

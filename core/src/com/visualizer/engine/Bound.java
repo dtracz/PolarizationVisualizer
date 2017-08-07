@@ -26,6 +26,8 @@ public class Bound {
 	//private ModelInstance boundPart1;
 	//private ModelInstance boundPart2;
 	
+	boolean renderable = true;
+	
 	private Matrix4 getTransform(Vector3 targetAxis, Vector3 position) {
 		Quaternion rotation = new Quaternion();
 		rotation = rotation.setFromCross(Vector3.Y, targetAxis.nor());
@@ -44,12 +46,9 @@ public class Bound {
 		
 		Vector3 quartLength = position2.cpy();
 		quartLength.sub(position1);
-		//System.out.println("qL " + quartLength);
 		quartLength.scl(0.25f);
-		//System.out.println("qL " + quartLength);
 		position1 = position1.add(quartLength);
 		position2 = position2.sub(quartLength);
-		//System.out.println("qL " + quartLength.len2());
 		halfBound = builder.createCylinder(diameter, 2*quartLength.len(), diameter, divisions,
 										   new Material(blendingAttribute), VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 		ModelInstance boundPart1 = new ModelInstance(halfBound, getTransform(quartLength, position1));

@@ -8,7 +8,6 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.beans.PropertyVetoException;
 import java.io.File;
 
 public class ModelSubframe extends JInternalFrame {

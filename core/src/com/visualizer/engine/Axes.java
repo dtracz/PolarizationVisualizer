@@ -38,6 +38,10 @@ public class Axes {
             instances[i] = new ModelInstance(models[i]); }
     }
 
+    public void scaleAll(float factor) {
+        translate(factor);
+    }
+    
     public void translate(float factor) {
         for(int i=0; i<3; i++) {
             //Vector3 position = instances[i].transform.getTranslation(Vector3.Zero);
