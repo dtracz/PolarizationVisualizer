@@ -9,8 +9,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
-import java.util.Arrays;
-
 public class Bound implements SpatialObject {
 	private BlendingAttribute blendingAttribute;
 	private final ModelInstance[] instances;
@@ -71,17 +69,23 @@ public class Bound implements SpatialObject {
 	
 	@Override
 	public void scale(float factor) {
-		instances[0].transform.scl(factor);
-		instances[1].transform.scl(factor);
-		instances[2].transform.scl(factor, 1, factor);
-		instances[2].transform.scl(factor, 1, factor); }
+		for(ModelInstance instance: instances) {
+			instance.transform.scl(factor); }
+	//	instances[0].transform.scl(factor);
+	//	instances[1].transform.scl(factor);
+	//	instances[2].transform.scl(factor, 1, factor);
+	//	instances[2].transform.scl(factor, 1, factor);
+	}
 	
 	@Override
 	public void spread(float factor) {
 		Vector3 position;
 		for(ModelInstance instance: instances) {
 			position = instance.transform.getTranslation(Vector3.Zero);
-			instance.transform.setTranslation(position.scl(factor)); } }
+			instance.transform.setTranslation(position.scl(factor)); }
+	//	instances[2].transform.scl(1, factor, 1);
+	//	instances[2].transform.scl(1, factor, 1);
+	}
 	
 	@Override
 	public void translate(Vector3 translation) {

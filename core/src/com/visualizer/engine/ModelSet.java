@@ -51,7 +51,10 @@ public class ModelSet extends ModelBatch {
 		return atoms.size(); }
 	
 	public void scaleAll(float factor) {
-		for(Atom atom: atoms) {
+		for(SpatialObject atom: atoms) {
+			atom.scale(factor);
+			atom.spread(factor); }
+		for(SpatialObject atom: bounds) {
 			atom.scale(factor);
 			atom.spread(factor); }
 		axes.translate(factor); }
