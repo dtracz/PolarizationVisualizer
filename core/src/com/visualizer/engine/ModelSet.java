@@ -8,10 +8,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.visualizer.userInterface.MainWindow;
 
-import javax.swing.*;
-import javax.xml.bind.ValidationEvent;
 import java.util.*;
 
 /**
@@ -23,7 +20,6 @@ public class ModelSet extends ModelBatch {
 	private int sphereDivisionsU = 32;
 	private int sphereDivisionsV = 32;
 	
-	private ModelBuilder builder;
 	private Model sphere;
 	private Model cylinder;
 	
@@ -32,7 +28,6 @@ public class ModelSet extends ModelBatch {
 	public List<Atom> atoms;
 	
 	public ModelSet(ModelBuilder builder) {
-		this.builder = builder;
 		atoms = new LinkedList<Atom>();
 		bounds = new LinkedList<Bound>();
 		axes = new Axes(builder, 5);
@@ -43,26 +38,12 @@ public class ModelSet extends ModelBatch {
 	}
 	
 	/* - ADDITIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-	
-//	public void addAtom(String name, float w, float h, float d, Matrix4 transform, Color color, int divisions) {
-//		atoms.add(new Atom(builder, name, w, h, d, transform, color, divisions)); }
-	
-//	public void addAtom(String name, Vector3 sizes, Matrix4 transform, Color color, int divisions) {
-//		atoms.add(new Atom(builder, name, sizes.x, sizes.y, sizes.z, transform, color, divisions)); }
 
-	public void addAtom(String name, Matrix4 transform) {
-		atoms.add(new Atom(name, sphere, new Material(ColorAttribute.createDiffuse(Color.RED)), transform)); }
+	public void addAtom(String name, Matrix4 transform, Color color) {
+		atoms.add(new Atom(name, sphere, new Material(ColorAttribute.createDiffuse(color)), transform)); }
 		
 	public void addBound(int atomIndex1, int atomIndex2) {
-		//try {
-			bounds.add(new Bound(sphere, cylinder, atoms.get(atomIndex1), atoms.get(atomIndex2), boundDiameter)); }
-		//catch(IndexOutOfBoundsException ioobe) {
-		//	ioobe.printStackTrace();
-		//	JOptionPane.showMessageDialog(MainWindow.getInstance(),
-		//								  "Atom index out of range during bounds creation",
-		//								  "Error", JOptionPane.ERROR_MESSAGE);
-	//	}
-	//}
+		bounds.add(new Bound(sphere, cylinder, atoms.get(atomIndex1), atoms.get(atomIndex2), boundDiameter)); }
 	
 	/* - CONFIGURATIONS- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
@@ -73,8 +54,7 @@ public class ModelSet extends ModelBatch {
 		for(Atom atom: atoms) {
 			atom.scale(factor);
 			atom.spread(factor); }
-		axes.translate(factor);
-	}
+		axes.translate(factor); }
 	
 	public void spreadAll(float factor) {
 	
@@ -96,6 +76,5 @@ public class ModelSet extends ModelBatch {
 			if(bound.renderable) {
 				for(ModelInstance instance: bound.getInstances()) {
 					this.render(instance, environment); } } }
-		this.end();
-	}
+		this.end(); }
 }

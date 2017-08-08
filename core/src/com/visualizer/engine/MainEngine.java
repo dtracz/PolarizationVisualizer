@@ -3,7 +3,6 @@ package com.visualizer.engine;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
@@ -11,12 +10,14 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.*;
+import com.visualizer.userInterface.MainWindow;
 
+import javax.swing.*;
+import java.beans.XMLDecoder;
 import java.io.File;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Queue;
-import java.util.Scanner;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.*;
 
 public class MainEngine implements ApplicationListener {
 	public final static Vector3 ONES = new Vector3(1,1,1);
@@ -24,6 +25,8 @@ public class MainEngine implements ApplicationListener {
 	private Environment environment;
 	private Viewport viewport;
 	private CameraHandler cameraHandler;
+	
+	private Map<String, Integer> atomColors;
 	
 	boolean mode2d;
 	float m2dFactor;
@@ -56,14 +59,32 @@ public class MainEngine implements ApplicationListener {
 				Quaternion rotation = new Quaternion(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
 				transforms.add(new Matrix4(position, rotation, size)); }
 			while(!transforms.isEmpty()) {
-				models.addAtom(names.poll(), transforms.poll()); } }
+				String name = names.poll();
+				Color color = null;
+				if(name.matches("[A-Z][a-z].*")) {
+					color = new Color(atomColors.get(name.substring(0,2))); }
+				else if(name.matches("[A-Z].*")) {
+					color = new Color(atomColors.get(name.substring(0,1))); }
+				else {
+					JOptionPane.showMessageDialog(MainWindow.getInstance(), "Cannot recognize atom type from given name: "+name,
+												 "Error", JOptionPane.ERROR_MESSAGE); }
+				if(color == null) {
+					color = Color.WHITE; }
+				models.addAtom(name, transforms.poll(), color); } }
 		catch(Exception e) {
 			e.printStackTrace(); } }
 	
 	public MainEngine(File file) {
 		sourceFile = file;
 		mode2d = false;
-		m2dFactor = 30; }
+		m2dFactor = 30;
+		try {
+			XMLDecoder xmlDecoder = new XMLDecoder(new FileInputStream("atomColors.xml"));
+			atomColors = (TreeMap<String, Integer>)xmlDecoder.readObject();
+			xmlDecoder.close(); }
+		catch(FileNotFoundException fnfe) {
+			fnfe.printStackTrace(); }
+	}
 	
 	/* - PUBLIC SETTINGS - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	

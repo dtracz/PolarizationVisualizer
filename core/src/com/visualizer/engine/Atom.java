@@ -21,11 +21,11 @@ public class Atom implements SpatialObject {
     BlendingAttribute blendingAttribute;
     ModelInstance[] instances;
     
-    final public String symbol;
+    //final public String symbol;
     public String name = "";
 
     Atom(String name, Model model, Material material, Matrix4 transform) {
-        this.symbol = "";
+        //this.symbol = "";
         this.name = name;
         this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
         ModelInstance sphereInstance = new ModelInstance(model, transform);
@@ -74,11 +74,9 @@ public class Atom implements SpatialObject {
         
     //@Override
     public Material getMaterial() {
-        return instances[0].materials.get(0).copy(); }
+        return instances[0].materials.get(0); }
     
 }
-
-
 
 //public void changeColor(Color color) {
 //    instance.materials.get(0).set(ColorAttribute.createDiffuse(color)); }

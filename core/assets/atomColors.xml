@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.8.0_131" class="java.beans.XMLDecoder">
+ <object class="java.util.TreeMap">
+  <void method="put">
+   <string>C</string>
+   <int>640034559</int>
+  </void>
+  <void method="put">
+   <string>H</string>
+   <int>-437918209</int>
+  </void>
+  <void method="put">
+   <string>N</string>
+   <int>65535</int>
+  </void>
+  <void method="put">
+   <string>O</string>
+   <int>-16776961</int>
+  </void>
+ </object>
+</java>
