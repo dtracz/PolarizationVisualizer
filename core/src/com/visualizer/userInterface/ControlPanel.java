@@ -26,7 +26,7 @@ public class ControlPanel extends JScrollPane {
 		checkBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				atom.renderable = (e.getStateChange() == ItemEvent.SELECTED); } });
+				atom.setRenderable(e.getStateChange() == ItemEvent.SELECTED); } });
 		checkBox.setSelected(true);
 		atomicControlPanel.add(checkBox);
 		JButton params = new JButton("param.");

@@ -48,16 +48,15 @@ public class MainEngine implements ApplicationListener {
 			scanner = new Scanner(sourceFile);
 			scanner.useLocale(Locale.ROOT);
 			Queue<String> names = new LinkedList<String>();
-			Queue<Vector3> sizes = new LinkedList<Vector3>();
 			Queue<Matrix4> transforms = new LinkedList<Matrix4>();
 			while (scanner.hasNext()) {
 				names.add(scanner.next());
-				sizes.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
+				Vector3 size = new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
 				Vector3 position = new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
 				Quaternion rotation = new Quaternion(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
-				transforms.add(new Matrix4(position, rotation, ONES)); }
+				transforms.add(new Matrix4(position, rotation, size)); }
 			while(!transforms.isEmpty()) {
-				models.addAtom(names.poll(), sizes.poll(), transforms.poll(), Color.RED, 40); } }
+				models.addAtom(names.poll(), transforms.poll()); } }
 		catch(Exception e) {
 			e.printStackTrace(); } }
 	
@@ -138,6 +137,8 @@ public class MainEngine implements ApplicationListener {
 		models.addBound(2,3);
 		models.addBound(3,0);
 		models.addBound(0,1);
+		
+		System.out.println(new Quaternion(Vector3.Y, 45+90));
 	}
 	
 	@Override
