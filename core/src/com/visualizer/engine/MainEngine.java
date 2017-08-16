@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.BufferUtils;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -84,7 +86,7 @@ public class MainEngine implements ApplicationListener {
 			fnfe.printStackTrace(); }
 	}
 	
-	/* - PUBLIC SETTINGS - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	/* - PUBLIC OPERATIONS - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	public void changeMode() {
 		setMode(!mode2d); }
@@ -101,6 +103,13 @@ public class MainEngine implements ApplicationListener {
 			environment.add(pointLight);
 			cameraHandler.setCamera(new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), -500); }
 	}
+	
+	public void exportImage(String filename) {
+		byte[] pixels = ScreenUtils.getFrameBufferPixels(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+		Pixmap pixmap = new Pixmap(Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), Pixmap.Format.RGBA8888);
+		BufferUtils.copy(pixels, 0, pixmap.getPixels(), pixels.length);
+		PixmapIO.writePNG(Gdx.files.external(filename), pixmap);
+		pixmap.dispose(); }
 	
 	/* - APPLICATION LISTENER- - - - - - - - - - - - - - - - - - - - - - - - */
 	

@@ -1,6 +1,9 @@
 package com.visualizer.userInterface;
 
+import com.badlogic.gdx.Gdx;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,13 +38,24 @@ public class MainWindow extends JFrame {
 					addModel(selectFile()); }
 				catch(FileNotFoundException fnfe) {
 					fnfe.printStackTrace(); } } });
-		final JMenuItem itemExportAs = new JMenuItem("Export as...");
+		final JMenuItem itemExport = new JMenuItem("Export as png");
+		itemExport.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				try {
+					final String filename = selectDirectory();
+					Gdx.app.postRunnable(new Runnable() {
+						@Override
+						public void run() {
+								topSubframe.engine.exportImage(filename); } }); }
+				catch(FileNotFoundException fnfe) {
+					fnfe.printStackTrace(); } } } );
 		final JMenuItem itemExit = new JMenuItem("Exit");
 		itemExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				System.exit(0); } });
 		menuFile.add(itemImport);
-		menuFile.add(itemExportAs);
+		menuFile.add(itemExport);
 		menuFile.addSeparator();
 		menuFile.add(itemExit);
 		bar.add(menuFile);
@@ -124,14 +138,29 @@ public class MainWindow extends JFrame {
 	
 	private File selectFile() throws FileNotFoundException {
 		final JFileChooser jFC = new JFileChooser();
-		jFC.setCurrentDirectory(new File("."));                                             // set default Directory!!!
-		int parent = jFC.showOpenDialog(new JFrame());
-		File file;
-		if(parent == JFileChooser.APPROVE_OPTION) {
-			file = jFC.getSelectedFile(); }
+		jFC.setCurrentDirectory(new File("."));											// set default Directory!!!
+		int result = jFC.showOpenDialog(null);
+		if(result == JFileChooser.APPROVE_OPTION) {
+			return jFC.getSelectedFile(); }
 		else {
-			throw new FileNotFoundException("No file selected"); }
-		return file; }
+			throw new FileNotFoundException("No file selected"); } }
+		
+	private String selectDirectory() throws FileNotFoundException {
+		final JFileChooser jFC = new JFileChooser(new File("."));						// set default Directory!!!
+		jFC.setDialogTitle("Save as..");
+		jFC.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				return file.getName().matches(".+\\.[(png)(PNG)]"); }      				// not working in fact...
+			@Override
+			public String getDescription() {
+				return "Image file (*.png)"; } });
+		int result = jFC.showSaveDialog(null);
+		if(result == JFileChooser.APPROVE_OPTION) {
+			int homelength = System.getProperty("user.home").length();
+			return jFC.getSelectedFile().getAbsolutePath().substring(homelength); }
+		else {
+			throw new FileNotFoundException("No file selected"); } }
 	
 	private ModelSubframe addModel(File sourceFile) {
 		ModelSubframe subframe = new ModelSubframe("subframe", 800, 600, sourceFile);
@@ -182,5 +211,4 @@ public class MainWindow extends JFrame {
 		if(currControlPanel != null) {
 			add(controlPanel, BorderLayout.EAST);
 			currControlPanel.setVisible(true); } }
-	
 }

@@ -73,9 +73,4 @@ public class ControlPanel extends JScrollPane {
 		viewPanel.add(box);
 		setViewportView(viewPanel); }
 	
-	/*public void updateBounds(int width, int height) {
-		width = width<xSize ? xSize : width;
-		//height = height<minYSize ? minYSize : height;
-		setBounds(width-xSize, 0, xSize, height-20); }
-	//*/
 }
