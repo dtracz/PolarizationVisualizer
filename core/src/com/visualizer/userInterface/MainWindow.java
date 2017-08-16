@@ -79,6 +79,9 @@ public class MainWindow extends JFrame {
 		menuView.add(itemControl);
 		bar.add(menuView);
 		
+		JMenu menuSettings = new JMenu("Settings");
+		bar.add(menuSettings);
+		
 		setJMenuBar(bar); }
 	
 	protected MainWindow(int width, int height) {

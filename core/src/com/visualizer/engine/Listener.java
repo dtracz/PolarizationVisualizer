@@ -14,16 +14,16 @@ public class Listener implements InputProcessor {
 	
 	private float angleSpeed;
 	private float moveSpeed;
-	private final float scrollParam;
-
+	//private final float scrollParam;
+	
 	public Listener(CameraHandler handler, MainEngine engine) {
 		this.engine = engine;
 		cameraHandler = handler;
 		mouse = new Mouse(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		//scrollParam = 0.95f;
 		angleSpeed = 1f;
-		moveSpeed = 1f;
-		scrollParam = 0.95f; }
-
+		moveSpeed = 1f; }
+	
 	public void resize(int width, int height) {
 		mouse.setCenter(width, height); }
 
@@ -43,10 +43,16 @@ public class Listener implements InputProcessor {
 		if(keycode == Input.Keys.NUM_5) {
 			for(Atom at: engine.models.atoms) {
 				at.changeOpacity(0.5f); } }
-		if(keycode == Input.Keys.NUM_6) {
-			engine.models.scaleAll(2); }
 		if(keycode == Input.Keys.NUM_7) {
 			engine.changeMode(); }
+		if(keycode == Input.Keys.NUM_1) {
+			engine.models.scaleAtoms(1f/1.2f); }
+		if(keycode == Input.Keys.NUM_2) {
+			engine.models.scaleAtoms(1.2f); }
+		if(keycode == Input.Keys.NUM_3) {
+			engine.models.scaleBounds(1f/1.2f); }
+		if(keycode == Input.Keys.NUM_4) {
+			engine.models.scaleBounds(1.2f); }
 		return true; }
 
 	@Override

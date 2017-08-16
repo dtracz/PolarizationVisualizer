@@ -6,10 +6,11 @@ import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by dawid on 11.07.17.
@@ -39,8 +40,8 @@ public class ModelSet extends ModelBatch {
 	
 	/* - ADDITIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	public void addAtom(String name, Matrix4 transform, Color color) {
-		atoms.add(new Atom(name, sphere, new Material(ColorAttribute.createDiffuse(color)), transform)); }
+	public void addAtom(String name, Color color, Vector3 position, Quaternion orientation, Vector3 scale) {
+		atoms.add(new Atom(name, sphere, new Material(ColorAttribute.createDiffuse(color)), position, orientation, scale)); }
 		
 	public void addBound(int atomIndex1, int atomIndex2) {
 		bounds.add(new Bound(sphere, cylinder, atoms.get(atomIndex1), atoms.get(atomIndex2), boundDiameter)); }
@@ -50,15 +51,13 @@ public class ModelSet extends ModelBatch {
 	public int getNumberOfAtoms() {
 		return atoms.size(); }
 	
-	public void scaleAll(float factor) {
+	public void scaleAtoms(float factor) {
 		for(SpatialObject atom: atoms) {
-			atom.scale(factor);
-			atom.spread(factor); }
-		//if(factor<30) {
+			atom.scale(factor); } }
+			
+	public void scaleBounds(float factor) {
 		for(SpatialObject atom: bounds) {
-			atom.scale(factor);
-			atom.spread(factor); }
-		axes.translate(factor); }
+			atom.scale(factor); } }
 	
 	public void spreadAll(float factor) {
 	

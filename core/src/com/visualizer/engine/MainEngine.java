@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -22,6 +21,7 @@ import java.util.*;
 public class MainEngine implements ApplicationListener {
 	public File sourceFile;
 	public final static Vector3 ONES = new Vector3(1,1,1);
+	public final static Quaternion Q_ZERO = new Quaternion();
 	
 	private Environment environment;
 	private PointLight pointLight;
@@ -43,14 +43,15 @@ public class MainEngine implements ApplicationListener {
 			scanner = new Scanner(sourceFile);
 			scanner.useLocale(Locale.ROOT);
 			Queue<String> names = new LinkedList<String>();
-			Queue<Matrix4> transforms = new LinkedList<Matrix4>();
+			Queue<Vector3> positions = new LinkedList<Vector3>();
+			Queue<Quaternion> orientations = new LinkedList<Quaternion>();
+			Queue<Vector3> sizes = new LinkedList<Vector3>();
 			while (scanner.hasNext()) {
 				names.add(scanner.next());
-				Vector3 size = new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
-				Vector3 position = new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
-				Quaternion rotation = new Quaternion(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat());
-				transforms.add(new Matrix4(position, rotation, size)); }
-			while(!transforms.isEmpty()) {
+				sizes.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
+				positions.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
+				orientations.add(new Quaternion(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat())); }
+			while(!orientations.isEmpty()) {
 				String name = names.poll();
 				Color color = null;
 				if(name.matches("[A-Z][a-z].*")) {
@@ -62,7 +63,7 @@ public class MainEngine implements ApplicationListener {
 				//								 "Error", JOptionPane.ERROR_MESSAGE); }
 				if(color == null) {
 					color = Color.WHITE; }
-				models.addAtom(name, transforms.poll(), color); } }
+				models.addAtom(name, color, positions.poll(), orientations.poll(), sizes.poll()); } }
 		catch(Exception e) {
 			e.printStackTrace(); }
 		models.addBound(1,2);
@@ -98,7 +99,6 @@ public class MainEngine implements ApplicationListener {
 			environment.remove(pointLight); }
 		else {
 			environment.add(pointLight);
-			System.out.println("!!!" + m2dFactor);
 			cameraHandler.setCamera(new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), -500); }
 	}
 	
@@ -106,7 +106,6 @@ public class MainEngine implements ApplicationListener {
 	
 	@Override
 	public void create() {
-		System.out.println("!!! MAIN::create()");
 		pointLight = new PointLight().set(0.8f, 0.8f, 0.8f, -10f, -10f, 10f, 200f);
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f));
