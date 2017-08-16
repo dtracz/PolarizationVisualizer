@@ -69,12 +69,18 @@ public class Bound implements SpatialObject {
 	
 	@Override
 	public void scale(float factor) {
-		for(ModelInstance instance: instances) {
-			instance.transform.scl(factor); }
-	//	instances[0].transform.scl(factor);
-	//	instances[1].transform.scl(factor);
-	//	instances[2].transform.scl(factor, 1, factor);
-	//	instances[2].transform.scl(factor, 1, factor);
+	//	Quaternion rotation = new Quaternion();
+	//	rotation.setFromCross(atom2.getCenter().sub(atom1.getCenter()), Vector3.Y);
+	//	instances[2].transform.rotate(rotation);
+	//	instances[3].transform.rotate(rotation);
+		
+	//	for(ModelInstance instance: instances) {
+	//		instance.transform.scl(factor); }
+
+		instances[0].transform.scl(factor);
+		instances[1].transform.scl(factor);
+		instances[2].transform.scl(factor, factor, factor);
+		instances[3].transform.scl(factor, factor, factor);
 	}
 	
 	@Override
@@ -83,8 +89,13 @@ public class Bound implements SpatialObject {
 		for(ModelInstance instance: instances) {
 			position = instance.transform.getTranslation(Vector3.Zero);
 			instance.transform.setTranslation(position.scl(factor)); }
+		
+	//	Quaternion rotation = new Quaternion();
+	//	rotation.setFromCross(Vector3.Y, atom2.getCenter().sub(atom1.getCenter()));
+	//	instances[2].transform.rotate(rotation);
+	//	instances[3].transform.rotate(rotation);
 	//	instances[2].transform.scl(1, factor, 1);
-	//	instances[2].transform.scl(1, factor, 1);
+	//	instances[3].transform.scl(1, factor, 1);
 	}
 	
 	@Override

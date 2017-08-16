@@ -54,6 +54,7 @@ public class ModelSet extends ModelBatch {
 		for(SpatialObject atom: atoms) {
 			atom.scale(factor);
 			atom.spread(factor); }
+		//if(factor<30) {
 		for(SpatialObject atom: bounds) {
 			atom.scale(factor);
 			atom.spread(factor); }

@@ -4,7 +4,6 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
@@ -21,28 +20,20 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class MainEngine implements ApplicationListener {
+	public File sourceFile;
 	public final static Vector3 ONES = new Vector3(1,1,1);
 	
 	private Environment environment;
+	private PointLight pointLight;
 	private Viewport viewport;
 	private CameraHandler cameraHandler;
-	
+	private Listener listener;
 	private Map<String, Integer> atomColors;
 	
 	boolean mode2d;
 	float m2dFactor;
 	
-	public File sourceFile;
-	
-	public Listener listener;
-	//private ModelBatch modelBatch;
-	
 	public ModelSet models;
-	//public Axes axes;
-	
-	ModelInstance cylinderInstance;
-	ModelInstance capsuleInstance;
-	Bound bound;
 	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
@@ -83,7 +74,7 @@ public class MainEngine implements ApplicationListener {
 	public MainEngine(File file) {
 		sourceFile = file;
 		mode2d = false;
-		m2dFactor = 30;
+		m2dFactor = 34;
 		try {
 			XMLDecoder xmlDecoder = new XMLDecoder(new FileInputStream("atomColors.xml"));
 			atomColors = (TreeMap<String, Integer>)xmlDecoder.readObject();
@@ -103,10 +94,12 @@ public class MainEngine implements ApplicationListener {
 		else return;
 		if(mode2d) {
 			cameraHandler.setCamera(new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), 500);
-			models.scaleAll(m2dFactor); }
+			((OrthographicCamera)cameraHandler.getCamera()).zoom /= m2dFactor;
+			environment.remove(pointLight); }
 		else {
-			cameraHandler.setCamera(new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), -500);
-			models.scaleAll(1f/m2dFactor);  }
+			environment.add(pointLight);
+			System.out.println("!!!" + m2dFactor);
+			cameraHandler.setCamera(new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), -500); }
 	}
 	
 	/* - APPLICATION LISTENER- - - - - - - - - - - - - - - - - - - - - - - - */
@@ -114,15 +107,13 @@ public class MainEngine implements ApplicationListener {
 	@Override
 	public void create() {
 		System.out.println("!!! MAIN::create()");
+		pointLight = new PointLight().set(0.8f, 0.8f, 0.8f, -10f, -10f, 10f, 200f);
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f));
-		environment.add(new PointLight().set(0.8f, 0.8f, 0.8f, -10f, -10f, 10f, 200f));
+		environment.add(pointLight);
 
 		ModelBuilder builder = new ModelBuilder();
-		//modelBatch = new ModelBatch();
-		
 		models = new ModelSet(builder);
-		//axes = new Axes(builder, 5);
 		
 		Camera camera = new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		//Camera camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
