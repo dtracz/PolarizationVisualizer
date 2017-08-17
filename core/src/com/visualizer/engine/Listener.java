@@ -53,8 +53,6 @@ public class Listener implements InputProcessor {
 			engine.models.scaleBounds(1f/1.2f); }
 		if(keycode == Input.Keys.NUM_4) {
 			engine.models.scaleBounds(1.2f); }
-		if(keycode == Input.Keys.X) {
-			engine.exportImage("/home/dawid/Dokumenty/mypngimage.png"); }
 		return true; }
 
 	@Override

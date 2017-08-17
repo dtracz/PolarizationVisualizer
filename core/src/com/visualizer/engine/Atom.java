@@ -13,25 +13,25 @@ import com.badlogic.gdx.math.Vector3;
  * Created by dawid on 04.04.17.
  */
 public class Atom implements SpatialObject {
-	private boolean renderable;
- 
-	Vector3 position;
-	Quaternion orientation;
-	Vector3 scale;
+	private BlendingAttribute blendingAttribute;
+	private final ModelInstance[] instances;
 	
-	BlendingAttribute blendingAttribute;
-	ModelInstance[] instances;
+	private Vector3 position;
+	private Quaternion orientation;
+	private Vector3 scale;
+	
+	private boolean renderable;
 	
 	//final public String symbol;
 	public String name = "";
 
 	Atom(String name, Model model, Material material, Vector3 position, Quaternion orientation, Vector3 scale) {
-	    this.position = position;
-	    this.orientation = orientation;
-	    this.scale = scale;
+		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
+		this.position = position;
+		this.orientation = orientation;
+		this.scale = scale;
 		//this.symbol = "";
 		this.name = name;
-		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
 		ModelInstance sphereInstance = new ModelInstance(model, new Matrix4(position, orientation, scale));
 		sphereInstance.materials.get(0).set(material);
 		instances = new ModelInstance[] {sphereInstance};

@@ -17,12 +17,14 @@ import java.util.List;
  */
 public class ModelSet extends ModelBatch {
 	private float boundDiameter = 0.4f;
-	private int boundDivisions = 16;
+	private int cylindricDivisions = 16;
 	private int sphereDivisionsU = 32;
 	private int sphereDivisionsV = 32;
 	
 	private Model sphere;
 	private Model cylinder;
+	private Model cone;
+	private Model arrow;
 	
 	public Axes axes;
 	public List<Bound> bounds;
@@ -31,11 +33,17 @@ public class ModelSet extends ModelBatch {
 	public ModelSet(ModelBuilder builder) {
 		atoms = new LinkedList<Atom>();
 		bounds = new LinkedList<Bound>();
-		axes = new Axes(builder, 5);
+		//axes = new Axes(builder, 5);
 		sphere = builder.createSphere(1,1,1, sphereDivisionsU, sphereDivisionsV, new Material(),
 									  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-		cylinder = builder.createCylinder(1, 1, 1, boundDivisions, new Material(),
+		cylinder = builder.createCylinder(1, 1, 1, cylindricDivisions, new Material(),
 										  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+		//arrow = builder.createArrow(0,0,0,0,1,0,1,0, cylindricalDivisions,
+		//							4,new Material(),
+		//							VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+		cone = builder.createCone(1, 1, 1, cylindricDivisions, new Material(),
+								  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+		axes = new Axes(cylinder, cone, new Vector3(-5, -5, -5), 10, 1, 0.2f);
 	}
 	
 	/* - ADDITIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -69,8 +77,9 @@ public class ModelSet extends ModelBatch {
 	
 	public void renderAll(Camera camera, Environment environment) {
 		this.begin(camera);
-		for(ModelInstance axis: axes.instances) {
-			this.render(axis, environment); }
+		if(axes.renderable()) {
+			for(ModelInstance instance: axes.getInstances()) {
+				this.render(instance, environment); } }
 		for(Atom atom: atoms) {
 			if(atom.renderable()) {
 				for(ModelInstance instance: atom.getInstances()) {
