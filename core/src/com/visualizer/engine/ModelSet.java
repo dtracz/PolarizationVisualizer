@@ -16,7 +16,7 @@ import java.util.List;
  * Created by dawid on 11.07.17.
  */
 public class ModelSet extends ModelBatch {
-	private float boundDiameter = 0.4f;
+	private float boundDiameter = 0.4f;										// parameters !!!
 	private int cylindricDivisions = 16;
 	private int sphereDivisionsU = 32;
 	private int sphereDivisionsV = 32;
@@ -24,7 +24,7 @@ public class ModelSet extends ModelBatch {
 	private Model sphere;
 	private Model cylinder;
 	private Model cone;
-	private Model arrow;
+	//private Model arrow;
 	
 	public Axes axes;
 	public List<Bound> bounds;
@@ -33,7 +33,6 @@ public class ModelSet extends ModelBatch {
 	public ModelSet(ModelBuilder builder) {
 		atoms = new LinkedList<Atom>();
 		bounds = new LinkedList<Bound>();
-		//axes = new Axes(builder, 5);
 		sphere = builder.createSphere(1,1,1, sphereDivisionsU, sphereDivisionsV, new Material(),
 									  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 		cylinder = builder.createCylinder(1, 1, 1, cylindricDivisions, new Material(),

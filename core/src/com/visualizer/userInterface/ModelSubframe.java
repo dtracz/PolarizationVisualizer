@@ -1,6 +1,7 @@
 package com.visualizer.userInterface;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglAWTCanvas;
+import com.google.gwt.core.shared.GWTBridge;
 import com.visualizer.engine.MainEngine;
 
 import javax.swing.*;
@@ -14,10 +15,9 @@ public class ModelSubframe extends JInternalFrame {
 	private static final int xStart = 0, yStart = 0;
 	private static final int xOffset = 30, yOffset = 30;
 	private static int frameCounter = 0;
-	
 	MainEngine engine;
 	private LwjglAWTCanvas canvas;
-	
+	private GWTBridge gwtBridge; // ?!
 	
 	public ModelSubframe(String name, int width, int height, final File sourceFile) {
 		super(sourceFile.getName() + " ("+(++frameCounter)+')', true, true, true, false);

@@ -11,12 +11,11 @@ import java.lang.reflect.Field;
  * Created by dawid on 04.03.17.
  */
 public class CameraHandler {
+	private final Vector3 helper;
 	private Camera camera;
 	private Vector3 center;  // x, y, z
 	private Float phi;
 	private Float theta;
-	private Field[] fields;
-	private Vector3 helper;
 	
 	private float scrollParam;
 
@@ -28,19 +27,13 @@ public class CameraHandler {
 		this.camera = camera;
 		phi = 270f;
 		theta = 0f;
-		try {
-			fields = new Field[3];
-			fields[0] = camera.position.getClass().getField("x");
-			fields[1] = camera.position.getClass().getField("y");
-			fields[2] = camera.position.getClass().getField("z"); }
-		catch (NoSuchFieldException e) {
-			e.printStackTrace(); }
 		helper = new Vector3(0f, 0f, 0f);
 		scrollParam = 0.962f; }
-
-	public Camera getCamera() {
-		return camera; }
-
+	
+	private void setPhi() {
+	
+	}
+	
 	public void setCamera(Camera newCamera, float distanceChange) {
 		if(newCamera instanceof OrthographicCamera) {
 			((OrthographicCamera) newCamera).setToOrtho(true); }
@@ -55,46 +48,56 @@ public class CameraHandler {
 			catch(IllegalAccessException iae) {
 				iae.printStackTrace(); } }
 		newCamera.position.add(camera.position.nor().scl(distanceChange));
+		newCamera.lookAt(center);
 		camera = newCamera; }
 
+	public Camera getCamera() {
+		return camera; }
+	
+	public void setCenter(Vector3 center) {
+		this.center = center;
+		camera.lookAt(center); }
+		
+	public void setCenter(float x, float y, float z) {
+		this.center.set(x, y, z);
+		camera.lookAt(center); }
+
 	public void rotArZ(float dir) {
-		camera.rotateAround(center, Vector3.Z, dir);
+		helper.set(Vector3.Z);
+		camera.rotateAround(center, helper, dir);
 		phi += dir;}
 
 	public void rotUpDown(float dir) {
 		if(theta + dir <= -90) {
-			camera.position.set(0f, 0f, -camera.position.len());
+			helper.set(camera.position).sub(center);
+			camera.position.set(0f, 0f, -helper.len()).add(center);
 			camera.lookAt(center);
 			theta = -90f; }
 		else if(theta + dir >= 90) {
-			camera.position.set(0f, 0f, camera.position.len());
+			helper.set(camera.position).sub(center);
+			camera.position.set(0f, 0f, helper.len()).add(center);
 			camera.lookAt(center);
 			theta = 90f; }
-		else if(camera.position.x == 0 && camera.position.y == 0) {
+		else if(camera.position.x == center.x && camera.position.y == center.y) {
 			helper.x = (float) Math.cos(Math.toRadians(phi - 90f));
 			helper.y = (float) Math.sin(Math.toRadians(phi - 90f));
 			helper.z = 0f;
 			camera.rotateAround(center, helper, dir);
 			theta += dir; }
 		else {
-			helper.x = camera.position.y;
-			helper.y = -camera.position.x;
-			helper.z = 0f;
+			helper.x = -camera.direction.y;
+			helper.y = camera.direction.x;
+			helper.z = 0;
 			camera.rotateAround(center, helper, dir);
 			theta += dir; } }
 
 	public void rotArDir(float dir) {
-		try {
-			for(Field f: fields) {
-				f.set(helper, f.get(camera.position)); } }
-		catch(IllegalAccessException e) {
-			e.printStackTrace(); }
-		camera.rotateAround(center, helper, dir); }
+		helper.set(camera.position);
+		camera.rotateAround(center, helper.sub(center), dir); }
 
 	public float move(float displacement) {
-		float factor = displacement > 0 ? (displacement*scrollParam) : 1/(displacement*scrollParam);
-		factor = Math.abs(factor);
-		camera.position.scl( Math.abs(displacement + camera.position.len()) / camera.position.len() + 1e-8f );
+		float factor = Math.abs( displacement > 0 ? (displacement*scrollParam) : 1/(displacement*scrollParam) );
+		camera.position.add(helper.set(camera.direction).scl(-displacement));
 		if(camera instanceof OrthographicCamera) {
 			((OrthographicCamera)camera).zoom /= factor; }
 		return factor; }

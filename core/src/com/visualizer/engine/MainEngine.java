@@ -134,6 +134,7 @@ public class MainEngine implements ApplicationListener {
 		viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
 		Gdx.input.setInputProcessor(listener);
 		
+		//cameraHandler.setCenter(0,-5,-5);
 		atomFactory(); }
 	
 	@Override

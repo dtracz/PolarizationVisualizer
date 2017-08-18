@@ -77,9 +77,11 @@ public class Listener implements InputProcessor {
 		mouse.move(screenX, screenY);
 		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 			cameraHandler.rotArZ(-mouse.dx*angleSpeed);
-			cameraHandler.rotUpDown(-mouse.dy*angleSpeed); }
+			cameraHandler.rotUpDown(-mouse.dy*angleSpeed);
+		}
 		else if(Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
-			cameraHandler.rotArDir(-mouse.dPhi*angleSpeed); }
+			cameraHandler.rotArDir(-mouse.dPhi*angleSpeed);
+		}
 		return true; }
 
 	@Override
