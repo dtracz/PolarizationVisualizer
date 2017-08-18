@@ -60,6 +60,9 @@ public class MainWindow extends JFrame {
 		menuFile.add(itemExit);
 		bar.add(menuFile);
 		
+		JMenu menuEdit = new JMenu("Edit");
+		bar.add(menuEdit);
+		
 		JMenu menuView = new JMenu("View");
 		final JMenuItem itemMode = new JMenuItem("Mode 2D/3D");
 		itemMode.addActionListener(new ActionListener() {
@@ -151,7 +154,7 @@ public class MainWindow extends JFrame {
 		jFC.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
-				return file.getName().matches(".+\\.[(png)(PNG)]"); }      				// not working in fact...
+				return file.getName().matches(".+\\.[(png)(PNG)]") || file.isDirectory(); }      				// not working in fact...
 			@Override
 			public String getDescription() {
 				return "Image file (*.png)"; } });
