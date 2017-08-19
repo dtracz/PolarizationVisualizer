@@ -39,6 +39,7 @@ public class MainEngine implements ApplicationListener {
 	public ModelSet models;
 	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	//http://badlogicgames.com/forum/viewtopic.php?f=11&t=9959
 	
 	private Quaternion countAngle(Matrix3 alpha, Vector3 helper) {
 		helper.set(Vector3.Z);
@@ -161,17 +162,13 @@ public class MainEngine implements ApplicationListener {
 		models = new ModelSet(builder);
 		
 		Camera camera = new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		//Camera camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.position.set(0f, -20f, 0f);
-		//camera.near = 0.1f;
-		//camera.far = 30f;
+		cameraHandler = new CameraHandler(camera, Vector3.Zero.cpy());
+		listener = new Listener(this, cameraHandler, models);
 		
-		cameraHandler = new CameraHandler(camera);
-		listener = new Listener(cameraHandler, this);
 		viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
 		Gdx.input.setInputProcessor(listener);
 		
-		//cameraHandler.setCenter(0,-5,-5);
 		atomFactory(); }
 	
 	@Override

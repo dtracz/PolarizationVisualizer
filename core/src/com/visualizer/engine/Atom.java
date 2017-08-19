@@ -72,7 +72,7 @@ public class Atom implements SpatialObject {
 		
 	//@Override
 	public Vector3 getCenter() {
-		return instances[0].transform.getTranslation(Vector3.Zero).cpy(); }
+		return instances[0].transform.getTranslation(Vector3.Zero.cpy()); }
 		
 	//@Override
 	public Material getMaterial() {
