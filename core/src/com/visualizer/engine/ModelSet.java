@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Created by dawid on 11.07.17.
@@ -27,12 +28,12 @@ public class ModelSet extends ModelBatch {
 	//private Model arrow;
 	
 	public Axes axes;
-	public List<Bound> bounds;
+	public List<Bond> bonds;
 	public List<Atom> atoms;
 	
 	public ModelSet(ModelBuilder builder) {
 		atoms = new LinkedList<Atom>();
-		bounds = new LinkedList<Bound>();
+		bonds = new LinkedList<Bond>();
 		sphere = builder.createSphere(1,1,1, sphereDivisionsU, sphereDivisionsV, new Material(),
 									  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 		cylinder = builder.createCylinder(1, 1, 1, cylindricDivisions, new Material(),
@@ -46,12 +47,18 @@ public class ModelSet extends ModelBatch {
 	}
 	
 	/* - ADDITIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+	
+	private Atom getAtom(String atomName) throws NoSuchElementException {
+		for(Atom atom: atoms) {
+			if(atom.name.equals(atomName)) {
+				return atom; } }
+		throw new NoSuchElementException("No atom with given Name"); }
+	
 	public void addAtom(String name, Color color, Vector3 position, Quaternion orientation, Vector3 scale) {
 		atoms.add(new Atom(name, sphere, new Material(ColorAttribute.createDiffuse(color)), position, orientation, scale)); }
 		
-	public void addBound(int atomIndex1, int atomIndex2) {
-		bounds.add(new Bound(sphere, cylinder, atoms.get(atomIndex1), atoms.get(atomIndex2), boundDiameter)); }
+	public void addBond(String atomName1, String atomName2) throws NoSuchElementException {
+		bonds.add(new Bond(sphere, cylinder, getAtom(atomName1), getAtom(atomName2), boundDiameter)); }
 	
 	/* - CONFIGURATIONS- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
@@ -63,7 +70,7 @@ public class ModelSet extends ModelBatch {
 			atom.scale(factor); } }
 			
 	public void scaleBounds(float factor) {
-		for(SpatialObject atom: bounds) {
+		for(SpatialObject atom: bonds) {
 			atom.scale(factor); } }
 	
 	public void spreadAll(float factor) {
@@ -83,9 +90,9 @@ public class ModelSet extends ModelBatch {
 			if(atom.renderable()) {
 				for(ModelInstance instance: atom.getInstances()) {
 					this.render(instance, environment); } } }
-		for(Bound bound: bounds) {
-			if(bound.renderable) {
-				for(ModelInstance instance: bound.getInstances()) {
+		for(Bond bond : bonds) {
+			if(bond.renderable) {
+				for(ModelInstance instance: bond.getInstances()) {
 					this.render(instance, environment); } } }
 		this.end(); }
 }

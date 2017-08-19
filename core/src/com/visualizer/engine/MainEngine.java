@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.BufferUtils;
@@ -39,39 +40,76 @@ public class MainEngine implements ApplicationListener {
 	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
+	private Quaternion countAngle(Matrix3 alpha, Vector3 helper) {
+		helper.set(Vector3.Z);
+		helper.mul(alpha);
+		return new Quaternion().setFromCross(helper.nor(), Vector3.Z); }
+	
+	private void fileReader(Queue<String> names, Queue<Vector3> positions, Queue<Quaternion> orientations,
+	                        Queue<Vector3> sizes, Queue<String> bonds) throws FileNotFoundException, RuntimeException {
+		Scanner scanner = new Scanner(sourceFile).useLocale(Locale.ROOT); 	// dot decimal separator instead of comma
+		String name;
+		Matrix3 alpha = new Matrix3();
+		Vector3 helper = new Vector3();
+		
+		while(!scanner.nextLine().matches("ATOMIC COORDINATES \\(ORTHOGONAL SYSTEM\\)"));
+		scanner.nextLine(); scanner.nextLine(); scanner.nextLine();
+		while((name = scanner.next()).matches("[A-Z][a-z]?.*")) {
+			names.add(name);
+			positions.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat())); }
+		
+		while(!scanner.nextLine().matches("ATOMIC PROPERTIES"));
+		while(!scanner.nextLine().matches("Atom.*")); scanner.nextLine();
+		while(scanner.next().matches("[A-Z][a-z]?.*")) {
+			scanner.nextFloat();
+			alpha.val[0] = scanner.nextFloat();
+			alpha.val[4] = scanner.nextFloat();
+			alpha.val[8] = scanner.nextFloat();
+			alpha.val[1] = alpha.val[3] = scanner.nextFloat();
+			alpha.val[2] = alpha.val[6] = scanner.nextFloat();
+			alpha.val[5] = alpha.val[7] = scanner.nextFloat();
+			sizes.add(new Vector3(alpha.val[0], alpha.val[4], alpha.val[8]));
+			orientations.add(countAngle(alpha, helper));
+			scanner.nextFloat(); scanner.nextFloat(); }
+		
+		while(!scanner.nextLine().matches("BOND PROPERTIES"));
+		while(!scanner.nextLine().matches("\\s+A.B.*")); scanner.nextLine();
+		while(scanner.hasNext("[A-Z][a-z]?\\d*")) {
+			bonds.add(scanner.next());
+			bonds.add(scanner.next());
+			scanner.nextLine(); }
+		scanner.close(); }
+
 	private void atomFactory() {
-		Scanner scanner;
+		Queue<String> names = new LinkedList<String>();
+		Queue<Vector3> positions = new LinkedList<Vector3>();
+		Queue<Quaternion> orientations = new LinkedList<Quaternion>();
+		Queue<Vector3> sizes = new LinkedList<Vector3>();
+		Queue<String> bonds = new LinkedList<String>();
 		try {
-			scanner = new Scanner(sourceFile);
-			scanner.useLocale(Locale.ROOT);
-			Queue<String> names = new LinkedList<String>();
-			Queue<Vector3> positions = new LinkedList<Vector3>();
-			Queue<Quaternion> orientations = new LinkedList<Quaternion>();
-			Queue<Vector3> sizes = new LinkedList<Vector3>();
-			while (scanner.hasNext()) {
-				names.add(scanner.next());
-				sizes.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
-				positions.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
-				orientations.add(new Quaternion(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat())); }
-			while(!orientations.isEmpty()) {
-				String name = names.poll();
-				Color color = null;
-				if(name.matches("[A-Z][a-z].*")) {
-					color = new Color(atomColors.get(name.substring(0,2))); }
-				else if(name.matches("[A-Z].*")) {
-					color = new Color(atomColors.get(name.substring(0,1))); }
-				//else {
-				//	JOptionPane.showMessageDialog(MainWindow.getInstance(), "Cannot recognize atom type from given name: "+name,
-				//								 "Error", JOptionPane.ERROR_MESSAGE); }
-				if(color == null) {
-					color = Color.WHITE; }
-				models.addAtom(name, color, positions.poll(), orientations.poll(), sizes.poll()); } }
-		catch(Exception e) {
-			e.printStackTrace(); }
-		models.addBound(1,2);
-		models.addBound(2,3);
-		models.addBound(3,0);
-		models.addBound(0,1);
+			fileReader(names, positions, orientations, sizes, bonds); }
+		catch(FileNotFoundException fnfe) {
+			fnfe.printStackTrace();
+			return; }
+		catch(RuntimeException re) {
+			re.printStackTrace();
+			return; }
+		while(!sizes.isEmpty()) {
+			String name = names.poll();
+			Color color = null;
+			if(name.matches("[A-Z][a-z].*")) {
+				color = new Color(atomColors.get(name.substring(0,2))); }
+			else if(name.matches("[A-Z].*")) {
+				color = new Color(atomColors.get(name.substring(0,1))); }
+			if(color == null) {
+				color = Color.WHITE; }
+			models.addAtom(name, color, positions.poll(), orientations.poll(), sizes.poll()); }
+		while(!bonds.isEmpty()) {
+			try {
+				models.addBond(bonds.poll(), bonds.poll()); }
+			catch(NoSuchElementException nsee) {
+				nsee.printStackTrace(); } }
+		
 	}
 	
 	public MainEngine(File file) {
@@ -83,8 +121,7 @@ public class MainEngine implements ApplicationListener {
 			atomColors = (TreeMap<String, Integer>)xmlDecoder.readObject();
 			xmlDecoder.close(); }
 		catch(FileNotFoundException fnfe) {
-			fnfe.printStackTrace(); }
-	}
+			fnfe.printStackTrace(); } }
 	
 	/* - PUBLIC OPERATIONS - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
@@ -97,10 +134,10 @@ public class MainEngine implements ApplicationListener {
 		else return;
 		if(mode2d) {
 			cameraHandler.setCamera(new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), 500);
-			((OrthographicCamera)cameraHandler.getCamera()).zoom /= m2dFactor;
-			environment.remove(pointLight); }
+			//environment.remove(pointLight);
+			((OrthographicCamera)cameraHandler.getCamera()).zoom /= m2dFactor; }
 		else {
-			environment.add(pointLight);
+			//environment.add(pointLight);
 			cameraHandler.setCamera(new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), -500); }
 	}
 	

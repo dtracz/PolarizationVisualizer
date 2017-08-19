@@ -22,15 +22,13 @@ public class Atom implements SpatialObject {
 	
 	private boolean renderable;
 	
-	//final public String symbol;
-	public String name = "";
+	public final String name;
 
 	Atom(String name, Model model, Material material, Vector3 position, Quaternion orientation, Vector3 scale) {
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
 		this.position = position;
 		this.orientation = orientation;
 		this.scale = scale;
-		//this.symbol = "";
 		this.name = name;
 		ModelInstance sphereInstance = new ModelInstance(model, new Matrix4(position, orientation, scale));
 		sphereInstance.materials.get(0).set(material);

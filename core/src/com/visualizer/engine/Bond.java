@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
-public class Bound implements SpatialObject {
+public class Bond implements SpatialObject {
 	private BlendingAttribute blendingAttribute;
 	private final ModelInstance[] instances;
 	
@@ -19,7 +19,7 @@ public class Bound implements SpatialObject {
 	
 	boolean renderable = true;
 	
-	public Bound(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter) {
+	public Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter) {
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
 		positions = new Vector3[2];
 		positions[0] = atom1.getCenter();
