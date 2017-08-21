@@ -22,8 +22,8 @@ public class Bond implements SpatialObject {
 	public Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter) {
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
 		positions = new Vector3[2];
-		positions[0] = atom1.getCenter();
-		positions[1] = atom2.getCenter();
+		positions[0] = atom1.getCenter(Vector3.Zero.cpy());
+		positions[1] = atom2.getCenter(Vector3.Zero.cpy());
 		ModelInstance center1 = new ModelInstance(atomCenter, new Matrix4(positions[0], MainEngine.Q_ZERO, new Vector3(diameter, diameter, diameter)));
 		ModelInstance center2 = new ModelInstance(atomCenter, new Matrix4(positions[1], MainEngine.Q_ZERO, new Vector3(diameter, diameter, diameter)));
 		

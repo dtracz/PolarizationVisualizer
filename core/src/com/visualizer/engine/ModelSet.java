@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
  */
 public class ModelSet extends ModelBatch {
 	private float boundDiameter = 0.4f;										// parameters !!!
-	private int cylindricDivisions = 16;
+	private int cylindricalDivisions = 16;
 	private int sphereDivisionsU = 32;
 	private int sphereDivisionsV = 32;
 	
@@ -36,34 +36,50 @@ public class ModelSet extends ModelBatch {
 		bonds = new LinkedList<Bond>();
 		sphere = builder.createSphere(1,1,1, sphereDivisionsU, sphereDivisionsV, new Material(),
 									  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-		cylinder = builder.createCylinder(1, 1, 1, cylindricDivisions, new Material(),
+		cylinder = builder.createCylinder(1, 1, 1, cylindricalDivisions, new Material(),
 										  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 		//arrow = builder.createArrow(0,0,0,0,1,0,1,0, cylindricalDivisions,
 		//							4,new Material(),
 		//							VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-		cone = builder.createCone(1, 1, 1, cylindricDivisions, new Material(),
+		cone = builder.createCone(1, 1, 1, cylindricalDivisions, new Material(),
 								  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-		axes = new Axes(cylinder, cone, new Vector3(-5, -5, -5), 10, 1, 0.2f);
 	}
 	
 	/* - ADDITIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
-	private Atom getAtom(String atomName) throws NoSuchElementException {
+	public void addAtom(String name, Color color, Vector3 position, Quaternion orientation, Vector3 scale) {
+		atoms.add(new Atom(name, sphere, new Material(ColorAttribute.createDiffuse(color)), position, orientation, scale));
+	}
+	
+	public void addBond(String atomName1, String atomName2) throws NoSuchElementException {
+		bonds.add(new Bond(sphere, cylinder, getAtom(atomName1), getAtom(atomName2), boundDiameter)); }
+	
+	public void createAxes(Vector3 origin, float length, float headLength, float diameter) {
+		axes = new Axes(cylinder, cone, origin, length, headLength, diameter); }
+	
+	/* - GETTERS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	
+	public Atom getAtom(String atomName) throws NoSuchElementException {
 		for(Atom atom: atoms) {
 			if(atom.name.equals(atomName)) {
 				return atom; } }
 		throw new NoSuchElementException("No atom with given Name"); }
 	
-	public void addAtom(String name, Color color, Vector3 position, Quaternion orientation, Vector3 scale) {
-		atoms.add(new Atom(name, sphere, new Material(ColorAttribute.createDiffuse(color)), position, orientation, scale)); }
-		
-	public void addBond(String atomName1, String atomName2) throws NoSuchElementException {
-		bonds.add(new Bond(sphere, cylinder, getAtom(atomName1), getAtom(atomName2), boundDiameter)); }
-	
-	/* - CONFIGURATIONS- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-	
 	public int getNumberOfAtoms() {
 		return atoms.size(); }
+	
+	public Vector3 getMoleculeCenter() {
+		Vector3 center = new Vector3();
+		Vector3 tmp = MainEngine.ONES;
+		for(Atom atom: atoms) {
+			tmp.set(0,0,0);
+			atom.getCenter(tmp);
+			center.add(tmp); }
+		center.scl(1f/atoms.size());
+		MainEngine.ONES.set(1,1,1);
+		return center; }
+		
+	/* - CONFIGURATIONS- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	public void scaleAtoms(float factor) {
 		for(SpatialObject atom: atoms) {

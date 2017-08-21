@@ -36,9 +36,9 @@ public class Listener implements InputProcessor {
 	public boolean keyDown(int keycode) {
 		System.out.println(keycode);
 		if(keycode == Input.Keys.LEFT) {
-			cameraHandler.rotArZ(-1); }
+			cameraHandler.rotArUp(-1); }
 		if(keycode == Input.Keys.RIGHT) {
-			cameraHandler.rotArZ(1); }
+			cameraHandler.rotArUp(1); }
 		if(keycode == Input.Keys.UP) {
 			cameraHandler.rotUpDown(1); }
 		if(keycode == Input.Keys.DOWN) {
@@ -56,13 +56,10 @@ public class Listener implements InputProcessor {
 			models.scaleBounds(1f/1.2f); }
 		if(keycode == Input.Keys.NUM_4) {
 			models.scaleBounds(1.2f); }
-		if(keycode == Input.Keys.C) {
-			cameraHandler.lookAt(new Vector3(-5f, -5, -5)); }
 		if(keycode == Input.Keys.X) {
-			System.out.println(cameraHandler.getCamera().up);
-			cameraHandler.getCamera().up.set(0,0,1);
-			System.out.println(cameraHandler.getCamera().up);
-		}
+			cameraHandler.setUpAxis(Vector3.Z); }
+		if(keycode == Input.Keys.Z) {
+			cameraHandler.lookAtPlane(Vector3.Zero, Vector3.X, Vector3.Y); }
 		return true; }
 
 	@Override
@@ -86,7 +83,7 @@ public class Listener implements InputProcessor {
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		mouse.move(screenX, screenY);
 		if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-			cameraHandler.rotArZ(-mouse.dx*angleSpeed);
+			cameraHandler.rotArUp(-mouse.dx*angleSpeed);
 			cameraHandler.rotUpDown(mouse.dy*angleSpeed); }
 		else if(Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
 			cameraHandler.rotArDir(mouse.dPhi*angleSpeed);
@@ -102,6 +99,6 @@ public class Listener implements InputProcessor {
 	@Override
 	public boolean scrolled(int amount) {
 		float factor = cameraHandler.moveForward(amount*moveSpeed);
-		engine.m2dFactor *= factor;
+		//engine.m2dFactor *= factor;
 		return true; }
 }

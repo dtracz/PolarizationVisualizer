@@ -22,20 +22,26 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class MainEngine implements ApplicationListener {
-	public File sourceFile;
 	public final static Vector3 ONES = new Vector3(1,1,1);
 	public final static Quaternion Q_ZERO = new Quaternion();
+	//public final Vector3 helper = new Vector3();
 	
+	public List<PointLight> pointLights;
 	private Environment environment;
-	private PointLight pointLight;
 	private Viewport viewport;
-	private CameraHandler cameraHandler;
 	private Listener listener;
+	
+	private CameraHandler cameraHandler;
+	private boolean mode2d;
+	private Camera orthographicCamera;
+	private Camera perspectiveCamera;
+	public final Vector3 defaultUpAxis = new Vector3(0,0,1);
+	public final static Matrix3 rotationMatrix = new Matrix3(new float[] { 0, 0, 1,
+	                                                                       1, 0, 0,
+	                                                                       0, 1, 0 });
+	
+	private File sourceFile;
 	private Map<String, Integer> atomColors;
-	
-	boolean mode2d;
-	float m2dFactor;
-	
 	public ModelSet models;
 	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -81,7 +87,8 @@ public class MainEngine implements ApplicationListener {
 			scanner.nextLine(); }
 		scanner.close(); }
 
-	private void atomFactory() {
+	private Vector3 atomFactory() {
+		Vector3 shift = new Vector3(1000, 1000, 1000);
 		Queue<String> names = new LinkedList<String>();
 		Queue<Vector3> positions = new LinkedList<Vector3>();
 		Queue<Quaternion> orientations = new LinkedList<Quaternion>();
@@ -91,10 +98,10 @@ public class MainEngine implements ApplicationListener {
 			fileReader(names, positions, orientations, sizes, bonds); }
 		catch(FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
-			return; }
+			return shift; }
 		catch(RuntimeException re) {
 			re.printStackTrace();
-			return; }
+			return shift; }
 		while(!sizes.isEmpty()) {
 			String name = names.poll();
 			Color color = null;
@@ -104,19 +111,21 @@ public class MainEngine implements ApplicationListener {
 				color = new Color(atomColors.get(name.substring(0,1))); }
 			if(color == null) {
 				color = Color.WHITE; }
-			models.addAtom(name, color, positions.poll(), orientations.poll(), sizes.poll()); }
+			Vector3 position = positions.poll();
+			shift.x = position.x < shift.x ? position.x : shift.x;
+			shift.y = position.y < shift.y ? position.y : shift.y;
+			shift.z = position.z < shift.z ? position.z : shift.z;
+			models.addAtom(name, color, position, orientations.poll(), sizes.poll()); }
 		while(!bonds.isEmpty()) {
 			try {
 				models.addBond(bonds.poll(), bonds.poll()); }
 			catch(NoSuchElementException nsee) {
 				nsee.printStackTrace(); } }
-		
-	}
+		return shift; }
 	
 	public MainEngine(File file) {
 		sourceFile = file;
 		mode2d = false;
-		m2dFactor = 34;
 		try {
 			XMLDecoder xmlDecoder = new XMLDecoder(new FileInputStream("atomColors.xml"));
 			atomColors = (TreeMap<String, Integer>)xmlDecoder.readObject();
@@ -134,12 +143,9 @@ public class MainEngine implements ApplicationListener {
 			mode2d = m2d; }
 		else return;
 		if(mode2d) {
-			cameraHandler.setCamera(new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), 500);
-			//environment.remove(pointLight);
-			((OrthographicCamera)cameraHandler.getCamera()).zoom /= m2dFactor; }
+			cameraHandler.setCamera(orthographicCamera); }
 		else {
-			//environment.add(pointLight);
-			cameraHandler.setCamera(new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), -500); }
+			cameraHandler.setCamera(perspectiveCamera); }
 	}
 	
 	public void exportImage(String filename) {
@@ -153,23 +159,30 @@ public class MainEngine implements ApplicationListener {
 	
 	@Override
 	public void create() {
-		pointLight = new PointLight().set(0.8f, 0.8f, 0.8f, -10f, -10f, 10f, 200f);
 		environment = new Environment();
 		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f));
-		environment.add(pointLight);
-
+		
+		viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
 		ModelBuilder builder = new ModelBuilder();
 		models = new ModelSet(builder);
+		Vector3 origin = atomFactory();
+		models.createAxes(origin.sub(ONES), 5, 0.8f, 0.1f);
 		
-		Camera camera = new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		camera.position.set(0f, -20f, 0f);
-		cameraHandler = new CameraHandler(camera, Vector3.Zero.cpy());
+		Vector3 center = models.getMoleculeCenter();
+		perspectiveCamera = new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		orthographicCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		cameraHandler = new CameraHandler(perspectiveCamera, center, defaultUpAxis);
+		
+		pointLights = new LinkedList<PointLight>();
+		pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-20, -10, 20), 400f));
+		//pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-10,   0, 10), 150f));
+		pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-20,  10, 20), 150f));
+		for(PointLight pointLight: pointLights) {
+			environment.add(pointLight); }
+		
 		listener = new Listener(this, cameraHandler, models);
-		
-		viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
-		Gdx.input.setInputProcessor(listener);
-		
-		atomFactory(); }
+		Gdx.input.setInputProcessor(listener); }
 	
 	@Override
 	public void render() {

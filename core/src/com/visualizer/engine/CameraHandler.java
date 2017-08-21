@@ -12,36 +12,44 @@ import java.lang.reflect.Field;
  */
 public class CameraHandler {
 	private final Vector3 helper;
+	private final Vector3 center;                   // x, y, z
+	private final Vector3 upAxis;                   // always normalized!!!
 	private Camera camera;
-	private Vector3 center;	// x, y, z
-	private double phi;		// radians
-	private float theta;	// degrees
+	private float theta;                            // degrees
 	
-	private float scrollParam2D;
-
-	public CameraHandler(Camera camera, Vector3 center) throws IllegalArgumentException {
-		helper = camera.position.cpy();
-		helper.sub(center);
-		if(helper.isOnLine(Vector3.Z)) {
-			phi = 3*Math.PI/2; }
+	private float scroll2D_a =  0.855f;             // HARDCODED!!!
+	private float scroll2D_b = -0.062f;             // HARDCODED!!!
+	private float scroll2D_c =  4.56f;              // HARDCODED!!!
+	private float scroll2D_d =  8.0f;               // HARDCODED!!!
+	
+	private void recalculateTheta() {
+		float dot = upAxis.dot(camera.direction);
+		float den = (float)Math.sqrt(upAxis.len2()*camera.direction.len2());
+		theta = (float)Math.toDegrees(Math.asin(dot/den)); }
+	
+	private void setZoom2D() {
+		if(camera instanceof OrthographicCamera) {
+			float dist = camera.position.dst(center);
+			float zoom = (float)(scroll2D_a * Math.exp(scroll2D_b*dist + scroll2D_c) + scroll2D_d);
+			((OrthographicCamera)camera).zoom = 1f/zoom; } }
+	
+	public CameraHandler(Camera camera, Vector3 center, Vector3 upAxis) {
 		this.camera = camera;
 		this.center = center;
+		this.upAxis = new Vector3(upAxis).nor();
+		helper = Vector3.Zero.cpy();
+		camera.position.set(this.upAxis);
+		camera.position.mul(MainEngine.rotationMatrix).scl(-20);
+		camera.position.add(center);
+		camera.up.set(this.upAxis);
 		camera.near = 0.1f;
 		camera.far = 3000f;
 		camera.lookAt(center);
-		countAngles();
-		scrollParam2D = 0.962f; }
+		recalculateTheta(); }
 	
-	private boolean countAngles() {
-		theta = (float)Math.toDegrees(Math.asin(camera.direction.z/camera.direction.len()));
-		if(!camera.direction.isOnLine(Vector3.Z)) {
-			phi = Math.atan2(camera.direction.y, camera.direction.x) + Math.PI;
-			return true; }
-		return false; }
-	
-	public void setCamera(Camera newCamera, float distanceChange) {
+	public void setCamera(Camera newCamera) {
 		if(newCamera instanceof OrthographicCamera) {
-			((OrthographicCamera) newCamera).setToOrtho(true); }
+			((OrthographicCamera)newCamera).setToOrtho(true); }
 		for(Field field: Camera.class.getFields()) {
 			try {
 				if(field.getType() == Matrix4.class) {
@@ -52,85 +60,93 @@ public class CameraHandler {
 					field.set(newCamera, field.get(camera)); } }
 			catch(IllegalAccessException iae) {
 				iae.printStackTrace(); } }
-		newCamera.position.add(camera.position.nor().scl(distanceChange));
-		newCamera.lookAt(center);
 		camera = newCamera;
-		countAngles(); }
-
+		setZoom2D(); }
+	
 	public Camera getCamera() {
 		return camera; }
 	
-	public void lookAt(Vector3 center) {
-		//System.out.println(Math.toDegrees(phi) +" "+ theta);
-		helper.set(center).sub(camera.position);
-		float dPhi = (float)Math.toDegrees(Math.atan2(helper.y, helper.x) + Math.PI - phi);
-		float dTheta = (float)Math.toDegrees(Math.asin(helper.z/helper.len())) - theta;
-		camera.rotate(Vector3.Z, dPhi);
-		//if(!countAngles()) { phi += Math.toRadians(dPhi); }
-		phi += Math.toRadians(dPhi);
-		theta += dTheta;
-		camera.rotate(dTheta, -camera.position.y, camera.position.x, 0);
-		//System.out.println(dPhi +" "+ dTheta);
-		//System.out.println(Math.toDegrees(phi) +" "+ theta);
+	public void updateCamera() {
+		camera.update(); }
+	
+	/* - SETTINGS- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	
+	public void setUpAxis(Vector3 upAxis) {
+		this.upAxis.set(upAxis).nor();
+		if(!camera.direction.isOnLine(upAxis)) {
+			camera.up.set(upAxis); } }
+	
+	public void setCentaer(Vector3 center) {
+		this.center.set(center);
 		camera.lookAt(center);
-		this.center.set(center); }
-		
-	public void setCenter(float x, float y, float z) {
-		this.center.set(x, y, z);
-		camera.lookAt(center); }
-
-	public void rotArZ(float dir) {
-		helper.set(Vector3.Z);
-		camera.rotateAround(center, helper, dir);
-		phi += Math.toRadians(dir);}
-
+		recalculateTheta();
+		if(!camera.direction.isOnLine(upAxis)) {
+			camera.up.set(upAxis); }
+		setZoom2D(); }
+	
+	public void setPosition(Vector3 position) {
+		camera.position.set(position);
+		camera.lookAt(center);
+		recalculateTheta();
+		if(!camera.direction.isOnLine(upAxis)) {
+			camera.up.set(upAxis); }
+		setZoom2D(); }
+	
+	public void lookAtPlane(Vector3 x1, Vector3 x2, Vector3 x3) throws IllegalArgumentException {
+		center.set(x3).sub(x1);
+		helper.set(x2).sub(x1);
+		if(helper.isOnLine(center)) {
+			throw new IllegalArgumentException("Given points does not determinate plane"); }
+		helper.crs(center).nor().scl(-20);										// hardcoded distance!!
+		center.set(x1).add(x2).add(x3).scl(1f/3f);
+		setPosition(helper.add(center));
+		setZoom2D(); }
+	
+	/* - ROTATIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	
+	public void rotArUp(float dir) {
+		camera.rotateAround(center, upAxis, dir); }
+	
 	public void rotUpDown(float dir) {
-		if(theta + dir <= -90) {
-			helper.set(camera.position).sub(center);
-			camera.position.set(0f, 0f, helper.len()).add(center);
+		if(theta + dir <= -90) {									// lock on down
+			helper.set(camera.position);
+			camera.position.set(upAxis).scl(helper.dst(center)).add(center);
 			camera.lookAt(center);
 			theta = -90f; }
-		else if(theta + dir >= 90) {
-			helper.set(camera.position).sub(center);
-			camera.position.set(0f, 0f, -helper.len()).add(center);
+		else if(theta + dir >= 90) {								// lock on up
+			helper.set(camera.position);
+			camera.position.set(upAxis).scl(-helper.dst(center)).add(center);
 			camera.lookAt(center);
 			theta = 90f; }
-		else if(camera.position.x == center.x && camera.position.y == center.y) {
-			helper.x = (float)Math.cos(phi + Math.PI/2);
-			helper.y = (float)Math.sin(phi + Math.PI/2);
-			helper.z = 0f;
+		else if(camera.direction.isCollinear(upAxis)) {				// unlock from down
+			helper.set(upAxis).rotate(camera.up, 90f).scl(-1);
+			camera.rotateAround(center, helper, dir);
+			theta += dir; }
+		else if(camera.direction.isCollinearOpposite(upAxis)) {		// unlock from up
+			helper.set(upAxis).rotate(camera.up, 90f);
 			camera.rotateAround(center, helper, dir);
 			theta += dir; }
 		else {
-			helper.x = camera.direction.y;
-			helper.y = -camera.direction.x;
-			helper.z = 0;
+			helper.set(upAxis).crs(camera.direction).scl(-1);
 			camera.rotateAround(center, helper, dir);
 			theta += dir; } }
-
-	public void rotArDir(float dir) {
-		camera.rotateAround(center, camera.direction, dir); }
-
+	
 	public float moveForward(float displacement) {
-		float factor = Math.abs( displacement > 0 ? (displacement*scrollParam2D) : 1/(displacement*scrollParam2D) );
+		float factor = Math.abs( displacement > 0 ? (displacement*scroll2D_a) : 1/(displacement*scroll2D_a) );
 		camera.position.add(helper.set(camera.direction).scl(-displacement));
 		if(camera instanceof OrthographicCamera) {
 			((OrthographicCamera)camera).zoom /= factor; }
 		return factor; }
-		
+	
 	public void movePlanar(float dx, float dy) {
-		float dX = (float)Math.cos(phi - (Math.PI/2))*dx;
-		float dY = (float)Math.sin(phi - (Math.PI/2))*dx;
-		dX += Math.cos(phi - Math.PI)*Math.sin(Math.toRadians(theta))*dy;
-		dY += Math.sin(phi - Math.PI)*Math.sin(Math.toRadians(theta))*dy;
-		float dZ = -(float)Math.cos(Math.toRadians(theta))*dy;
-		camera.position.add(dX, dY, dZ);
-		center.add(dX, dY, dZ);
-		camera.lookAt(center); }
+		helper.set(camera.up).scl(-dy);
+		camera.position.add(helper);
+		center.add(helper);
+		helper.set(camera.direction).crs(camera.up).scl(-dx);
+		camera.position.add(helper);
+		center.add(helper); }
 		
-	public void updateCamera() {
-		camera.update(); }
-
-//	public void update(boolean updateFrustum) {
-//		camera.update(updateFrustum); }
+	public void rotArDir(float dir) {
+		camera.rotate(camera.direction, dir);
+		upAxis.rotate(camera.direction, dir); }
 }

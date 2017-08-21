@@ -17,7 +17,7 @@ public class Axes implements SpatialObject {
 	private BlendingAttribute blendingAttribute;
 	private final ModelInstance[] instances;
 	
-	private Vector3 center;
+	private Vector3 origin;
 	private float[] lengths;
 	private float headLength;
 	private float diameter;
@@ -25,9 +25,9 @@ public class Axes implements SpatialObject {
 	
 	private boolean renderable;
 	
-	public Axes(Model cylinder, Model cone, Vector3 center, float length, float headLength, float diameter) {
+	public Axes(Model cylinder, Model cone, Vector3 origin, float length, float headLength, float diameter) {
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
-		this.center = center;
+		this.origin = origin;
 		lengths = new float[]{length, length, length};
 		this.headLength = headLength;
 		this.diameter = diameter;
@@ -53,9 +53,9 @@ public class Axes implements SpatialObject {
 		for(int i=0; i<3; i++) {
 			Vector3 position = new Vector3(0,0.5f,0).mul(orientations[i]);
 			position.scl(lengths[i]);
-			position.add(center);
+			position.add(origin);
 			instances[2*i].transform.set(position, orientations[i], new Vector3(diameter, lengths[i], diameter));
-            position.sub(center).scl(2f).add(center);
+            position.sub(origin).scl(2f).add(origin);
             instances[2*i+1].transform.set(position, orientations[i], new Vector3(3*diameter, headLength, 3*diameter)); } }
 			
 	@Override
@@ -80,7 +80,7 @@ public class Axes implements SpatialObject {
 	
 	@Override
 	public void spread(float factor) {
-	    center.scl(factor);
+	    origin.scl(factor);
 	    for(int i=0; i<3; i++) {
 	        lengths[i] *= factor; }
         setTransforms(); }
