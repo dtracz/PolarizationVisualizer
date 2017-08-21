@@ -131,12 +131,9 @@ public class CameraHandler {
 			camera.rotateAround(center, helper, dir);
 			theta += dir; } }
 	
-	public float moveForward(float displacement) {
-		float factor = Math.abs( displacement > 0 ? (displacement*scroll2D_a) : 1/(displacement*scroll2D_a) );
+	public void moveForward(float displacement) {
 		camera.position.add(helper.set(camera.direction).scl(-displacement));
-		if(camera instanceof OrthographicCamera) {
-			((OrthographicCamera)camera).zoom /= factor; }
-		return factor; }
+		setZoom2D(); }
 	
 	public void movePlanar(float dx, float dy) {
 		helper.set(camera.up).scl(-dy);

@@ -98,7 +98,6 @@ public class Listener implements InputProcessor {
 	
 	@Override
 	public boolean scrolled(int amount) {
-		float factor = cameraHandler.moveForward(amount*moveSpeed);
-		//engine.m2dFactor *= factor;
+		cameraHandler.moveForward(amount*moveSpeed);
 		return true; }
 }
