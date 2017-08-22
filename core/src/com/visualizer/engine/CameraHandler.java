@@ -146,4 +146,5 @@ public class CameraHandler {
 	public void rotArDir(float dir) {
 		camera.rotate(camera.direction, dir);
 		upAxis.rotate(camera.direction, dir); }
+
 }

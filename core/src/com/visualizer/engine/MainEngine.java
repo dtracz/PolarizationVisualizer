@@ -14,7 +14,9 @@ import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.visualizer.userInterface.MainWindow;
 
+import javax.swing.*;
 import java.beans.XMLDecoder;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +26,6 @@ import java.util.*;
 public class MainEngine implements ApplicationListener {
 	public final static Vector3 ONES = new Vector3(1,1,1);
 	public final static Quaternion Q_ZERO = new Quaternion();
-	//public final Vector3 helper = new Vector3();
 	
 	public List<PointLight> pointLights;
 	private Environment environment;
@@ -43,6 +44,15 @@ public class MainEngine implements ApplicationListener {
 	private File sourceFile;
 	private Map<String, Integer> atomColors;
 	public ModelSet models;
+	
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	
+	void showMessage(final String text, final String type) {
+		Thread messageThread = new Thread(new Runnable(){
+			@Override
+			public void run() {
+				JOptionPane.showMessageDialog(MainWindow.getInstance(), text, type, JOptionPane.ERROR_MESSAGE); } } );
+		messageThread.start(); }
 	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	//http://badlogicgames.com/forum/viewtopic.php?f=11&t=9959
@@ -84,6 +94,7 @@ public class MainEngine implements ApplicationListener {
 		while(scanner.hasNext("[A-Z][a-z]?\\d*")) {
 			bonds.add(scanner.next());
 			bonds.add(scanner.next());
+			bonds.add("true");
 			scanner.nextLine(); }
 		scanner.close(); }
 
@@ -98,9 +109,11 @@ public class MainEngine implements ApplicationListener {
 			fileReader(names, positions, orientations, sizes, bonds); }
 		catch(FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
+			showMessage(fnfe.getMessage(), "Error");
 			return shift; }
 		catch(RuntimeException re) {
 			re.printStackTrace();
+			showMessage(re.getMessage(), "Error");
 			return shift; }
 		while(!sizes.isEmpty()) {
 			String name = names.poll();
@@ -110,6 +123,7 @@ public class MainEngine implements ApplicationListener {
 			else if(name.matches("[A-Z].*")) {
 				color = new Color(atomColors.get(name.substring(0,1))); }
 			if(color == null) {
+				
 				color = Color.WHITE; }
 			Vector3 position = positions.poll();
 			shift.x = position.x < shift.x ? position.x : shift.x;
@@ -118,8 +132,9 @@ public class MainEngine implements ApplicationListener {
 			models.addAtom(name, color, position, orientations.poll(), sizes.poll()); }
 		while(!bonds.isEmpty()) {
 			try {
-				models.addBond(bonds.poll(), bonds.poll()); }
+				models.addBond(bonds.poll(), bonds.poll(), Boolean.parseBoolean(bonds.poll())); }
 			catch(NoSuchElementException nsee) {
+				showMessage(nsee.getMessage(), "Error");
 				nsee.printStackTrace(); } }
 		return shift; }
 	
@@ -190,7 +205,9 @@ public class MainEngine implements ApplicationListener {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		//viewport.apply();
 		cameraHandler.updateCamera();
-		models.renderAll(cameraHandler.getCamera(), environment); }
+		models.renderAll(cameraHandler.getCamera(), environment,
+		                 viewport.getScreenX(), viewport.getScreenY(),
+		                 viewport.getScreenWidth(), viewport.getScreenHeight()); }
 	
 	@Override
 	public void pause() {
@@ -204,12 +221,14 @@ public class MainEngine implements ApplicationListener {
 	
 	@Override
 	public void dispose() {
+		models.dispose();
 		System.out.println("x2");
 	}
 	
 	@Override
 	public void resize(int width, int height) {
-		viewport.update(width, height);
+		viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		listener.resize(width, height);
 		cameraHandler.updateCamera(); }
+
 }

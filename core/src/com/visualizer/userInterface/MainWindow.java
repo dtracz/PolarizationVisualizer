@@ -7,8 +7,6 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -114,7 +112,7 @@ public class MainWindow extends JFrame {
 		setSize(width, height);
 		createMenu();
 		projects = new HashMap<ModelSubframe, ControlPanel>();
-		addComponentListener(new ComponentListener() {
+		/*addComponentListener(new ComponentListener() {
 			@Override
 			public void componentResized(ComponentEvent e) {
 				if(currControlPanel != null) {
@@ -129,7 +127,7 @@ public class MainWindow extends JFrame {
 			
 			@Override
 			public void componentHidden(ComponentEvent e) { }
-		});
+		});*/
 		setVisible(true); }
 	
 	public static MainWindow getInstance() {

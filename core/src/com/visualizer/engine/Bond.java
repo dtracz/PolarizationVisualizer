@@ -1,10 +1,14 @@
 package com.visualizer.engine;
 
+import com.badlogic.gdx.Files;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -19,7 +23,7 @@ public class Bond implements SpatialObject {
 	
 	boolean renderable = true;
 	
-	public Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter) {
+	public Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean striped) {
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
 		positions = new Vector3[2];
 		positions[0] = atom1.getCenter(Vector3.Zero.cpy());
@@ -37,11 +41,17 @@ public class Bond implements SpatialObject {
 		ModelInstance boundPart1 = new ModelInstance(halfBound, new Matrix4(positions[0], orientation, sizes));
 		ModelInstance boundPart2 = new ModelInstance(halfBound, new Matrix4(positions[1], orientation, sizes));
 		
-		Material material1 = atom1.getMaterial();
+		Material material1 = atom1.getMaterial().copy();
 		center1.materials.get(0).set(material1);
+		if(striped) {
+			material1.set(TextureAttribute.createDiffuse(
+					new Texture(Gdx.files.getFileHandle("stripes.jpg", Files.FileType.Internal)))); }
 		boundPart1.materials.get(0).set(material1);
-		Material material2 = atom2.getMaterial();
+		Material material2 = atom2.getMaterial().copy();
 		center2.materials.get(0).set(material2);
+		if(striped) {
+			material2.set(TextureAttribute.createDiffuse(
+					new Texture(Gdx.files.getFileHandle("stripes.jpg", Files.FileType.Internal)))); }
 		boundPart2.materials.get(0).set(material2);
 		
 		instances = new ModelInstance[]{boundPart1, boundPart2, center1, center2}; }
