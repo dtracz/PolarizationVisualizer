@@ -115,7 +115,7 @@ public class ModelSet extends ModelBatch {
 	
 	}
 	
-	public void renderAll(Camera camera, Environment environment, float x, float y, float width, float height) {
+	public void renderAll(Camera camera, Environment environment) {
 		this.begin(camera);
 		if(axes.renderable()) {
 			for(ModelInstance instance: axes.getInstances()) {

@@ -205,9 +205,7 @@ public class MainEngine implements ApplicationListener {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		//viewport.apply();
 		cameraHandler.updateCamera();
-		models.renderAll(cameraHandler.getCamera(), environment,
-		                 viewport.getScreenX(), viewport.getScreenY(),
-		                 viewport.getScreenWidth(), viewport.getScreenHeight()); }
+		models.renderAll(cameraHandler.getCamera(), environment); }
 	
 	@Override
 	public void pause() {
