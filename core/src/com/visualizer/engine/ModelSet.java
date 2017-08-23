@@ -13,7 +13,6 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -21,7 +20,7 @@ import java.util.NoSuchElementException;
  */
 public class ModelSet extends ModelBatch {
 	private final Vector3 helper = new Vector3();
-	private float boundDiameter = 0.4f;										// parameters !!!
+	private float boundDiameter = 0.1f;										// parameters !!!
 	private int cylindricalDivisions = 16;
 	private int sphereDivisionsU = 32;
 	private int sphereDivisionsV = 32;
@@ -32,9 +31,9 @@ public class ModelSet extends ModelBatch {
 	//private Model arrow;
 	
 	public Axes axes;
-	public List<Bond> bonds;
+	public LinkedList<Bond> bonds;
 	public boolean visibleBonds;
-	public List<Atom> atoms;
+	public LinkedList<Atom> atoms;
 	public boolean visibleAtoms;
 	
 	private final SpriteBatch batch = new SpriteBatch();
@@ -99,14 +98,38 @@ public class ModelSet extends ModelBatch {
 		
 	/* - CONFIGURATIONS- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
+	public void show(boolean isVisible, String objects) {
+		if(objects.equals("ATOMS")) {
+			visibleAtoms = isVisible; }
+		if(objects.equals("BONDS")) {
+			visibleBonds = isVisible; }
+		if(objects.equals("AXES")) {
+			axes.setRenderable(isVisible); } }
+	
+	public void scale(float factor, String objects) {
+		if(objects.equals("ATOMS")) {
+			for(SpatialObject atom: atoms) {
+				atom.scale(factor); } }
+		if(objects.equals("BONDS")) {
+			for(SpatialObject atom: bonds) {
+				atom.scale(factor); } } }
+	
+	public void changeOpacity(float opacity, String objects) {
+		if(objects.equals("ATOMS")) {
+			for(SpatialObject atom: atoms) {
+				atom.changeOpacity(opacity); } }
+		if(objects.equals("BONDS")) {
+			for(SpatialObject atom: bonds) {
+				atom.changeOpacity(opacity); } } }
+	
 	public void scaleAtoms(float factor) {
 		for(SpatialObject atom: atoms) {
 			atom.scale(factor); } }
-			
+	
 	public void scaleBounds(float factor) {
 		for(SpatialObject atom: bonds) {
 			atom.scale(factor); } }
-	
+
 	public void spreadAll(float factor) {
 	
 	}

@@ -17,11 +17,13 @@ public class MainWindow extends JFrame {
 	private JMenuBar bar;
 	private JDesktopPane desktop;
 	
-	private Map<ModelSubframe, ControlPanel> projects;
+	private Map<ModelSubframe, JScrollPane[]> projects;
 	private ModelSubframe topSubframe;
-	private boolean controlPanelOn;
+	private boolean controlPanelOn; //////////////////////////////////////////////////////////////////////////////////
 	private int xSize;
+	private int ySize;
 	private ControlPanel currControlPanel;
+	private SouthPanel currSouthPanel;
 	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
@@ -80,12 +82,12 @@ public class MainWindow extends JFrame {
 				controlPanelOn = !controlPanelOn;
 				if(controlPanelOn) {
 					try {
-						setCurrControlPanel(getControlPanel());
+						setCurrPanels(getControlPanel());
 						itemControl.setText("Hide control panel"); }
 					catch(NullPointerException npe) {
 						controlPanelOn = false; } }
 				else {
-					setCurrControlPanel(null);
+					setCurrPanels(null);
 					itemControl.setText("Show control panel"); }
 				MainWindow.getInstance().validate(); }
 		});
@@ -102,6 +104,7 @@ public class MainWindow extends JFrame {
 	protected MainWindow(int width, int height) {
 		controlPanelOn = false;
 		xSize = 240;
+		ySize = 95;
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		desktop = new JDesktopPane();
@@ -111,7 +114,7 @@ public class MainWindow extends JFrame {
 		
 		setSize(width, height);
 		createMenu();
-		projects = new HashMap<ModelSubframe, ControlPanel>();
+		projects = new HashMap<ModelSubframe, JScrollPane[]>();
 		/*addComponentListener(new ComponentListener() {
 			@Override
 			public void componentResized(ComponentEvent e) {
@@ -173,7 +176,7 @@ public class MainWindow extends JFrame {
 		topSubframe = subframe;
 		if(controlPanelOn) {
 			System.out.println("setCurrCP");
-			setCurrControlPanel(getControlPanel()); }
+			setCurrPanels(getControlPanel()); }
 		MainWindow.getInstance().validate(); }
 		//try {
 		//catch(NullPointerException npe) {
@@ -185,31 +188,47 @@ public class MainWindow extends JFrame {
 	public void deleteSubframe(ModelSubframe subframe) {
 		if(topSubframe == subframe) {
 			topSubframe = null;
-			setCurrControlPanel(null); }
+			setCurrPanels(null); }
 		projects.remove(subframe); }
 	
 	/* - CONTROL PANEL - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
-	private ControlPanel getControlPanel() throws NullPointerException {
+	private JScrollPane[] getControlPanel() throws NullPointerException {
 		if(topSubframe == null) {
 			JOptionPane.showMessageDialog(this, "No model frame selected!", "Error", JOptionPane.ERROR_MESSAGE);
 			throw new NullPointerException("No model frame selected!"); }
 			//return null; }
-		ControlPanel controlPanel;
+		JScrollPane[] controlPanels;
 		if(projects.containsKey(topSubframe)) {
-			controlPanel = projects.get(topSubframe); }
+			controlPanels = projects.get(topSubframe); }
 		else {
-			controlPanel = new ControlPanel(topSubframe, xSize);
-			//controlPanel.updateBounds(getWidth(), getHeight());
-			projects.put(topSubframe, controlPanel); }
-		return controlPanel; }
+			ControlPanel controlPanel = new ControlPanel(topSubframe, xSize);
+			SouthPanel southPanel = new SouthPanel(topSubframe, ySize);
+			controlPanels = new JScrollPane[]{controlPanel, southPanel};
+			projects.put(topSubframe, controlPanels); }
+		return controlPanels; }
 	
-	private void setCurrControlPanel(ControlPanel controlPanel) {
+	/**
+	 *  removes current panels if exist
+	 *  sets new panel, or nulls if panels should be hide
+	 *  if there are new panels, shows them
+	 */
+	private void setCurrPanels(JScrollPane[] controlPanels) {
 		if(currControlPanel != null) {
+			currSouthPanel.setVisible(false);
+			remove(currSouthPanel);
 			currControlPanel.setVisible(false);
 			remove(currControlPanel); }
-		currControlPanel = controlPanel;
+		if(controlPanels != null) {
+			currControlPanel = (ControlPanel)controlPanels[0];
+			currSouthPanel = (SouthPanel)controlPanels[1]; }
+		else {
+			currControlPanel = null;
+			currSouthPanel = null; }
 		if(currControlPanel != null) {
-			add(controlPanel, BorderLayout.EAST);
+			add(currSouthPanel, BorderLayout.SOUTH);
+			currSouthPanel.setVisible(true);
+			add(currControlPanel, BorderLayout.EAST);
 			currControlPanel.setVisible(true); } }
+
 }

@@ -219,8 +219,8 @@ public class MainEngine implements ApplicationListener {
 	
 	@Override
 	public void dispose() {
-		models.dispose();
 		System.out.println("x2");
+		models.dispose();
 	}
 	
 	@Override

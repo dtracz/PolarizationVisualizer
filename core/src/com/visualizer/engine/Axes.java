@@ -22,10 +22,14 @@ public class Axes implements SpatialObject {
 	private float headLength;
 	private float diameter;
 	private Quaternion[] orientations;
+	private float scale;
+	private float stretch;
 	
 	private boolean renderable;
 	
 	public Axes(Model cylinder, Model cone, Vector3 origin, float length, float headLength, float diameter) {
+		scale = 1f;
+		stretch = 1f;
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
 		this.origin = origin;
 		lengths = new float[]{length, length, length};
@@ -74,16 +78,20 @@ public class Axes implements SpatialObject {
 	
 	@Override
 	public void scale(float factor) {
-	    diameter *= factor;
-	    headLength *= factor;
-	    setTransforms(); }
+		factor = factor <= 0 ? 0.001f : factor;
+	    diameter *= factor/scale;
+	    headLength *= factor/scale;
+	    setTransforms();
+		scale = factor; }
 	
 	@Override
 	public void spread(float factor) {
-	    origin.scl(factor);
+		factor = factor <= 0 ? 0.001f : factor;
+	    origin.scl(factor/scale);
 	    for(int i=0; i<3; i++) {
-	        lengths[i] *= factor; }
-        setTransforms(); }
+	        lengths[i] *= factor/scale; }
+        setTransforms();
+		scale = factor; }
 	
 	@Override
 	public void translate(Vector3 translation) {

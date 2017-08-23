@@ -1,7 +1,7 @@
 package com.visualizer.userInterface;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglAWTCanvas;
-import com.google.gwt.core.shared.GWTBridge;
 import com.visualizer.engine.MainEngine;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ public class ModelSubframe extends JInternalFrame {
 	private static int frameCounter = 0;
 	MainEngine engine;
 	private LwjglAWTCanvas canvas;
-	private GWTBridge gwtBridge; // ?!
+	//private GWTBridge gwtBridge; // ?!
 	
 	public ModelSubframe(String name, int width, int height, final File sourceFile) {
 		super(sourceFile.getName() + " ("+(++frameCounter)+')', true, true, true, false);
@@ -35,6 +35,7 @@ public class ModelSubframe extends JInternalFrame {
 			@Override
 			public void componentHidden(ComponentEvent componentEvent) { }
 		});
+		
 		addInternalFrameListener(new InternalFrameListener() {
 			@Override
 			public void internalFrameOpened(InternalFrameEvent e) { }
@@ -42,7 +43,10 @@ public class ModelSubframe extends JInternalFrame {
 			public void internalFrameClosing(InternalFrameEvent e) { }
 			@Override
 			public void internalFrameClosed(InternalFrameEvent e) {
-				engine.dispose();
+				Gdx.app.postRunnable(new Runnable() {
+					@Override
+					public void run() {
+						engine.dispose(); } } );
 				MainWindow.getInstance().deleteSubframe(self);
 				--frameCounter; }
 			@Override

@@ -13,27 +13,32 @@ import com.badlogic.gdx.math.Vector3;
  * Created by dawid on 04.04.17.
  */
 public class Atom implements SpatialObject {
+	private final Vector3 helper = new Vector3();
 	private BlendingAttribute blendingAttribute;
 	private final ModelInstance[] instances;
 	
 	private Vector3 position;
 	private Quaternion orientation;
-	private Vector3 scale;
+	private Vector3 sizes;
+	private float scale;
+	private float stretch;
 	
 	private boolean renderable;
 	
 	public final String name;
 	public boolean visibleName;
 
-	Atom(String name, Model model, Material material, Vector3 position, Quaternion orientation, Vector3 scale) {
+	Atom(String name, Model model, Material material, Vector3 position, Quaternion orientation, Vector3 sizes) {
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
 		this.position = position;
 		this.orientation = orientation;
-		this.scale = scale;
+		this.sizes = sizes;
 		this.name = name;
-		ModelInstance sphereInstance = new ModelInstance(model, new Matrix4(position, orientation, scale));
+		scale = 1f;
+		stretch = 1f;
+		ModelInstance sphereInstance = new ModelInstance(model, new Matrix4(position, orientation, sizes));
 		sphereInstance.materials.get(0).set(material);
-		instances = new ModelInstance[] {sphereInstance};
+		instances = new ModelInstance[]{sphereInstance};
 		renderable = true;
 		visibleName = true; }
 	
@@ -53,15 +58,19 @@ public class Atom implements SpatialObject {
 	
 	@Override
 	public void scale(float factor) {
-	    scale.scl(factor);
+		factor = factor <= 0 ? 0.001f : factor;
+		sizes.scl(factor/scale);
 		for(ModelInstance instance: instances) {
-		    instance.transform.set(position, orientation, scale); } }
+		    instance.transform.set(position, orientation, sizes); }
+		scale = factor; }
 
 	@Override
 	public void spread(float factor) {
+		factor = factor <= 0 ? 0.001f : factor;
 		for(ModelInstance instance: instances) {
-            Vector3 position = instance.transform.getTranslation(Vector3.Zero);
-			instance.transform.setTranslation(position.scl(factor)); } }
+            Vector3 position = instance.transform.getTranslation(helper.set(0,0,0));
+			instance.transform.setTranslation(position.scl(factor/stretch)); }
+		stretch = factor; }
 	
 	@Override
 	public void translate(Vector3 translation) {
