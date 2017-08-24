@@ -89,9 +89,9 @@ public class Axes implements SpatialObject {
 		factor = factor <= 0 ? 0.001f : factor;
 	    origin.scl(factor/scale);
 	    for(int i=0; i<3; i++) {
-	        lengths[i] *= factor/scale; }
+	        lengths[i] *= factor/stretch; }
         setTransforms();
-		scale = factor; }
+		stretch = factor; }
 	
 	@Override
 	public void translate(Vector3 translation) {

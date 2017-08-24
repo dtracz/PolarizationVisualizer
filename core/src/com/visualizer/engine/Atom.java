@@ -26,7 +26,8 @@ public class Atom implements SpatialObject {
 	private boolean renderable;
 	
 	public final String name;
-	public boolean visibleName;
+	public final String description = " xx yy ";
+	public boolean visibleLabel;
 
 	Atom(String name, Model model, Material material, Vector3 position, Quaternion orientation, Vector3 sizes) {
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
@@ -40,7 +41,10 @@ public class Atom implements SpatialObject {
 		sphereInstance.materials.get(0).set(material);
 		instances = new ModelInstance[]{sphereInstance};
 		renderable = true;
-		visibleName = true; }
+		visibleLabel = true; }
+	
+	public String getDescription() {
+		return description; }
 	
 	@Override
 	public boolean renderable() {

@@ -22,7 +22,7 @@ public class MainWindow extends JFrame {
 	private boolean controlPanelOn; //////////////////////////////////////////////////////////////////////////////////
 	private int xSize;
 	private int ySize;
-	private ControlPanel currControlPanel;
+	private EastPanel currEastPanel;
 	private SouthPanel currSouthPanel;
 	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -104,12 +104,12 @@ public class MainWindow extends JFrame {
 	protected MainWindow(int width, int height) {
 		controlPanelOn = false;
 		xSize = 240;
-		ySize = 95;
+		ySize = 105;
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		desktop = new JDesktopPane();
 		//desktop.setBackground(Color.CYAN);
-		desktop.setMaximumSize(new Dimension(400, 300));
+		//desktop.setMaximumSize(new Dimension(400, 300));
 		add(desktop, BorderLayout.CENTER);
 		
 		setSize(width, height);
@@ -118,8 +118,8 @@ public class MainWindow extends JFrame {
 		/*addComponentListener(new ComponentListener() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				if(currControlPanel != null) {
-					//	currControlPanel.updateBounds(getWidth(), getHeight());
+				if(currEastPanel != null) {
+					//	currEastPanel.updateBounds(getWidth(), getHeight());
 				} }
 			
 			@Override
@@ -202,9 +202,9 @@ public class MainWindow extends JFrame {
 		if(projects.containsKey(topSubframe)) {
 			controlPanels = projects.get(topSubframe); }
 		else {
-			ControlPanel controlPanel = new ControlPanel(topSubframe, xSize);
+			EastPanel eastPanel = new EastPanel(topSubframe, xSize);
 			SouthPanel southPanel = new SouthPanel(topSubframe, ySize);
-			controlPanels = new JScrollPane[]{controlPanel, southPanel};
+			controlPanels = new JScrollPane[]{eastPanel, southPanel};
 			projects.put(topSubframe, controlPanels); }
 		return controlPanels; }
 	
@@ -214,21 +214,21 @@ public class MainWindow extends JFrame {
 	 *  if there are new panels, shows them
 	 */
 	private void setCurrPanels(JScrollPane[] controlPanels) {
-		if(currControlPanel != null) {
+		if(currEastPanel != null) {
 			currSouthPanel.setVisible(false);
 			remove(currSouthPanel);
-			currControlPanel.setVisible(false);
-			remove(currControlPanel); }
+			currEastPanel.setVisible(false);
+			remove(currEastPanel); }
 		if(controlPanels != null) {
-			currControlPanel = (ControlPanel)controlPanels[0];
+			currEastPanel = (EastPanel)controlPanels[0];
 			currSouthPanel = (SouthPanel)controlPanels[1]; }
 		else {
-			currControlPanel = null;
+			currEastPanel = null;
 			currSouthPanel = null; }
-		if(currControlPanel != null) {
+		if(currEastPanel != null) {
 			add(currSouthPanel, BorderLayout.SOUTH);
 			currSouthPanel.setVisible(true);
-			add(currControlPanel, BorderLayout.EAST);
-			currControlPanel.setVisible(true); } }
+			add(currEastPanel, BorderLayout.EAST);
+			currEastPanel.setVisible(true); } }
 
 }

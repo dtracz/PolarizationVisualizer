@@ -1,5 +1,7 @@
 package com.visualizer.userInterface;
 
+import com.visualizer.engine.CameraHandler;
+import com.visualizer.engine.MainEngine;
 import com.visualizer.engine.ModelSet;
 
 import javax.swing.*;
@@ -11,13 +13,15 @@ import java.awt.event.ItemListener;
 import java.util.Locale;
 
 public class SouthPanel extends JScrollPane{
+	private MainEngine engine;
 	private ModelSet models;
-	//private MainEngine engine;
+	private CameraHandler cameraHandler;
 	
 	private JPanel viewPanel;
+	private JPanel optionsPane;
 	private int ySize;
 	
-	private JPanel addTitle(final String name) {
+	private JPanel createTitle(final String name) {
 		JPanel namePanel = new JPanel();
 		JLabel title = new JLabel(name+" ");
 		namePanel.add(title);
@@ -30,18 +34,8 @@ public class SouthPanel extends JScrollPane{
 		namePanel.add(checkBox);
 		return namePanel; }
 	
-	private JPanel addOpacitySlider(final String objects) {
-		JPanel panel = new JPanel(new BorderLayout());
-		
-		JCheckBox checkBox = new JCheckBox("Show atom names");
-		checkBox.setHorizontalTextPosition(SwingConstants.LEFT);
-		checkBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				models.visibleLabels = e.getStateChange() == ItemEvent.SELECTED; } });
-		checkBox.setSelected(true);
-		panel.add(checkBox, BorderLayout.NORTH);
-		
+	private JPanel createOpacitySlider(final String objects) {
+		JPanel sliderPane = new JPanel();
 		final JSlider slider = new JSlider(0, 100, 100);
 		slider.setPreferredSize(new Dimension(100, 30));
 		slider.setMajorTickSpacing(50);
@@ -54,11 +48,11 @@ public class SouthPanel extends JScrollPane{
 			public void stateChanged(ChangeEvent e) {
 				sliderLabel.setText(String.format(Locale.ROOT,"%.2f", (float)slider.getValue()/100));
 				models.changeOpacity((float)slider.getValue()/100, objects);
-				MainWindow.getInstance().validate();                                                        //????
+				//MainWindow.getInstance().validate();                                                        //????
 			} });
-		panel.add(slider, BorderLayout.CENTER);
-		panel.add(sliderLabel, BorderLayout.EAST);
-		return panel; }
+		sliderPane.add(slider);
+		sliderPane.add(sliderLabel);
+		return sliderPane; }
 		
 	private JPanel addSizeSpinner(final String objects) {
 		JPanel sizePanel = new JPanel();
@@ -80,38 +74,94 @@ public class SouthPanel extends JScrollPane{
 			spinner.setValue(0.25); }
 		sizePanel.add(spinner);
 		return sizePanel; }
-	
-	private Box addControllers(final String name) {
-		Box box = Box.createVerticalBox();
-		JPanel title = addTitle(name);
-		box.add(title);
-		JPanel sizeSpinner = addSizeSpinner(name);
-		box.add(sizeSpinner);
-		return box; }
-	
+
+	private JButton createAxesButton() {
+		JButton setAxes = new JButton("set axes");
+		return setAxes; }
+		
+	private JCheckBox createCameraBox() {
+		JCheckBox checkBox = new JCheckBox("mode 2D");
+		checkBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				engine.setMode2D(e.getStateChange() == ItemEvent.SELECTED); } });
+		return checkBox; }
+		
+	private JCheckBox createNameBox() {
+		JCheckBox checkBox = new JCheckBox("Show atom names");
+		checkBox.setHorizontalTextPosition(SwingConstants.LEFT);
+		checkBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				models.visibleLabels = e.getStateChange() == ItemEvent.SELECTED; } });
+		checkBox.setSelected(true);
+		return checkBox; }
+		
+	private JButton createCameraResetButton() {
+		JButton reset = new JButton("reset");
+		return reset; }
+		
+	private JButton createViewButton() {
+		JButton setView = new JButton("set view");
+		return setView; }
+		
 	public SouthPanel(ModelSubframe subframe, int ySize) {
+		engine = subframe.engine;
 		models = subframe.engine.models;
-		//engine = subframe.engine;
+		cameraHandler = subframe.engine.cameraHandler;
 		this.ySize = ySize;
+		setPreferredSize(new Dimension(360, ySize));
 		
 		viewPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		//viewPanel.setBackground(Color.LIGHT_GRAY);
-		setPreferredSize(new Dimension(450, ySize));
+		optionsPane = new JPanel(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
 		
-		Box mainBox = Box.createHorizontalBox();
-			Box box = Box.createVerticalBox();
-				box.add(Box.createRigidArea(new Dimension(0,5)));
-				JPanel panel = addOpacitySlider("ATOMS");
-					box.add(panel);
-				mainBox.add(box);
-				mainBox.add(Box.createRigidArea(new Dimension(30,0)));
-			Box atomsController = addControllers("ATOMS");
-				mainBox.add(atomsController);
-				mainBox.add(Box.createRigidArea(new Dimension(30,0)));
-			Box bondsController = addControllers("BONDS");
-				mainBox.add(bondsController);
-			viewPanel.add(mainBox);
+		gbc.gridy = 0;
+		gbc.gridx = 0;
+		gbc.insets = new Insets(0,0,0,25);
+		Component nameBox = createNameBox();
+		optionsPane.add(nameBox, gbc);
+		gbc.gridx++;
+		Component atoms = createTitle("ATOMS");
+		optionsPane.add(atoms, gbc);
+		gbc.gridx++;
+		Component bonds = createTitle("BONDS");
+		optionsPane.add(bonds, gbc);
+		gbc.gridx++;
+		Component axes = createTitle("AXES");
+		optionsPane.add(axes, gbc);
+		gbc.gridx++;
+		gbc.insets.right = 0;
+		Component cameraLabel = new JLabel("CAMERA");
+		optionsPane.add(cameraLabel);
+		gbc.gridx++;
+		Component cameraBox = createCameraBox();
+		optionsPane.add(cameraBox, gbc);
 		
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.insets.right = 25;
+		Component opacitySlider = createOpacitySlider("ATOMS");
+		optionsPane.add(opacitySlider, gbc);
+		gbc.gridx++;
+		Component atomSizer = addSizeSpinner("ATOMS");
+		optionsPane.add(atomSizer, gbc);
+		gbc.gridx++;
+		Component bondSizer = addSizeSpinner("BONDS");
+		optionsPane.add(bondSizer, gbc);
+		gbc.gridx++;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		Component setAxes = createAxesButton();
+		optionsPane.add(setAxes, gbc);
+		gbc.gridx++;
+		gbc.insets.right = 0;
+		Component resetCamera = createCameraResetButton();
+		optionsPane.add(resetCamera, gbc);
+		gbc.gridx++;
+		Component setView = createViewButton();
+		optionsPane.add(setView, gbc);
+		
+		viewPanel.add(optionsPane);
 		setViewportView(viewPanel); }
 
 }

@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 /**
@@ -31,9 +31,9 @@ public class ModelSet extends ModelBatch {
 	//private Model arrow;
 	
 	public Axes axes;
-	public LinkedList<Bond> bonds;
+	public ArrayList<Bond> bonds;
 	public boolean visibleBonds;
-	public LinkedList<Atom> atoms;
+	public ArrayList<Atom> atoms;
 	public boolean visibleAtoms;
 	
 	private final SpriteBatch batch = new SpriteBatch();
@@ -44,8 +44,8 @@ public class ModelSet extends ModelBatch {
 	private float startHeight;
 	
 	public ModelSet(ModelBuilder builder) {
-		atoms = new LinkedList<Atom>();
-		bonds = new LinkedList<Bond>();
+		atoms = new ArrayList<Atom>();
+		bonds = new ArrayList<Bond>();
 		sphere = builder.createSphere(1,1,1, sphereDivisionsU, sphereDivisionsV, new Material(),
 									  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 		cylinder = builder.createCylinder(1, 1, 1, cylindricalDivisions, new Material(),
@@ -112,7 +112,9 @@ public class ModelSet extends ModelBatch {
 				atom.scale(factor); } }
 		if(objects.equals("BONDS")) {
 			for(SpatialObject atom: bonds) {
-				atom.scale(factor); } } }
+				atom.scale(factor); } }
+		if(objects.equals("AXES")) {
+			axes.scale(factor); } }
 	
 	public void changeOpacity(float opacity, String objects) {
 		if(objects.equals("ATOMS")) {
@@ -157,7 +159,7 @@ public class ModelSet extends ModelBatch {
 		if(visibleLabels) {
 			batch.begin();
 			for(Atom atom: atoms) {
-				if(atom.visibleName) {
+				if(atom.visibleLabel) {
 					atom.getCenter(helper.set(0,0,0));
 					camera.project(helper, 0, 0, startWidth, startHeight);
 					font.draw(batch, atom.name, helper.x, helper.y); } }

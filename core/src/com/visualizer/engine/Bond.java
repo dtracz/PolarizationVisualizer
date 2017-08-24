@@ -26,7 +26,9 @@ public class Bond implements SpatialObject {
 	
 	boolean renderable;
 	
-	public Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean striped) {
+	public final String description = " y x ";
+	
+	Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean striped) {
 		scale = 1f;
 		stretch = 1f;
 		renderable = true;
@@ -61,6 +63,9 @@ public class Bond implements SpatialObject {
 		boundPart2.materials.get(0).set(material2);
 		
 		instances = new ModelInstance[]{boundPart1, boundPart2, center1, center2}; }
+	
+	public String getDescription() {
+		return description; }
 	
 	@Override
 	public boolean renderable() {

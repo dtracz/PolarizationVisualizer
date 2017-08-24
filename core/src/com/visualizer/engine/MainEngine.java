@@ -32,7 +32,7 @@ public class MainEngine implements ApplicationListener {
 	private Viewport viewport;
 	private Listener listener;
 	
-	private CameraHandler cameraHandler;
+	public CameraHandler cameraHandler;
 	private boolean mode2d;
 	private Camera orthographicCamera;
 	private Camera perspectiveCamera;
@@ -151,9 +151,9 @@ public class MainEngine implements ApplicationListener {
 	/* - PUBLIC OPERATIONS - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	public void changeMode() {
-		setMode(!mode2d); }
+		setMode2D(!mode2d); }
 	
-	public void setMode(boolean m2d) {
+	public void setMode2D(boolean m2d) {
 		if(mode2d^m2d) {
 			mode2d = m2d; }
 		else return;
