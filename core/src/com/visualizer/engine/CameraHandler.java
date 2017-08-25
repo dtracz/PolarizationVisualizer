@@ -76,14 +76,6 @@ public class CameraHandler {
 		if(!camera.direction.isOnLine(upAxis)) {
 			camera.up.set(upAxis); } }
 	
-	public void setCentaer(Vector3 center) {
-		this.center.set(center);
-		camera.lookAt(center);
-		recalculateTheta();
-		if(!camera.direction.isOnLine(upAxis)) {
-			camera.up.set(upAxis); }
-		setZoom2D(); }
-	
 	public void setPosition(Vector3 position) {
 		camera.position.set(position);
 		camera.lookAt(center);
@@ -92,15 +84,36 @@ public class CameraHandler {
 			camera.up.set(upAxis); }
 		setZoom2D(); }
 	
-	public void lookAtPlane(Vector3 x1, Vector3 x2, Vector3 x3) throws IllegalArgumentException {
+	public void lookAt(Vector3 center) {
+		this.center.set(center);
+		camera.lookAt(center);
+		recalculateTheta();
+		if(!camera.direction.isOnLine(upAxis)) {
+			camera.up.set(upAxis); }
+		setZoom2D(); }
+	
+	public void lookAt(Vector3 x1, Vector3 x2, Vector3 x3) throws IllegalArgumentException {
 		center.set(x3).sub(x1);
 		helper.set(x2).sub(x1);
 		if(helper.isOnLine(center)) {
-			throw new IllegalArgumentException("Given points does not determinate plane"); }
-		helper.crs(center).nor().scl(-20);										// hardcoded distance!!
+			throw new IllegalArgumentException("Given points does not determinate a plane"); }
+		helper.crs(center).nor().scl(-20);                                      // hardcoded distance!!
 		center.set(x1).add(x2).add(x3).scl(1f/3f);
 		setPosition(helper.add(center));
 		setZoom2D(); }
+		
+	public void lookAlong(Vector3 x1, Vector3 x2) throws IllegalArgumentException {
+		if(x1.equals(x2)) {
+			throw new IllegalArgumentException("Given points does not determinate an axis"); }
+		center.set(x2);
+		setPosition(x1);
+		moveForward(20);	                                             // hardcoded distance!!
+	}
+	
+	public void lookAlong(Vector3 direction) {
+		helper.set(direction).nor().scl(-20);
+		helper.add(center);
+		setPosition(helper); }
 	
 	/* - ROTATIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	

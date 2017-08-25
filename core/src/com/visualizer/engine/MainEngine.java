@@ -197,7 +197,10 @@ public class MainEngine implements ApplicationListener {
 			environment.add(pointLight); }
 		
 		listener = new Listener(this, cameraHandler, models);
-		Gdx.input.setInputProcessor(listener); }
+		Gdx.input.setInputProcessor(listener);
+		
+		
+	}
 	
 	@Override
 	public void render() {

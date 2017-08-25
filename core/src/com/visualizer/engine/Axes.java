@@ -94,9 +94,9 @@ public class Axes implements SpatialObject {
 		stretch = factor; }
 	
 	@Override
-	public void translate(Vector3 translation) {
-		for(ModelInstance instance: instances) {
-			instance.transform.setTranslation(translation); } }
+	public void translateTo(Vector3 translation) {
+		origin.set(translation);
+		setTransforms(); }
 	
 	@Override
 	public ModelInstance[] getInstances() {

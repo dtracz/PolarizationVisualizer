@@ -77,7 +77,7 @@ public class Atom implements SpatialObject {
 		stretch = factor; }
 	
 	@Override
-	public void translate(Vector3 translation) {
+	public void translateTo(Vector3 translation) {
 		for(ModelInstance instance: instances) {
 			instance.transform.setTranslation(translation); } }
 	

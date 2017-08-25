@@ -13,31 +13,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainWindow extends JFrame {
+	private final static int[] mainWindowSizes = new int[]{1152, 768};
+	private final static int[] modelSubframeSizes = new int[]{800, 600};
+	private final static int[] northPanelSizes = new int[]{10, 105};
+	private final static int[] eastPanelSizes = new int[]{245, 10};
+	private final JScrollPane[] emptyPanels; // {east, north}
+	
 	private static MainWindow instance;
 	private JMenuBar bar;
 	private JDesktopPane desktop;
 	
 	private Map<ModelSubframe, JScrollPane[]> projects;
 	private ModelSubframe topSubframe;
-	private boolean controlPanelOn; //////////////////////////////////////////////////////////////////////////////////
-	private int xSize;
-	private int ySize;
-	private EastPanel currEastPanel;
-	private SouthPanel currSouthPanel;
+	private boolean showPanels; //////////////////////////////////////////////////////////////////////////////////
+	private JScrollPane currEastPanel;
+	private JScrollPane currNorthPanel;
 	
-	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	/* - MENU CREATOR- - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
-	private void createMenu() {
-		bar = new JMenuBar();
+	private JMenu createMenuFile(String name) {
+		JMenu menuFile = new JMenu(name);
 		
-		JMenu menuFile = new JMenu("File");
 		final JMenuItem itemImport = new JMenuItem("Import...");
 		itemImport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				try {
 					addModel(selectFile()); }
 				catch(FileNotFoundException fnfe) {
-					fnfe.printStackTrace(); } } });
+					fnfe.printStackTrace(); }
+				MainWindow.getInstance().validate(); }
+		});
+		
 		final JMenuItem itemExport = new JMenuItem("Export as png");
 		itemExport.addActionListener(new ActionListener() {
 			@Override
@@ -47,23 +53,26 @@ public class MainWindow extends JFrame {
 					Gdx.app.postRunnable(new Runnable() {
 						@Override
 						public void run() {
-								topSubframe.engine.exportImage(filename); } }); }
+							topSubframe.engine.exportImage(filename); }
+					}); }
 				catch(FileNotFoundException fnfe) {
-					fnfe.printStackTrace(); } } } );
+					fnfe.printStackTrace(); } }
+		});
+		
 		final JMenuItem itemExit = new JMenuItem("Exit");
 		itemExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				System.exit(0); } });
+				System.exit(0); }
+		});
+		
 		menuFile.add(itemImport);
 		menuFile.add(itemExport);
 		menuFile.addSeparator();
 		menuFile.add(itemExit);
-		bar.add(menuFile);
-		
-		JMenu menuEdit = new JMenu("Edit");
-		bar.add(menuEdit);
-		
-		JMenu menuView = new JMenu("View");
+		return menuFile; }
+	
+	private JMenu createMenuView(String name) {
+		JMenu menuView = new JMenu(name);
 		final JMenuItem itemMode = new JMenuItem("Mode 2D/3D");
 		itemMode.addActionListener(new ActionListener() {
 			@Override
@@ -75,17 +84,17 @@ public class MainWindow extends JFrame {
 				MainWindow.getInstance().validate(); }
 		});
 		final JMenuItem itemCamera = new JMenuItem("Set Camera");
-		final JMenuItem itemControl = new JMenuItem("Show control panel");
+		final JMenuItem itemControl = new JMenuItem("Hide control panel");
 		itemControl.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-				controlPanelOn = !controlPanelOn;
-				if(controlPanelOn) {
+				showPanels = !showPanels;
+				if(showPanels) {
 					try {
 						setCurrPanels(getControlPanel());
 						itemControl.setText("Hide control panel"); }
 					catch(NullPointerException npe) {
-						controlPanelOn = false; } }
+						showPanels = false; } }
 				else {
 					setCurrPanels(null);
 					itemControl.setText("Show control panel"); }
@@ -94,22 +103,35 @@ public class MainWindow extends JFrame {
 		menuView.add(itemMode);
 		menuView.add(itemCamera);
 		menuView.add(itemControl);
-		bar.add(menuView);
+		return menuView; }
 		
+	private void createMenu() {
+		bar = new JMenuBar();
+		JMenu menuFile = createMenuFile("File");
+		bar.add(menuFile);
+		JMenu menuEdit = new JMenu("Edit");
+		bar.add(menuEdit);
+		JMenu menuView = createMenuView("View");
+		bar.add(menuView);
 		JMenu menuSettings = new JMenu("Settings");
 		bar.add(menuSettings);
-		
 		setJMenuBar(bar); }
 	
+	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	
 	protected MainWindow(int width, int height) {
-		controlPanelOn = false;
-		xSize = 240;
-		ySize = 105;
+		showPanels = true;
+		
+		emptyPanels = new JScrollPane[2];
+		JPanel east = new JPanel();
+		east.setPreferredSize(new Dimension(eastPanelSizes[0], eastPanelSizes[1]));
+		emptyPanels[0] = new JScrollPane(east);
+		JPanel north = new JPanel();
+		north.setPreferredSize(new Dimension(northPanelSizes[0], northPanelSizes[1]));
+		emptyPanels[1] = new JScrollPane(north);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		desktop = new JDesktopPane();
-		//desktop.setBackground(Color.CYAN);
-		//desktop.setMaximumSize(new Dimension(400, 300));
 		add(desktop, BorderLayout.CENTER);
 		
 		setSize(width, height);
@@ -131,11 +153,12 @@ public class MainWindow extends JFrame {
 			@Override
 			public void componentHidden(ComponentEvent e) { }
 		});*/
-		setVisible(true); }
+		setVisible(true);
+		setCurrPanels(emptyPanels); }
 	
 	public static MainWindow getInstance() {
 		if(instance == null) {
-			instance = new MainWindow(1280, 720); }
+			instance = new MainWindow(mainWindowSizes[0], mainWindowSizes[1]); }
 		return instance; }
 	
 	/* - SUBFRAME- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -155,7 +178,7 @@ public class MainWindow extends JFrame {
 		jFC.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
-				return file.getName().matches(".+\\.[(png)(PNG)]") || file.isDirectory(); }      				// not working in fact...
+				return file.getName().matches(".+\\.(png|PNG)") || file.isDirectory(); }      				// not working in fact...
 			@Override
 			public String getDescription() {
 				return "Image file (*.png)"; } });
@@ -167,44 +190,35 @@ public class MainWindow extends JFrame {
 			throw new FileNotFoundException("No file selected"); } }
 	
 	private ModelSubframe addModel(File sourceFile) {
-		ModelSubframe subframe = new ModelSubframe("subframe", 800, 600, sourceFile);
+		ModelSubframe subframe = new ModelSubframe("subframe", modelSubframeSizes[0], modelSubframeSizes[1], sourceFile);
 		desktop.add(subframe);
 		subframe.toFront();
 		return subframe; }
 	
 	public void setTopSubframe(ModelSubframe subframe) {
 		topSubframe = subframe;
-		if(controlPanelOn) {
-			System.out.println("setCurrCP");
+		if(showPanels) {
 			setCurrPanels(getControlPanel()); }
 		MainWindow.getInstance().validate(); }
-		//try {
-		//catch(NullPointerException npe) {
-			//	try {
-			//		subframe.setSelected(false); }
-			//	catch(PropertyVetoException pve) {
-			//		pve.printStackTrace(); } } }
 	
 	public void deleteSubframe(ModelSubframe subframe) {
 		if(topSubframe == subframe) {
 			topSubframe = null;
-			setCurrPanels(null); }
+			setCurrPanels(showPanels ? emptyPanels : null); }
 		projects.remove(subframe); }
 	
 	/* - CONTROL PANEL - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	private JScrollPane[] getControlPanel() throws NullPointerException {
 		if(topSubframe == null) {
-			JOptionPane.showMessageDialog(this, "No model frame selected!", "Error", JOptionPane.ERROR_MESSAGE);
-			throw new NullPointerException("No model frame selected!"); }
-			//return null; }
+			return emptyPanels; }
 		JScrollPane[] controlPanels;
 		if(projects.containsKey(topSubframe)) {
 			controlPanels = projects.get(topSubframe); }
 		else {
-			EastPanel eastPanel = new EastPanel(topSubframe, xSize);
-			SouthPanel southPanel = new SouthPanel(topSubframe, ySize);
-			controlPanels = new JScrollPane[]{eastPanel, southPanel};
+			EastPanel eastPanel = new EastPanel(topSubframe, eastPanelSizes[0], eastPanelSizes[1]);
+			NorthPanel northPanel = new NorthPanel(topSubframe, northPanelSizes[0], northPanelSizes[1]);
+			controlPanels = new JScrollPane[]{eastPanel, northPanel};
 			projects.put(topSubframe, controlPanels); }
 		return controlPanels; }
 	
@@ -215,19 +229,19 @@ public class MainWindow extends JFrame {
 	 */
 	private void setCurrPanels(JScrollPane[] controlPanels) {
 		if(currEastPanel != null) {
-			currSouthPanel.setVisible(false);
-			remove(currSouthPanel);
+			currNorthPanel.setVisible(false);
+			remove(currNorthPanel);
 			currEastPanel.setVisible(false);
 			remove(currEastPanel); }
-		if(controlPanels != null) {
-			currEastPanel = (EastPanel)controlPanels[0];
-			currSouthPanel = (SouthPanel)controlPanels[1]; }
-		else {
+		if(controlPanels == null) {
 			currEastPanel = null;
-			currSouthPanel = null; }
+			currNorthPanel = null; }
+		else {
+			currEastPanel = controlPanels[0];
+			currNorthPanel = controlPanels[1]; }
 		if(currEastPanel != null) {
-			add(currSouthPanel, BorderLayout.SOUTH);
-			currSouthPanel.setVisible(true);
+			add(currNorthPanel, BorderLayout.NORTH);
+			currNorthPanel.setVisible(true);
 			add(currEastPanel, BorderLayout.EAST);
 			currEastPanel.setVisible(true); } }
 

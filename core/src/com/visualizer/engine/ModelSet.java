@@ -132,6 +132,9 @@ public class ModelSet extends ModelBatch {
 		for(SpatialObject atom: bonds) {
 			atom.scale(factor); } }
 
+	public void setAxesPosition(Vector3 position) {
+		axes.translateTo(position); }
+	
 	public void spreadAll(float factor) {
 	
 	}

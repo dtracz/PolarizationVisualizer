@@ -1,6 +1,5 @@
 package com.visualizer.engine;
 
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 
@@ -16,7 +15,7 @@ public interface SpatialObject {
 	
 	void spread(float factor);
 	
-	void translate(Vector3 vector);
+	void translateTo(Vector3 vector);
 	
 	ModelInstance[] getInstances();
 	

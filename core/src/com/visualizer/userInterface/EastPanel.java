@@ -18,14 +18,15 @@ public class EastPanel extends JScrollPane {
 	private final ArrayList<Bond> bonds;
 	
 	private JPanel viewPanel;
+	private JPanel windowsPanel;
 	private int xSize;
 	
 	private final Component atomTable;
-	//private final Component bondTable;
+	private final Component bondTable;
 	private final JTextArea textArea;
 	
 	private JTable createAtomTable(final ArrayList<Atom> atoms) {
-		Object columnNames[] = new Object[] {" ", "at.", "lbl"};
+		Object columnNames[] = new Object[] {"atom", "v. at.", "v. lbl"};
 		Object values[][] = new Object[atoms.size()][];
 		int i = 0;
 		for(Atom atom: atoms) {
@@ -81,29 +82,87 @@ public class EastPanel extends JScrollPane {
 		});
 		return table; }
 	
-	private JTextArea createTextArea() {
-		JTextArea textArea = new JTextArea(7, 17);
-		textArea.setEditable(false);
-		return textArea; }
+	private JTable createBondTable(final ArrayList<Bond> bonds) {
+		Object columnNames[] = new Object[] {"bond", "visible"};
+		Object values[][] = new Object[bonds.size()][];
+		int i = 0;
+		for(Bond bond: bonds) {
+			values[i++] = new Object[]{bond.getAtomsNames(), true}; }
+		
+		/** creates model: set type of columns' values and whats editable */
+		DefaultTableModel model = new DefaultTableModel(values, columnNames) {
+			@Override
+			public Class<?> getColumnClass(int column) {
+				switch(column) {
+					case 0:
+						return String.class;
+					case 1:
+						return Boolean.class;
+					default:
+						return String.class; } }
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return column != 0; }
+		};
+		
+		/** creates table from model */
+		final JTable table = new JTable(model);
+		table.setPreferredScrollableViewportSize(new Dimension( 180, 120));
+		table.getColumnModel().getColumn(0).setPreferredWidth(100);
+		
+		/** set renderer */
+		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+		renderer.setHorizontalAlignment(JLabel.CENTER);
+		renderer.setFont(renderer.getFont().deriveFont(Font.BOLD));                     // not working :/
+		table.getColumnModel().getColumn(0).setCellRenderer(renderer);
+		
+		/** add change listener to model (uses table so needs to be implement after creating) */
+		table.getModel().addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent event) {
+				int i = event.getColumn();
+				int j = event.getFirstRow();
+				if(i == 1) {
+					bonds.get(j).setRenderable((Boolean)table.getValueAt(j, i)); } }
+		});
+		
+		/** set selection listener */
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+			public void valueChanged(ListSelectionEvent event) {
+				int row = table.getSelectedRow();
+				String description = bonds.get(row).getDescription();
+				textArea.setText(description); }
+		});
+		return table; }
 	
-	public EastPanel(ModelSubframe subframe, int xSize) {
+	public EastPanel(ModelSubframe subframe, int xSize, int ySize) {
 		atoms = subframe.engine.models.atoms;
 		bonds = subframe.engine.models.bonds;
 		this.xSize = xSize;
-		setPreferredSize(new Dimension(xSize, 10));
+		setPreferredSize(new Dimension(xSize, ySize));
 		
-		viewPanel = new JPanel(new GridBagLayout());
+		viewPanel = new JPanel();
+		windowsPanel = new JPanel(new GridBagLayout());
+		
+		JPanel textAreaPane = new JPanel(new GridBagLayout());
+		textAreaPane.setBorder(BorderFactory.createTitledBorder("Object info"));
+		textArea = new JTextArea(7, 16);
+		textArea.setEditable(false);
+		textAreaPane.add(textArea);
+		atomTable = createAtomTable(atoms);
+		bondTable = createBondTable(bonds);
+		
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(10,10,10,10);
+		gbc.insets = new Insets(15,9,5,9);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		textArea = createTextArea();
-		atomTable = createAtomTable(atoms);
-		
-		viewPanel.add(new JScrollPane(atomTable), gbc);
+		windowsPanel.add(new JScrollPane(atomTable), gbc);
 		gbc.gridy++;
-		viewPanel.add(new JScrollPane(textArea), gbc);
+		windowsPanel.add(new JScrollPane(bondTable), gbc);
+		gbc.gridy++;
+		windowsPanel.add(new JScrollPane(textAreaPane), gbc);
 		
+		viewPanel.add(windowsPanel);
 		setViewportView(viewPanel); }
 	
 }

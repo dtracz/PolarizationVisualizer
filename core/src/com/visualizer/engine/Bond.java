@@ -14,6 +14,8 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 public class Bond implements SpatialObject {
+	private final Atom[] connectedAtoms;
+	
 	private final Vector3 helper = new Vector3();
 	private BlendingAttribute blendingAttribute;
 	private final ModelInstance[] instances;
@@ -29,6 +31,7 @@ public class Bond implements SpatialObject {
 	public final String description = " y x ";
 	
 	Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean striped) {
+		connectedAtoms = new Atom[]{atom1, atom2};
 		scale = 1f;
 		stretch = 1f;
 		renderable = true;
@@ -64,6 +67,9 @@ public class Bond implements SpatialObject {
 		
 		instances = new ModelInstance[]{boundPart1, boundPart2, center1, center2}; }
 	
+	public String getAtomsNames() {
+		return connectedAtoms[0].name + " - " + connectedAtoms[1].name; }
+		
 	public String getDescription() {
 		return description; }
 	
@@ -104,7 +110,7 @@ public class Bond implements SpatialObject {
 		stretch = factor; }
 	
 	@Override
-	public void translate(Vector3 translation) {
+	public void translateTo(Vector3 translation) {
 		for(ModelInstance instance: instances) {
 			instance.transform.setTranslation(translation); } }
 	

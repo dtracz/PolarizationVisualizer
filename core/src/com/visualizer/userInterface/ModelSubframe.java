@@ -21,6 +21,8 @@ public class ModelSubframe extends JInternalFrame {
 	
 	public ModelSubframe(String name, int width, int height, final File sourceFile) {
 		super(sourceFile.getName() + " ("+(++frameCounter)+')', true, true, true, false);
+		setSize(width, height);
+		setLocation(xStart + xOffset*(frameCounter-1), yStart + yOffset*(frameCounter-1));
 		
 		final ModelSubframe self = this;
 		addComponentListener(new ComponentListener() {
@@ -60,8 +62,6 @@ public class ModelSubframe extends JInternalFrame {
 			public void internalFrameDeactivated(InternalFrameEvent e) { }
 		});
 		
-		setSize(width, height);
-		setLocation(xStart + xOffset*(frameCounter-1), yStart + yOffset*(frameCounter-1));
 		try {
 			setSelected(true); }
 		catch(java.beans.PropertyVetoException e) {

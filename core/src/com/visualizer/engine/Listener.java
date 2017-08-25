@@ -59,7 +59,7 @@ public class Listener implements InputProcessor {
 		if(keycode == Input.Keys.X) {
 			cameraHandler.setUpAxis(Vector3.Z); }
 		if(keycode == Input.Keys.Z) {
-			cameraHandler.lookAtPlane(Vector3.Zero, Vector3.X, Vector3.Y); }
+			cameraHandler.lookAt(Vector3.Zero, Vector3.X, Vector3.Y); }
 		return true; }
 
 	@Override
