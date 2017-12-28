@@ -101,7 +101,7 @@ public class MainWindow extends JFrame {
 				MainWindow.getInstance().validate(); }
 		});
 		menuView.add(itemMode);
-		menuView.add(itemCamera);
+		//menuView.add(itemCamera);
 		menuView.add(itemControl);
 		return menuView; }
 		
@@ -109,13 +109,14 @@ public class MainWindow extends JFrame {
 		bar = new JMenuBar();
 		JMenu menuFile = createMenuFile("File");
 		bar.add(menuFile);
-		JMenu menuEdit = new JMenu("Edit");
-		bar.add(menuEdit);
+		//JMenu menuEdit = new JMenu("Edit");
+		//bar.add(menuEdit);
 		JMenu menuView = createMenuView("View");
 		bar.add(menuView);
-		JMenu menuSettings = new JMenu("Settings");
-		bar.add(menuSettings);
-		setJMenuBar(bar); }
+		//JMenu menuSettings = new JMenu("Settings");
+		//bar.add(menuSettings);
+		setJMenuBar(bar);
+	}
 	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	

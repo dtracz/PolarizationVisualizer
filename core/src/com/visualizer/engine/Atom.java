@@ -26,22 +26,26 @@ public class Atom implements SpatialObject {
 	private boolean renderable;
 	
 	public final String name;
-	public final String description = " xx yy ";
+	public final String description;
 	public boolean visibleLabel;
 
-	Atom(String name, Model model, Material material, Vector3 position, Quaternion orientation, Vector3 sizes) {
+	Atom(String name, Model model, Material material, Vector3 position, Quaternion orientation, Vector3 sizes, String alpha) {
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
 		this.position = position;
 		this.orientation = orientation;
 		this.sizes = sizes;
 		this.name = name;
+		this.description = name + String.format(" (%.3f, %.3f, %.3f)\n\nalpha:\n", position.x, position.y, position.z) + alpha.substring(13);
 		scale = 1f;
 		stretch = 1f;
 		ModelInstance sphereInstance = new ModelInstance(model, new Matrix4(position, orientation, sizes));
-		sphereInstance.materials.get(0).set(material);
-		instances = new ModelInstance[]{sphereInstance};
+		ModelInstance centerInstance = new ModelInstance(model, new Matrix4(position, new Quaternion(), new Vector3(0.15f,0.15f,0.15f)));
+		instances = new ModelInstance[]{sphereInstance, centerInstance};
+		for(ModelInstance instance: instances) {
+			instance.materials.get(0).set(material); }
 		renderable = true;
-		visibleLabel = true; }
+		visibleLabel = true;
+	}
 	
 	public String getDescription() {
 		return description; }
@@ -57,15 +61,18 @@ public class Atom implements SpatialObject {
 	@Override
 	public void changeOpacity(float opacity) {
 		blendingAttribute.opacity = opacity;
-		for(ModelInstance instance: instances) {
-			instance.materials.get(0).set(blendingAttribute); } }
+		instances[0].materials.get(0).set(blendingAttribute);
+		//for(ModelInstance instance: instances) {
+		//	instance.materials.get(0).set(blendingAttribute); }
+	}
 	
 	@Override
 	public void scale(float factor) {
 		factor = factor <= 0 ? 0.001f : factor;
 		sizes.scl(factor/scale);
-		for(ModelInstance instance: instances) {
-		    instance.transform.set(position, orientation, sizes); }
+		instances[0].transform.set(position, orientation, sizes);
+		//for(ModelInstance instance: instances) {
+		//    instance.transform.set(position, orientation, sizes); }
 		scale = factor; }
 
 	@Override

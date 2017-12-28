@@ -28,9 +28,9 @@ public class Bond implements SpatialObject {
 	
 	boolean renderable;
 	
-	public final String description = " y x ";
+	public final String description;
 	
-	Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean striped) {
+	Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean striped, String bondpol) {
 		connectedAtoms = new Atom[]{atom1, atom2};
 		scale = 1f;
 		stretch = 1f;
@@ -44,6 +44,7 @@ public class Bond implements SpatialObject {
 		
 		Vector3 quartLength = positions[1].cpy();
 		quartLength.sub(positions[0]);
+		float length = quartLength.dst(Vector3.Zero);
 		quartLength.scl(0.25f);
 		positions[0] = positions[0].add(quartLength);
 		positions[1] = positions[1].sub(quartLength);
@@ -65,7 +66,13 @@ public class Bond implements SpatialObject {
 					new Texture(Gdx.files.getFileHandle("stripes.jpg", Files.FileType.Internal)))); }
 		boundPart2.materials.get(0).set(material2);
 		
-		instances = new ModelInstance[]{boundPart1, boundPart2, center1, center2}; }
+		instances = new ModelInstance[]{boundPart1, boundPart2, center1, center2};
+	
+		this.description = String.format("BOND: %s %s\n\n", atom1.name, atom2.name) +
+						   //"BOND: "+ atom1.name +" "+ atom2.name +'\n'+
+				           String.format("length: %.3f Å\n", length) +
+						   String.format("bondpol: %s", bondpol);
+	}
 	
 	public String getAtomsNames() {
 		return connectedAtoms[0].name + " - " + connectedAtoms[1].name; }

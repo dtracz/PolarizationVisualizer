@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
  */
 public class ModelSet extends ModelBatch {
 	private final Vector3 helper = new Vector3();
-	private float boundDiameter = 0.1f;										// parameters !!!
+	private float boundDiameter = 0.064f;										// parameters !!!
 	private int cylindricalDivisions = 16;
 	private int sphereDivisionsU = 32;
 	private int sphereDivisionsV = 32;
@@ -66,12 +66,12 @@ public class ModelSet extends ModelBatch {
 	
 	/* - ADDITIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
-	public void addAtom(String name, Color color, Vector3 position, Quaternion orientation, Vector3 scale) {
-		atoms.add(new Atom(name, sphere, new Material(ColorAttribute.createDiffuse(color)), position, orientation, scale));
+	public void addAtom(String name, Color color, Vector3 position, Quaternion orientation, Vector3 scale, String alpha) {
+		atoms.add(new Atom(name, sphere, new Material(ColorAttribute.createDiffuse(color)), position, orientation, scale, alpha));
 	}
 	
-	public void addBond(String atomName1, String atomName2, boolean striped) throws NoSuchElementException {
-		bonds.add(new Bond(sphere, cylinder, getAtom(atomName1), getAtom(atomName2), boundDiameter, striped)); }
+	public void addBond(String atomName1, String atomName2, boolean striped, String bondpol) throws NoSuchElementException {
+		bonds.add(new Bond(sphere, cylinder, getAtom(atomName1), getAtom(atomName2), boundDiameter, striped, bondpol)); }
 	
 	public void createAxes(Vector3 origin, float length, float headLength, float diameter) {
 		axes = new Axes(cylinder, cone, origin, length, headLength, diameter); }
