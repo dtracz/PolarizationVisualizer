@@ -47,7 +47,7 @@ public class ModelSet extends ModelBatch {
 		atoms = new ArrayList<Atom>();
 		bonds = new ArrayList<Bond>();
 		sphere = builder.createSphere(1,1,1, sphereDivisionsU, sphereDivisionsV, new Material(),
-									  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+									  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
 		cylinder = builder.createCylinder(1, 1, 1, cylindricalDivisions, new Material(),
 										  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
 		//arrow = builder.createArrow(0,0,0,0,1,0,1,0, cylindricalDivisions,

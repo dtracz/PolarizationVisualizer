@@ -81,7 +81,7 @@ public class NorthPanel extends JScrollPane{
 			public void stateChanged(ChangeEvent changeEvent) {
 				models.scale(((Double)spinner.getValue()).floatValue(), objects); } });
 		if(objects.equals("ATOMS")) {
-			spinner.setValue(0.25); }
+			spinner.setValue(0.2); }
 		sizePanel.add(spinner);
 		return sizePanel; }
 

@@ -61,7 +61,7 @@ public class MainEngine implements ApplicationListener {
 	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
-	private boolean isColse(double x1, double x2) {
+	private boolean isClose(double x1, double x2) {
 		return Math.abs(x1 - x2) < 0.0001;
 	}
 	
@@ -86,53 +86,53 @@ public class MainEngine implements ApplicationListener {
 		double ny = Math.sqrt((eigenVecs.getQuick(1,1) - Math.cos(phi))/(1.-Math.cos(phi)));
 		double nz = Math.sqrt((eigenVecs.getQuick(2,2) - Math.cos(phi))/(1.-Math.cos(phi)));
 		
-		if(isColse(getX01(phi, nx, ny, nz), eigenVecs.getQuick(0,1)) &&
-		   isColse(getX02(phi, nx, ny, nz), eigenVecs.getQuick(0,2)) &&
-		   isColse(getX12(phi, nx, ny, nz), eigenVecs.getQuick(1,2)) ) {
+		if(isClose(getX01(phi, nx, ny, nz), eigenVecs.getQuick(0,1)) &&
+		   isClose(getX02(phi, nx, ny, nz), eigenVecs.getQuick(0,2)) &&
+		   isClose(getX12(phi, nx, ny, nz), eigenVecs.getQuick(1,2)) ) {
 			//System.out.println("OK");
 		}
-		else if(isColse(getX01(phi, nx, ny, -nz), eigenVecs.getQuick(0,1)) &&
-				isColse(getX02(phi, nx, ny, -nz), eigenVecs.getQuick(0,2)) &&
-				isColse(getX12(phi, nx, ny, -nz), eigenVecs.getQuick(1,2)) ) {
+		else if(isClose(getX01(phi, nx, ny, -nz), eigenVecs.getQuick(0,1)) &&
+				isClose(getX02(phi, nx, ny, -nz), eigenVecs.getQuick(0,2)) &&
+				isClose(getX12(phi, nx, ny, -nz), eigenVecs.getQuick(1,2)) ) {
 			//System.out.println("#Z");
 			nz *= -1;
 		}
-		else if(isColse(getX01(phi, nx, -ny, nz), eigenVecs.getQuick(0,1)) &&
-				isColse(getX02(phi, nx, -ny, nz), eigenVecs.getQuick(0,2)) &&
-				isColse(getX12(phi, nx, -ny, nz), eigenVecs.getQuick(1,2)) ) {
+		else if(isClose(getX01(phi, nx, -ny, nz), eigenVecs.getQuick(0,1)) &&
+				isClose(getX02(phi, nx, -ny, nz), eigenVecs.getQuick(0,2)) &&
+				isClose(getX12(phi, nx, -ny, nz), eigenVecs.getQuick(1,2)) ) {
 			//System.out.println("#Y");
 			ny *= -1;
 		}
-		else if(isColse(getX01(phi, -nx, ny, nz), eigenVecs.getQuick(0,1)) &&
-				isColse(getX02(phi, -nx, ny, nz), eigenVecs.getQuick(0,2)) &&
-				isColse(getX12(phi, -nx, ny, nz), eigenVecs.getQuick(1,2)) ) {
+		else if(isClose(getX01(phi, -nx, ny, nz), eigenVecs.getQuick(0,1)) &&
+				isClose(getX02(phi, -nx, ny, nz), eigenVecs.getQuick(0,2)) &&
+				isClose(getX12(phi, -nx, ny, nz), eigenVecs.getQuick(1,2)) ) {
 			//System.out.println("#X");
 			nx *= -1;
 		}
-		else if(isColse(getX01(phi, nx, -ny, -nz), eigenVecs.getQuick(0,1)) &&
-				isColse(getX02(phi, nx, -ny, -nz), eigenVecs.getQuick(0,2)) &&
-				isColse(getX12(phi, nx, -ny, -nz), eigenVecs.getQuick(1,2)) ) {
+		else if(isClose(getX01(phi, nx, -ny, -nz), eigenVecs.getQuick(0,1)) &&
+				isClose(getX02(phi, nx, -ny, -nz), eigenVecs.getQuick(0,2)) &&
+				isClose(getX12(phi, nx, -ny, -nz), eigenVecs.getQuick(1,2)) ) {
 			//System.out.println("#YZ");
 			ny *= -1;
 			nz *= -1;
 		}
-		else if(isColse(getX01(phi, -nx, ny, -nz), eigenVecs.getQuick(0,1)) &&
-				isColse(getX02(phi, -nx, ny, -nz), eigenVecs.getQuick(0,2)) &&
-				isColse(getX12(phi, -nx, ny, -nz), eigenVecs.getQuick(1,2)) ) {
+		else if(isClose(getX01(phi, -nx, ny, -nz), eigenVecs.getQuick(0,1)) &&
+				isClose(getX02(phi, -nx, ny, -nz), eigenVecs.getQuick(0,2)) &&
+				isClose(getX12(phi, -nx, ny, -nz), eigenVecs.getQuick(1,2)) ) {
 			//System.out.println("#XZ");
 			nx *= -1;
 			nz *= -1;
 		}
-		else if(isColse(getX01(phi, -nx, -ny, nz), eigenVecs.getQuick(0,1)) &&
-				isColse(getX02(phi, -nx, -ny, nz), eigenVecs.getQuick(0,2)) &&
-				isColse(getX12(phi, -nx, -ny, nz), eigenVecs.getQuick(1,2)) ) {
+		else if(isClose(getX01(phi, -nx, -ny, nz), eigenVecs.getQuick(0,1)) &&
+				isClose(getX02(phi, -nx, -ny, nz), eigenVecs.getQuick(0,2)) &&
+				isClose(getX12(phi, -nx, -ny, nz), eigenVecs.getQuick(1,2)) ) {
 			//System.out.println("#XY");
 			nx *= -1;
 			ny *= -1;
 		}
-		else if(isColse(getX01(phi, -nx, -ny, -nz), eigenVecs.getQuick(0,1)) &&
-				isColse(getX02(phi, -nx, -ny, -nz), eigenVecs.getQuick(0,2)) &&
-				isColse(getX12(phi, -nx, -ny, -nz), eigenVecs.getQuick(1,2)) ) {
+		else if(isClose(getX01(phi, -nx, -ny, -nz), eigenVecs.getQuick(0,1)) &&
+				isClose(getX02(phi, -nx, -ny, -nz), eigenVecs.getQuick(0,2)) &&
+				isClose(getX12(phi, -nx, -ny, -nz), eigenVecs.getQuick(1,2)) ) {
 			//System.out.println("#XYZ");
 			nx *= -1;
 			ny *= -1;
@@ -242,6 +242,8 @@ public class MainEngine implements ApplicationListener {
 			catch(NoSuchElementException nsee) {
 				showMessage(nsee.getMessage(), "Error");
 				nsee.printStackTrace(); } }
+		for(Atom atom: models.atoms) {
+			atom.setTexture(true); }
 		return shift; }
 	
 		

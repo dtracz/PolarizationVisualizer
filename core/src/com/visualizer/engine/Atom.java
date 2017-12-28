@@ -1,10 +1,14 @@
 package com.visualizer.engine;
 
+import com.badlogic.gdx.Files;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -45,6 +49,13 @@ public class Atom implements SpatialObject {
 			instance.materials.get(0).set(material); }
 		renderable = true;
 		visibleLabel = true;
+		this.scale(0.2f);
+	}
+	
+	void setTexture(boolean ifAxes) {
+		if(ifAxes) {
+			instances[0].materials.get(0).set(TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle("grid2.jpg", Files.FileType.Internal))));
+		}
 	}
 	
 	public String getDescription() {

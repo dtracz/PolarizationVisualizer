@@ -1,21 +1,441 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<java version="1.8.0_131" class="java.beans.XMLDecoder">
+<java version="1.8.0_151" class="java.beans.XMLDecoder">
  <object class="java.util.TreeMap">
   <void method="put">
+   <string>Ac</string>
+   <int>1890319103</int>
+  </void>
+  <void method="put">
+   <string>Ag</string>
+   <int>-1061109505</int>
+  </void>
+  <void method="put">
+   <string>Al</string>
+   <int>-1079597313</int>
+  </void>
+  <void method="put">
+   <string>Am</string>
+   <int>1415377663</int>
+  </void>
+  <void method="put">
+   <string>Ar</string>
+   <int>-2133728257</int>
+  </void>
+  <void method="put">
+   <string>As</string>
+   <int>-1115626497</int>
+  </void>
+  <void method="put">
+   <string>At</string>
+   <int>1968129535</int>
+  </void>
+  <void method="put">
+   <string>Au</string>
+   <int>-3073537</int>
+  </void>
+  <void method="put">
+   <string>B</string>
+   <int>-4868609</int>
+  </void>
+  <void method="put">
+   <string>Ba</string>
+   <int>13172991</int>
+  </void>
+  <void method="put">
+   <string>Be</string>
+   <int>-1023475457</int>
+  </void>
+  <void method="put">
+   <string>Bh</string>
+   <int>-536856321</int>
+  </void>
+  <void method="put">
+   <string>Bi</string>
+   <int>-1638943233</int>
+  </void>
+  <void method="put">
+   <string>Bk</string>
+   <int>-1974475777</int>
+  </void>
+  <void method="put">
+   <string>Br</string>
+   <int>-1507251713</int>
+  </void>
+  <void method="put">
    <string>C</string>
-   <int>640034559</int>
+   <int>-1869573889</int>
+  </void>
+  <void method="put">
+   <string>Ca</string>
+   <int>1040122111</int>
+  </void>
+  <void method="put">
+   <string>Cd</string>
+   <int>-2519041</int>
+  </void>
+  <void method="put">
+   <string>Ce</string>
+   <int>-14337</int>
+  </void>
+  <void method="put">
+   <string>Cf</string>
+   <int>-1590242049</int>
+  </void>
+  <void method="put">
+   <string>Cl</string>
+   <int>535830527</int>
+  </void>
+  <void method="put">
+   <string>Cm</string>
+   <int>2019353599</int>
+  </void>
+  <void method="put">
+   <string>Co</string>
+   <int>-258957057</int>
+  </void>
+  <void method="put">
+   <string>Cr</string>
+   <int>-1969633281</int>
+  </void>
+  <void method="put">
+   <string>Cs</string>
+   <int>1461161983</int>
+  </void>
+  <void method="put">
+   <string>Cu</string>
+   <int>-931122177</int>
+  </void>
+  <void method="put">
+   <string>Db</string>
+   <int>-788508673</int>
+  </void>
+  <void method="put">
+   <string>Dy</string>
+   <int>536856575</int>
+  </void>
+  <void method="put">
+   <string>Er</string>
+   <int>15103487</int>
+  </void>
+  <void method="put">
+   <string>Es</string>
+   <int>-1289759489</int>
+  </void>
+  <void method="put">
+   <string>Eu</string>
+   <int>1644152831</int>
+  </void>
+  <void method="put">
+   <string>F</string>
+   <int>-1864347393</int>
+  </void>
+  <void method="put">
+   <string>Fe</string>
+   <int>-530172929</int>
+  </void>
+  <void method="put">
+   <string>Fm</string>
+   <int>-1289766145</int>
+  </void>
+  <void method="put">
+   <string>Fr</string>
+   <int>1107322623</int>
+  </void>
+  <void method="put">
+   <string>Ga</string>
+   <int>-1030778881</int>
+  </void>
+  <void method="put">
+   <string>Gd</string>
+   <int>1174390783</int>
+  </void>
+  <void method="put">
+   <string>Ge</string>
+   <int>1720684543</int>
   </void>
   <void method="put">
    <string>H</string>
    <int>-437918209</int>
   </void>
   <void method="put">
+   <string>He</string>
+   <int>-637534209</int>
+  </void>
+  <void method="put">
+   <string>Hf</string>
+   <int>1304625151</int>
+  </void>
+  <void method="put">
+   <string>Hg</string>
+   <int>-1195847425</int>
+  </void>
+  <void method="put">
+   <string>Ho</string>
+   <int>16751871</int>
+  </void>
+  <void method="put">
+   <string>Hs</string>
+   <int>-436195585</int>
+  </void>
+  <void method="put">
+   <string>I</string>
+   <int>-1811901185</int>
+  </void>
+  <void method="put">
+   <string>In</string>
+   <int>-1502252033</int>
+  </void>
+  <void method="put">
+   <string>Ir</string>
+   <int>391415807</int>
+  </void>
+  <void method="put">
+   <string>K</string>
+   <int>-1891576577</int>
+  </void>
+  <void method="put">
+   <string>Kr</string>
+   <int>1555616255</int>
+  </void>
+  <void method="put">
+   <string>La</string>
+   <int>1893007359</int>
+  </void>
+  <void method="put">
+   <string>Li</string>
+   <int>-863961089</int>
+  </void>
+  <void method="put">
+   <string>Lr</string>
+   <int>-956274945</int>
+  </void>
+  <void method="put">
+   <string>Lu</string>
+   <int>11216127</int>
+  </void>
+  <void method="put">
+   <string>Md</string>
+   <int>-1290950913</int>
+  </void>
+  <void method="put">
+   <string>Mg</string>
+   <int>-1962999553</int>
+  </void>
+  <void method="put">
+   <string>Mn</string>
+   <int>-1669675009</int>
+  </void>
+  <void method="put">
+   <string>Mo</string>
+   <int>1421194751</int>
+  </void>
+  <void method="put">
+   <string>Mt</string>
+   <int>-352311553</int>
+  </void>
+  <void method="put">
    <string>N</string>
-   <int>65535</int>
+   <int>810612991</int>
+  </void>
+  <void method="put">
+   <string>Na</string>
+   <int>-1419971841</int>
+  </void>
+  <void method="put">
+   <string>Nb</string>
+   <int>1942145535</int>
+  </void>
+  <void method="put">
+   <string>Nd</string>
+   <int>-939538433</int>
+  </void>
+  <void method="put">
+   <string>Ne</string>
+   <int>-1276905985</int>
+  </void>
+  <void method="put">
+   <string>Ni</string>
+   <int>1355829503</int>
+  </void>
+  <void method="put">
+   <string>No</string>
+   <int>-1123186689</int>
+  </void>
+  <void method="put">
+   <string>Np</string>
+   <int>8454143</int>
   </void>
   <void method="put">
    <string>O</string>
-   <int>-16776961</int>
+   <int>-15921665</int>
+  </void>
+  <void method="put">
+   <string>Os</string>
+   <int>644257535</int>
+  </void>
+  <void method="put">
+   <string>P</string>
+   <int>-8388353</int>
+  </void>
+  <void method="put">
+   <string>Pa</string>
+   <int>10616831</int>
+  </void>
+  <void method="put">
+   <string>Pb</string>
+   <int>1465475583</int>
+  </void>
+  <void method="put">
+   <string>Pd</string>
+   <int>6915583</int>
+  </void>
+  <void method="put">
+   <string>Pm</string>
+   <int>-1543518209</int>
+  </void>
+  <void method="put">
+   <string>Po</string>
+   <int>-1420033793</int>
+  </void>
+  <void method="put">
+   <string>Pr</string>
+   <int>-637548545</int>
+  </void>
+  <void method="put">
+   <string>Pt</string>
+   <int>-791617281</int>
+  </void>
+  <void method="put">
+   <string>Pu</string>
+   <int>7077887</int>
+  </void>
+  <void method="put">
+   <string>Ra</string>
+   <int>8192255</int>
+  </void>
+  <void method="put">
+   <string>Rb</string>
+   <int>1882108159</int>
+  </void>
+  <void method="put">
+   <string>Re</string>
+   <int>645770239</int>
+  </void>
+  <void method="put">
+   <string>Rf</string>
+   <int>-872392193</int>
+  </void>
+  <void method="put">
+   <string>Rh</string>
+   <int>176000255</int>
+  </void>
+  <void method="put">
+   <string>Rn</string>
+   <int>1115854591</int>
+  </void>
+  <void method="put">
+   <string>Ru</string>
+   <int>613388287</int>
+  </void>
+  <void method="put">
+   <string>S</string>
+   <int>-52993</int>
+  </void>
+  <void method="put">
+   <string>Sb</string>
+   <int>-1637632513</int>
+  </void>
+  <void method="put">
+   <string>Sc</string>
+   <int>-421075201</int>
+  </void>
+  <void method="put">
+   <string>Se</string>
+   <int>-6225665</int>
+  </void>
+  <void method="put">
+   <string>Sg</string>
+   <int>-654293505</int>
+  </void>
+  <void method="put">
+   <string>Si</string>
+   <int>-255287041</int>
+  </void>
+  <void method="put">
+   <string>Sm</string>
+   <int>-1879062529</int>
+  </void>
+  <void method="put">
+   <string>Sn</string>
+   <int>1719697663</int>
+  </void>
+  <void method="put">
+   <string>Sr</string>
+   <int>16711935</int>
+  </void>
+  <void method="put">
+   <string>Ta</string>
+   <int>1302790143</int>
+  </void>
+  <void method="put">
+   <string>Tb</string>
+   <int>822069247</int>
+  </void>
+  <void method="put">
+   <string>Tc</string>
+   <int>1000251135</int>
+  </void>
+  <void method="put">
+   <string>Te</string>
+   <int>-730201857</int>
+  </void>
+  <void method="put">
+   <string>Th</string>
+   <int>12255231</int>
+  </void>
+  <void method="put">
+   <string>Ti</string>
+   <int>-1077753857</int>
+  </void>
+  <void method="put">
+   <string>Tl</string>
+   <int>-1504424449</int>
+  </void>
+  <void method="put">
+   <string>Tm</string>
+   <int>7951103</int>
+  </void>
+  <void method="put">
+   <string>U</string>
+   <int>9437183</int>
+  </void>
+  <void method="put">
+   <string>V</string>
+   <int>-1499026433</int>
+  </void>
+  <void method="put">
+   <string>W</string>
+   <int>563402495</int>
+  </void>
+  <void method="put">
+   <string>Xe</string>
+   <int>1117696255</int>
+  </void>
+  <void method="put">
+   <string>Y</string>
+   <int>-1795162113</int>
+  </void>
+  <void method="put">
+   <string>Yb</string>
+   <int>12531967</int>
+  </void>
+  <void method="put">
+   <string>Zn</string>
+   <int>2105585919</int>
+  </void>
+  <void method="put">
+   <string>Zr</string>
+   <int>-1797201665</int>
   </void>
  </object>
 </java>

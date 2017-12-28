@@ -69,7 +69,6 @@ public class Bond implements SpatialObject {
 		instances = new ModelInstance[]{boundPart1, boundPart2, center1, center2};
 	
 		this.description = String.format("BOND: %s %s\n\n", atom1.name, atom2.name) +
-						   //"BOND: "+ atom1.name +" "+ atom2.name +'\n'+
 				           String.format("length: %.3f Å\n", length) +
 						   String.format("bondpol: %s", bondpol);
 	}
