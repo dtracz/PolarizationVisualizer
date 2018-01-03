@@ -54,7 +54,7 @@ public class Atom implements SpatialObject {
 	
 	void setTexture(boolean ifAxes) {
 		if(ifAxes) {
-			instances[0].materials.get(0).set(TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle("grid1.png", Files.FileType.Internal))));
+			instances[0].materials.get(0).set(TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle("path92.png", Files.FileType.Internal))));
 		}
 	}
 	
