@@ -82,13 +82,13 @@ public class Listener implements InputProcessor {
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		mouse.move(screenX, screenY);
-		if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 			cameraHandler.rotArUp(-mouse.dx*angleSpeed);
 			cameraHandler.rotUpDown(mouse.dy*angleSpeed); }
 		else if(Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
 			cameraHandler.rotArDir(mouse.dPhi*angleSpeed);
 		}
-		else if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+		else if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
 			cameraHandler.movePlanar(mouse.dx*0.0286f, mouse.dy*0.0286f); }
 		return true; }
 

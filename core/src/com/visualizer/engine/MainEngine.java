@@ -196,9 +196,9 @@ public class MainEngine implements ApplicationListener {
 		while(scanner.hasNext("[A-Z][a-z]?\\d*")) {
 			bonds.add(scanner.next());
 			bonds.add(scanner.next());
-			for(int _=0; _<4; _++) { scanner.next(); }
-			bonds.add(Boolean.toString(scanner.nextFloat() > 0));
-			for(int _=0; _<4; _++) { scanner.next(); }
+			for(int _=0; _<3; _++) { scanner.next(); }
+			bonds.add(Boolean.toString(scanner.nextFloat() < 0.1));
+			for(int _=0; _<5; _++) { scanner.next(); }
 			bonds.add(scanner.next());
 			scanner.nextLine(); }
 		scanner.close(); }

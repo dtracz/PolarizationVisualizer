@@ -69,7 +69,7 @@ public class EastPanel extends JScrollPane {
 				int j = event.getFirstRow();
 				if(i == 1) {
 					atoms.get(j).setRenderable((Boolean)table.getValueAt(j, i)); }
-				if(i == 2) {
+				else if(i == 2) {
 					atoms.get(j).visibleLabel = (Boolean)table.getValueAt(j, i); } }
 		});
 		
@@ -82,12 +82,14 @@ public class EastPanel extends JScrollPane {
 		});
 		return table; }
 	
+		
 	private JTable createBondTable(final ArrayList<Bond> bonds) {
-		Object columnNames[] = new Object[] {"bond", "visible"};
+		Object columnNames[] = new Object[] {"bond", "visible", "dashed"};
 		Object values[][] = new Object[bonds.size()][];
 		int i = 0;
 		for(Bond bond: bonds) {
-			values[i++] = new Object[]{bond.getAtomsNames(), true}; }
+			values[i++] = new Object[]{bond.getAtomsNames(), true, bond.ifDashed()};
+		}
 		
 		/** creates model: set type of columns' values and whats editable */
 		DefaultTableModel model = new DefaultTableModel(values, columnNames) {
@@ -97,6 +99,8 @@ public class EastPanel extends JScrollPane {
 					case 0:
 						return String.class;
 					case 1:
+						return Boolean.class;
+					case 2:
 						return Boolean.class;
 					default:
 						return String.class; } }
@@ -123,7 +127,10 @@ public class EastPanel extends JScrollPane {
 				int i = event.getColumn();
 				int j = event.getFirstRow();
 				if(i == 1) {
-					bonds.get(j).setRenderable((Boolean)table.getValueAt(j, i)); } }
+					bonds.get(j).setRenderable((Boolean)table.getValueAt(j, i)); }
+				else if(i == 2) {
+					bonds.get(j).stripe((Boolean)table.getValueAt(j, i)); }
+			}
 		});
 		
 		/** set selection listener */
@@ -135,6 +142,7 @@ public class EastPanel extends JScrollPane {
 		});
 		return table; }
 	
+		
 	public EastPanel(ModelSubframe subframe, int xSize, int ySize) {
 		atoms = subframe.engine.models.atoms;
 		bonds = subframe.engine.models.bonds;

@@ -7,6 +7,8 @@ public interface SpatialObject {
 	
 	boolean renderable();
 	
+	String getDescription();
+	
 	void setRenderable(boolean renderable);
 	
 	void changeOpacity(float opacity);

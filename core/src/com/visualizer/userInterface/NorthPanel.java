@@ -226,7 +226,24 @@ public class NorthPanel extends JScrollPane{
 		setPreferredSize(new Dimension(xSize, ySize));
 		
 		viewPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		optionsPane = new JPanel(new GridBagLayout());
+		final GridBagLayout layout = new GridBagLayout();
+		optionsPane = new JPanel(layout)
+		{
+			
+			@Override
+			public void paint(Graphics g)
+			{
+				super.paint(g);
+				int[][] dims = layout.getLayoutDimensions();
+				//g.setColor(Color.BLUE);
+				int x = 0;
+				for(int i=0; i<dims[0].length; i++) {
+					x += dims[0][i];
+					if(i != 4) {
+						g.drawLine(x, 0, x, getHeight()); } }
+			}
+			
+		};
 		GridBagConstraints gbc = new GridBagConstraints();
 		
 		int sideSpace = 25;

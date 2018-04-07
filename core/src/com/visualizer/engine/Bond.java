@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector3;
 public class Bond implements SpatialObject {
 	private final Atom[] connectedAtoms;
 	
+	private static TextureAttribute dashedTexture;
 	private final Vector3 helper = new Vector3();
 	private BlendingAttribute blendingAttribute;
 	private final ModelInstance[] instances;
@@ -25,12 +26,17 @@ public class Bond implements SpatialObject {
 	private Vector3 sizes;
 	private float scale;
 	private float stretch;
+	private boolean dashed;
 	
 	boolean renderable;
 	
+	
 	public final String description;
 	
-	Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean striped, String bondpol) {
+	Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean dashed, String bondpol) {
+		if(dashedTexture == null) {
+			dashedTexture = TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle("stripes.jpg", Files.FileType.Internal)));
+		}
 		connectedAtoms = new Atom[]{atom1, atom2};
 		scale = 1f;
 		stretch = 1f;
@@ -55,27 +61,42 @@ public class Bond implements SpatialObject {
 		
 		Material material1 = atom1.getMaterial().copy();
 		center1.materials.get(0).set(material1);
-		if(striped) {
-			material1.set(TextureAttribute.createDiffuse(
-					new Texture(Gdx.files.getFileHandle("stripes.jpg", Files.FileType.Internal)))); }
 		boundPart1.materials.get(0).set(material1);
 		Material material2 = atom2.getMaterial().copy();
 		center2.materials.get(0).set(material2);
-		if(striped) {
-			material2.set(TextureAttribute.createDiffuse(
-					new Texture(Gdx.files.getFileHandle("stripes.jpg", Files.FileType.Internal)))); }
 		boundPart2.materials.get(0).set(material2);
+		// this.dashed = dashed;
 		
 		instances = new ModelInstance[]{boundPart1, boundPart2, center1, center2};
+		stripe(dashed);
 	
 		this.description = String.format("BOND: %s %s\n\n", atom1.name, atom2.name) +
 				           String.format("length: %.3f Å\n", length) +
 						   String.format("bondpol: %s", bondpol);
 	}
 	
+	public void stripe(boolean dashed) {
+		if(dashed && !this.dashed) {
+			for(int i=0; i<2; i++) {
+				instances[i].materials.get(0).set(dashedTexture);
+			}
+		}
+		else if(!dashed && this.dashed) {
+			for(int i=0; i<2; i++) {
+				instances[i].materials.get(0).remove(TextureAttribute.Diffuse);
+			}
+		}
+		this.dashed = dashed;
+	}
+	
+	public boolean ifDashed() {
+		return dashed;
+	}
+	
 	public String getAtomsNames() {
 		return connectedAtoms[0].name + " - " + connectedAtoms[1].name; }
-		
+	
+	@Override
 	public String getDescription() {
 		return description; }
 	
