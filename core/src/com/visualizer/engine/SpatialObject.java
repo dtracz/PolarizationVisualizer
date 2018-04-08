@@ -7,7 +7,7 @@ public interface SpatialObject {
 	
 	boolean renderable();
 	
-	String getDescription();
+	// String getDescription();
 	
 	void setRenderable(boolean renderable);
 	

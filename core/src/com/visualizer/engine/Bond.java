@@ -96,7 +96,7 @@ public class Bond implements SpatialObject {
 	public String getAtomsNames() {
 		return connectedAtoms[0].name + " - " + connectedAtoms[1].name; }
 	
-	@Override
+	// @Override
 	public String getDescription() {
 		return description; }
 	

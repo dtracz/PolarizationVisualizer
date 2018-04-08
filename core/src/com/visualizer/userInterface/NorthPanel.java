@@ -17,7 +17,7 @@ import java.awt.event.ItemListener;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 
-public class NorthPanel extends JScrollPane{
+public class NorthPanel extends JScrollPane {
 	private final static String floatMatch = "-?\\d+\\.?\\d*";
 	private final static String atomMatch = "[A-Z][a-z]?\\d*";
 	private final Vector3 position = new Vector3();
@@ -229,7 +229,6 @@ public class NorthPanel extends JScrollPane{
 		final GridBagLayout layout = new GridBagLayout();
 		optionsPane = new JPanel(layout)
 		{
-			
 			@Override
 			public void paint(Graphics g)
 			{

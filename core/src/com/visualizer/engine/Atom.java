@@ -58,7 +58,7 @@ public class Atom implements SpatialObject {
 		}
 	}
 	
-	@Override
+	// @Override
 	public String getDescription() {
 		return description; }
 	

@@ -13,10 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainWindow extends JFrame {
-	private final static int[] mainWindowSizes = new int[]{1152, 768};
+	private final static int[] mainWindowSizes = new int[]{1280, 960};
 	private final static int[] modelSubframeSizes = new int[]{800, 600};
 	private final static int[] northPanelSizes = new int[]{10, 105};
 	private final static int[] eastPanelSizes = new int[]{245, 10};
+	private final static int[] southPanelSizes = new int[]{10, 205};
 	private final JScrollPane[] emptyPanels; // {east, north}
 	
 	private static MainWindow instance;
@@ -28,6 +29,7 @@ public class MainWindow extends JFrame {
 	private boolean showPanels; //////////////////////////////////////////////////////////////////////////////////
 	private JScrollPane currEastPanel;
 	private JScrollPane currNorthPanel;
+	private JScrollPane southPanel;
 	
 	/* - MENU CREATOR- - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
@@ -83,7 +85,9 @@ public class MainWindow extends JFrame {
 					topSubframe.engine.changeMode(); }
 				MainWindow.getInstance().validate(); }
 		});
+		
 		final JMenuItem itemCamera = new JMenuItem("Set Camera");
+		
 		final JMenuItem itemControl = new JMenuItem("Hide control panel");
 		itemControl.addActionListener(new ActionListener() {
 			@Override
@@ -100,9 +104,28 @@ public class MainWindow extends JFrame {
 					itemControl.setText("Show control panel"); }
 				MainWindow.getInstance().validate(); }
 		});
+		
+		final JMenuItem itemSubroutine = new JMenuItem("Hide control panel");
+//		itemSubroutine.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent ev) {
+//				showPanels = !showPanels;
+//				if(showPanels) {
+//					try {
+//						setCurrPanels(getControlPanel());
+//						itemControl.setText("Hide control panel"); }
+//					catch(NullPointerException npe) {
+//						showPanels = false; } }
+//				else {
+//					setCurrPanels(null);
+//					itemControl.setText("Show control panel"); }
+//				MainWindow.getInstance().validate(); }
+//		});
+		
 		menuView.add(itemMode);
 		//menuView.add(itemCamera);
 		menuView.add(itemControl);
+		menuView.add(itemSubroutine);
 		return menuView; }
 		
 	private void createMenu() {
@@ -155,7 +178,11 @@ public class MainWindow extends JFrame {
 			public void componentHidden(ComponentEvent e) { }
 		});*/
 		setVisible(true);
-		setCurrPanels(emptyPanels); }
+		setCurrPanels(emptyPanels);
+		
+		southPanel = new SouthPanel(southPanelSizes[0], southPanelSizes[1]);
+		add(southPanel, BorderLayout.SOUTH);
+	}
 	
 	public static MainWindow getInstance() {
 		if(instance == null) {
