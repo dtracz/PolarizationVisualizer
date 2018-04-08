@@ -27,6 +27,7 @@ public class MainWindow extends JFrame {
 	private Map<ModelSubframe, JScrollPane[]> projects;
 	private ModelSubframe topSubframe;
 	private boolean showPanels; //////////////////////////////////////////////////////////////////////////////////
+	private boolean showSouth;
 	private JScrollPane currEastPanel;
 	private JScrollPane currNorthPanel;
 	private JScrollPane southPanel;
@@ -105,22 +106,16 @@ public class MainWindow extends JFrame {
 				MainWindow.getInstance().validate(); }
 		});
 		
-		final JMenuItem itemSubroutine = new JMenuItem("Hide control panel");
-//		itemSubroutine.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent ev) {
-//				showPanels = !showPanels;
-//				if(showPanels) {
-//					try {
-//						setCurrPanels(getControlPanel());
-//						itemControl.setText("Hide control panel"); }
-//					catch(NullPointerException npe) {
-//						showPanels = false; } }
-//				else {
-//					setCurrPanels(null);
-//					itemControl.setText("Show control panel"); }
-//				MainWindow.getInstance().validate(); }
-//		});
+		final JMenuItem itemSubroutine = new JMenuItem("Hide subroutine panel");
+		itemSubroutine.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ev) {
+				showSouth = !showSouth;
+				southPanel.setVisible(showSouth);
+				itemSubroutine.setText(showSouth ? "Hide subroutine panel" : "Show subroutine panel");
+				MainWindow.getInstance().validate();
+            }
+		});
 		
 		menuView.add(itemMode);
 		//menuView.add(itemCamera);
@@ -182,6 +177,10 @@ public class MainWindow extends JFrame {
 		
 		southPanel = new SouthPanel(southPanelSizes[0], southPanelSizes[1]);
 		add(southPanel, BorderLayout.SOUTH);
+		showSouth = true;
+		southPanel.setVisible(showSouth);
+		
+		validate();
 	}
 	
 	public static MainWindow getInstance() {
