@@ -243,7 +243,7 @@ public class MainEngine implements ApplicationListener {
 				showMessage(nsee.getMessage(), "Error");
 				nsee.printStackTrace(); } }
 		for(Atom atom: models.atoms) {
-			atom.setTexture(true); }
+			atom.setTexture(false); }
 		return shift; }
 	
 		

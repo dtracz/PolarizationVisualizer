@@ -20,6 +20,7 @@ public class Atom implements SpatialObject {
 	private final Vector3 helper = new Vector3();
 	private BlendingAttribute blendingAttribute;
 	private final ModelInstance[] instances;
+	final ModelInstance[] axInstances;
 	
 	private Vector3 position;
 	private Quaternion orientation;
@@ -32,8 +33,9 @@ public class Atom implements SpatialObject {
 	public final String name;
 	public final String description;
 	public boolean visibleLabel;
+	public boolean visibleAxes;
 
-	Atom(String name, Model model, Material material, Vector3 position, Quaternion orientation, Vector3 sizes, String alpha) {
+	Atom(String name, Model sphereModel, Model axisModel, Material material, Material axMaterial, Vector3 position, Quaternion orientation, Vector3 sizes, String alpha) {
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
 		this.position = position;
 		this.orientation = orientation;
@@ -42,18 +44,30 @@ public class Atom implements SpatialObject {
 		this.description = name + String.format(" (%.3f, %.3f, %.3f)\n\nalpha:\n", position.x, position.y, position.z) + alpha.substring(13);
 		scale = 1f;
 		stretch = 1f;
-		ModelInstance sphereInstance = new ModelInstance(model, new Matrix4(position, orientation, sizes));
-		ModelInstance centerInstance = new ModelInstance(model, new Matrix4(position, new Quaternion(), new Vector3(0.15f,0.15f,0.15f)));
+		ModelInstance sphereInstance = new ModelInstance(sphereModel, new Matrix4(position, orientation, sizes));
+		ModelInstance centerInstance = new ModelInstance(sphereModel, new Matrix4(position, new Quaternion(), new Vector3(0.15f,0.15f,0.15f)));
+		
+		float axThickness = 0.015f;
+		ModelInstance xAxis = new ModelInstance(axisModel, new Matrix4(position, orientation, new Vector3(0.995f*sizes.x, axThickness, axThickness)).rotate(new Quaternion().setFromCross(Vector3.Y, Vector3.X)));
+		ModelInstance yAxis = new ModelInstance(axisModel, new Matrix4(position, orientation, new Vector3(axThickness, 0.995f*sizes.y, axThickness)));
+		ModelInstance zAxis = new ModelInstance(axisModel, new Matrix4(position, orientation, new Vector3(axThickness, axThickness, 0.995f*sizes.z)).rotate(new Quaternion().setFromCross(Vector3.Y, Vector3.Z)));
+		
 		instances = new ModelInstance[]{sphereInstance, centerInstance};
-		for(ModelInstance instance: instances) {
-			instance.materials.get(0).set(material); }
+		axInstances = new ModelInstance[]{xAxis, yAxis, zAxis};
+		instances[0].materials.get(0).set(material);
+		instances[1].materials.get(0).set(material);
+		axInstances[0].materials.get(0).set(axMaterial);
+		axInstances[1].materials.get(0).set(axMaterial);
+		axInstances[2].materials.get(0).set(axMaterial);
+		
 		renderable = true;
 		visibleLabel = true;
+		visibleAxes = true;
 		this.scale(0.2f);
 	}
 	
-	void setTexture(boolean ifAxes) {
-		if(ifAxes) {
+	void setTexture(boolean showGrid) {
+		if(showGrid) {
 			instances[0].materials.get(0).set(TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle("grid.png", Files.FileType.Internal))));
 		}
 	}
@@ -83,8 +97,11 @@ public class Atom implements SpatialObject {
 		factor = factor <= 0 ? 0.001f : factor;
 		sizes.scl(factor/scale);
 		instances[0].transform.set(position, orientation, sizes);
-		//for(ModelInstance instance: instances) {
-		//    instance.transform.set(position, orientation, sizes); }
+		
+		axInstances[0].transform.scale(1, factor/scale, 1);
+		axInstances[1].transform.scale(1, factor/scale, 1);
+		axInstances[2].transform.scale(1, factor/scale, 1);
+		
 		scale = factor; }
 
 	@Override
@@ -109,7 +126,7 @@ public class Atom implements SpatialObject {
 		
 	public Material getMaterial() {
 		return instances[0].materials.get(0); }
-
+		
 }
 
 //public void changeColor(Color color) {

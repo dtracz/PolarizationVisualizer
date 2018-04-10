@@ -2,20 +2,20 @@ package com.visualizer.userInterface;
 
 import com.visualizer.engine.Atom;
 import com.visualizer.engine.Bond;
+import com.visualizer.engine.SpatialObject;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
+import javax.swing.event.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class EastPanel extends JScrollPane {
 	private final ArrayList<Atom> atoms;
 	private final ArrayList<Bond> bonds;
+	private SpatialObject selected = null;
 	
 	private JPanel viewPanel;
 	private JPanel windowsPanel;
@@ -26,11 +26,11 @@ public class EastPanel extends JScrollPane {
 	private final JTextArea textArea;
 	
 	private JTable createAtomTable(final ArrayList<Atom> atoms) {
-		Object columnNames[] = new Object[] {"atom", "v. at.", "v. lbl"};
+		Object columnNames[] = new Object[] {"atom", "at.", "lbl", "ax."};
 		Object values[][] = new Object[atoms.size()][];
 		int i = 0;
 		for(Atom atom: atoms) {
-			values[i++] = new Object[]{atom.name, true, true}; }
+			values[i++] = new Object[]{atom.name, true, true, true}; }
 		
 		/** creates model: set type of columns' values and whats editable */
 		DefaultTableModel model = new DefaultTableModel(values, columnNames) {
@@ -42,6 +42,8 @@ public class EastPanel extends JScrollPane {
 					case 1:
 						return Boolean.class;
 					case 2:
+						return Boolean.class;
+					case 3:
 						return Boolean.class;
 					default:
 						return String.class; } }
@@ -70,7 +72,9 @@ public class EastPanel extends JScrollPane {
 				if(i == 1) {
 					atoms.get(j).setRenderable((Boolean)table.getValueAt(j, i)); }
 				else if(i == 2) {
-					atoms.get(j).visibleLabel = (Boolean)table.getValueAt(j, i); } }
+					atoms.get(j).visibleLabel = (Boolean)table.getValueAt(j, i); }
+				else if(i == 3) {
+					atoms.get(j).visibleAxes = (Boolean)table.getValueAt(j, i); } }
 		});
 		
 		/** set selection listener */
@@ -78,7 +82,8 @@ public class EastPanel extends JScrollPane {
 			public void valueChanged(ListSelectionEvent event) {
 				int row = table.getSelectedRow();
 				String description = atoms.get(row).getDescription();
-				textArea.setText(description); }
+				textArea.setText(description);
+				selected = atoms.get(row); }
 		});
 		return table; }
 	
@@ -138,10 +143,32 @@ public class EastPanel extends JScrollPane {
 			public void valueChanged(ListSelectionEvent event) {
 				int row = table.getSelectedRow();
 				String description = bonds.get(row).getDescription();
-				textArea.setText(description); }
+				textArea.setText(description);
+				selected = null; }
 		});
 		return table; }
 	
+	private JPanel createOpacitySlider() {
+		JPanel sliderPane = new JPanel();
+		final JSlider slider = new JSlider(0, 100, 100);
+		slider.setPreferredSize(new Dimension(165, 30));
+		slider.setMajorTickSpacing(50);
+		slider.setMinorTickSpacing(10);
+		slider.setPaintTicks(true);
+		slider.setPaintLabels(false);
+		final JLabel sliderLabel = new JLabel("1.00");
+		slider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				sliderLabel.setText(String.format(Locale.ROOT,"%.2f", (float)slider.getValue()/100));
+				try {
+					selected.changeOpacity((float)slider.getValue()/100); }
+				catch(NullPointerException npe) { }
+				//MainWindow.getInstance().validate();                                                        //????
+			} });
+		sliderPane.add(slider);
+		sliderPane.add(sliderLabel);
+		return sliderPane; }
 		
 	public EastPanel(ModelSubframe subframe, int xSize, int ySize) {
 		atoms = subframe.engine.models.atoms;
@@ -159,12 +186,15 @@ public class EastPanel extends JScrollPane {
 		textAreaPane.add(textArea);
 		atomTable = createAtomTable(atoms);
 		bondTable = createBondTable(bonds);
+		JPanel opacitySlider = createOpacitySlider();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(15,9,5,9);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		windowsPanel.add(new JScrollPane(atomTable), gbc);
+		gbc.gridy++;
+		windowsPanel.add(opacitySlider, gbc);
 		gbc.gridy++;
 		windowsPanel.add(new JScrollPane(bondTable), gbc);
 		gbc.gridy++;
