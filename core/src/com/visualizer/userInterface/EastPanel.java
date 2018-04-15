@@ -9,6 +9,8 @@ import javax.swing.event.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -19,6 +21,8 @@ public class EastPanel extends JScrollPane {
 	
 	private JPanel viewPanel;
 	private JPanel windowsPanel;
+	private JCheckBox oneAtomGray;
+	private JSlider oneAtomOpacity;
 	private int xSize;
 	
 	private final Component atomTable;
@@ -83,7 +87,11 @@ public class EastPanel extends JScrollPane {
 				int row = table.getSelectedRow();
 				String description = atoms.get(row).getDescription();
 				textArea.setText(description);
-				selected = atoms.get(row); }
+				
+				selected = atoms.get(row);
+				oneAtomGray.setSelected(atoms.get(row).isGray);
+				oneAtomOpacity.setValue((int)(atoms.get(row).opacity*100));
+			}
 		});
 		return table; }
 	
@@ -148,27 +156,39 @@ public class EastPanel extends JScrollPane {
 		});
 		return table; }
 	
-	private JPanel createOpacitySlider() {
-		JPanel sliderPane = new JPanel();
-		final JSlider slider = new JSlider(0, 100, 100);
-		slider.setPreferredSize(new Dimension(165, 30));
-		slider.setMajorTickSpacing(50);
-		slider.setMinorTickSpacing(10);
-		slider.setPaintTicks(true);
-		slider.setPaintLabels(false);
+	private JPanel createOneAtomPanel() {
+		JPanel oneAtomPanel = new JPanel();
+		
+		oneAtomGray = new JCheckBox("gray");
+		oneAtomGray.setHorizontalTextPosition(SwingConstants.RIGHT);
+		oneAtomGray.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				((Atom)selected).setGray(e.getStateChange() == ItemEvent.SELECTED); } });
+		oneAtomGray.setSelected(false);
+		
+		oneAtomOpacity = new JSlider(0, 100, 100);
+		oneAtomOpacity.setPreferredSize(new Dimension(100, 30));
+		oneAtomOpacity.setMajorTickSpacing(50);
+		oneAtomOpacity.setMinorTickSpacing(10);
+		oneAtomOpacity.setPaintTicks(true);
+		oneAtomOpacity.setPaintLabels(false);
 		final JLabel sliderLabel = new JLabel("1.00");
-		slider.addChangeListener(new ChangeListener() {
+		oneAtomOpacity.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				sliderLabel.setText(String.format(Locale.ROOT,"%.2f", (float)slider.getValue()/100));
+				sliderLabel.setText(String.format(Locale.ROOT,"%.2f", (float)oneAtomOpacity.getValue()/100));
 				try {
-					selected.changeOpacity((float)slider.getValue()/100); }
+					selected.changeOpacity((float)oneAtomOpacity.getValue()/100); }
 				catch(NullPointerException npe) { }
 				//MainWindow.getInstance().validate();                                                        //????
 			} });
-		sliderPane.add(slider);
-		sliderPane.add(sliderLabel);
-		return sliderPane; }
+		
+		oneAtomPanel.add(oneAtomGray);
+		oneAtomPanel.add(oneAtomOpacity);
+		oneAtomPanel.add(sliderLabel);
+		return oneAtomPanel;
+	}
 		
 	public EastPanel(ModelSubframe subframe, int xSize, int ySize) {
 		atoms = subframe.engine.models.atoms;
@@ -186,7 +206,7 @@ public class EastPanel extends JScrollPane {
 		textAreaPane.add(textArea);
 		atomTable = createAtomTable(atoms);
 		bondTable = createBondTable(bonds);
-		JPanel opacitySlider = createOpacitySlider();
+		JPanel opacitySlider = createOneAtomPanel();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(15,9,5,9);

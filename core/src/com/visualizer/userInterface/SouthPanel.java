@@ -88,9 +88,9 @@ public class SouthPanel extends JScrollPane {
 		viewPanel = new JPanel(new BorderLayout());
 		
 		paths = new ArrayList<String>();
-		paths.add("./text.x");
-		paths.add("./text.x");
-		paths.add("./text.x");
+		paths.add("./PolaberExe.exe");
+		paths.add("./FG_assign.exe");
+		paths.add("./FG_calc.exe");
 		processes = new ArrayList<Process>(Collections.<Process>nCopies(paths.size(), null));
 		System.out.print(processes.size());
 		

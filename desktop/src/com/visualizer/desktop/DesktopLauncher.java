@@ -20,7 +20,7 @@ public class DesktopLauncher {
 		atomColors.put("Li", Color.rgba8888(204f/255f,128f/255f,255f/255f, 1));
 		atomColors.put("Be", Color.rgba8888(194f/255f,255f/255f,000f/255f, 1));
 		atomColors.put("B",  Color.rgba8888(255f/255f,181f/255f,181f/255f, 1));
-		atomColors.put("C",  Color.rgba8888(144f/255f,144f/255f,144f/255f, 1));
+		atomColors.put("C",  Color.rgba8888(074f/255f,074f/255f,074f/255f, 1));
 		atomColors.put("N",  Color.rgba8888(048f/255f,080f/255f,248f/255f, 1));
 		atomColors.put("O",  Color.rgba8888(255f/255f,013f/255f,013f/255f, 1));
 		atomColors.put("F",  Color.rgba8888(144f/255f,224f/255f,080f/255f, 1));

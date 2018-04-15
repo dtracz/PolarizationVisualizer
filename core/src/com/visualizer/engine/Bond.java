@@ -71,7 +71,7 @@ public class Bond implements SpatialObject {
 		stripe(dashed);
 	
 		this.description = String.format("BOND: %s %s\n\n", atom1.name, atom2.name) +
-				           String.format("length: %.3f Å\n", length) +
+				           String.format("length: %.3f au\n", length) +
 						   String.format("bondpol: %s", bondpol);
 	}
 	

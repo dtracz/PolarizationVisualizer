@@ -4,6 +4,7 @@ import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
@@ -12,12 +13,14 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 
 /**
  * Created by dawid on 04.04.17.
  */
 public class Atom implements SpatialObject {
 	private final Vector3 helper = new Vector3();
+	private Attribute mainColour;
 	private BlendingAttribute blendingAttribute;
 	private final ModelInstance[] instances;
 	final ModelInstance[] axInstances;
@@ -34,8 +37,11 @@ public class Atom implements SpatialObject {
 	public final String description;
 	public boolean visibleLabel;
 	public boolean visibleAxes;
+	public float opacity = 1;
+	public boolean isGray = false;
 
-	Atom(String name, Model sphereModel, Model axisModel, Material material, Material axMaterial, Vector3 position, Quaternion orientation, Vector3 sizes, String alpha) {
+	Atom(String name, Model sphereModel, Model axisModel, Attribute colour, Vector3 position, Quaternion orientation, Vector3 sizes, String alpha) {
+		this.mainColour = colour;
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
 		this.position = position;
 		this.orientation = orientation;
@@ -54,11 +60,12 @@ public class Atom implements SpatialObject {
 		
 		instances = new ModelInstance[]{sphereInstance, centerInstance};
 		axInstances = new ModelInstance[]{xAxis, yAxis, zAxis};
+		Material material = new Material(colour);
 		instances[0].materials.get(0).set(material);
 		instances[1].materials.get(0).set(material);
-		axInstances[0].materials.get(0).set(axMaterial);
-		axInstances[1].materials.get(0).set(axMaterial);
-		axInstances[2].materials.get(0).set(axMaterial);
+		axInstances[0].materials.get(0).set(ModelSet.BLACK_MATERIAL);
+		axInstances[1].materials.get(0).set(ModelSet.BLACK_MATERIAL);
+		axInstances[2].materials.get(0).set(ModelSet.BLACK_MATERIAL);
 		
 		renderable = true;
 		visibleLabel = true;
@@ -86,6 +93,7 @@ public class Atom implements SpatialObject {
 	
 	@Override
 	public void changeOpacity(float opacity) {
+		this.opacity = opacity;
 		blendingAttribute.opacity = opacity;
 		instances[0].materials.get(0).set(blendingAttribute);
 		//for(ModelInstance instance: instances) {
@@ -126,6 +134,18 @@ public class Atom implements SpatialObject {
 		
 	public Material getMaterial() {
 		return instances[0].materials.get(0); }
+		
+	public void setGray(boolean gray) {
+		if(gray && ! this.isGray) {
+			instances[0].materials.get(0).set(ModelSet.GRAY);
+			instances[1].materials.get(0).set(ModelSet.GRAY);
+		}
+		else if(!gray && this.isGray) {
+			instances[0].materials.get(0).set(mainColour);
+			instances[1].materials.get(0).set(mainColour);
+		}
+		this.isGray = gray;
+	}
 		
 }
 

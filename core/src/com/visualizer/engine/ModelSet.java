@@ -20,7 +20,8 @@ import java.util.NoSuchElementException;
  */
 public class ModelSet extends ModelBatch {
 	private final Vector3 helper = new Vector3();
-	private final Material balckMaterial = new Material(ColorAttribute.createDiffuse(0,0,0,1));
+	final static Material BLACK_MATERIAL = new Material(ColorAttribute.createDiffuse(0,0,0,1));
+	final static Attribute GRAY = ColorAttribute.createDiffuse(0.5f,0.5f,0.5f,1);
 	private float boundDiameter = 0.064f;										// parameters !!!
 	private int cylindricalDivisions = 16;
 	private int sphereDivisionsU = 32;
@@ -68,7 +69,7 @@ public class ModelSet extends ModelBatch {
 	/* - ADDITIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	public void addAtom(String name, Color color, Vector3 position, Quaternion orientation, Vector3 scale, String alpha) {
-		atoms.add(new Atom(name, sphere, cylinder, new Material(ColorAttribute.createDiffuse(color)), balckMaterial, position, orientation, scale, alpha));
+		atoms.add(new Atom(name, sphere, cylinder, ColorAttribute.createDiffuse(color), position, orientation, scale, alpha));
 	}
 	
 	public void addBond(String atomName1, String atomName2, boolean striped, String bondpol) throws NoSuchElementException {
@@ -153,10 +154,10 @@ public class ModelSet extends ModelBatch {
 			for(Atom atom: atoms) {
 				if(atom.renderable()) {
 					for(ModelInstance instance: atom.getInstances()) {
-						this.render(instance, environment); } }
-				if(atom.visibleAxes) {
-					for(ModelInstance instance: atom.axInstances) {
-						this.render(instance, environment); } } } }
+						this.render(instance, environment); }
+					if(atom.visibleAxes) {
+						for(ModelInstance instance: atom.axInstances) {
+							this.render(instance, environment); } } } } }
 		if(visibleBonds) {
 			for(Bond bond : bonds) {
 				if(bond.renderable) {
