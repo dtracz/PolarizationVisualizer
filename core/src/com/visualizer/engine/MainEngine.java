@@ -151,23 +151,25 @@ public class MainEngine implements ApplicationListener {
 		return new Quaternion(helper.nor(), (float)Math.toDegrees(phi));
 	}
 	
-		
-	private void fileReader(Queue<String> names, Queue<Vector3> positions, Queue<Quaternion> orientations,
-	                        Queue<Vector3> sizes, Queue<String> bonds, Queue<String> alphas)
-							throws FileNotFoundException, RuntimeException {
-		Scanner scanner = new Scanner(sourceFile).useLocale(Locale.ROOT); 	// dot decimal separator instead of comma
-		String name;
+	
+	private Vector3 getAtoms(Scanner scanner, Queue<String> names, Queue<Vector3> positions,
+	                      Queue<Quaternion> orientations, Queue<Vector3> sizes, Queue<String> alphas) {
 		DoubleMatrix2D alpha = DoubleFactory2D.dense.make(3,3);
+		String name;
 		Vector3 helper = new Vector3();
 		Algebra algebra = new Algebra();
+		Vector3 midCoords = new Vector3(0, 0, 0);
 		
 		while(!scanner.nextLine().matches("ATOMIC COORDINATES \\(ORTHOGONAL SYSTEM\\)"));
 		scanner.nextLine(); scanner.nextLine(); scanner.nextLine();
 		while((name = scanner.next()).matches("[A-Z][a-z]?.*")) {
 			names.add(name);
-			positions.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat())); }
+			positions.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
+		}
 		while(!scanner.nextLine().matches("ATOMIC PROPERTIES"));
-		while(!scanner.nextLine().matches("Atom.*")); scanner.nextLine();
+		while(!scanner.nextLine().matches("Atom.*"));
+		scanner.nextLine();
+		float sumWeights = 0;
 		while(scanner.next().matches("[A-Z][a-z]?.*")) {
 			scanner.nextFloat();
 			alpha.setQuick(0,0, scanner.nextDouble());
@@ -183,16 +185,52 @@ public class MainEngine implements ApplicationListener {
 			alpha.setQuick(1,2, d12);
 			alpha.setQuick(2,1, d12);
 			
+			// calculating ellipsoid
 			EigenvalueDecomposition eigenDecomp = new EigenvalueDecomposition(alpha);
 			DoubleMatrix2D eigenValues = eigenDecomp.getD();
-			
 			sizes.add(new Vector3((float)eigenValues.getQuick(0,0), (float)eigenValues.getQuick(1,1), (float)eigenValues.getQuick(2,2)));
 			orientations.add(getAngle(eigenDecomp.getV(), helper, algebra));
 			alphas.add(alpha.toString());
-			scanner.nextFloat(); scanner.nextFloat(); }
+			
+			// calculating center of molecule
+			float weight = scanner.nextFloat();
+			sumWeights += weight;
+			Vector3 coords = positions.poll();
+			midCoords.add(coords.x*weight, coords.y*weight, coords.x*weight);
+			positions.add(coords);
+			scanner.nextFloat();
+		}
+		return midCoords;
+	}
+	
+	
+	private void fileReader(Queue<String> names, Queue<Vector3> positions, Queue<Quaternion> orientations,
+	                        Queue<Vector3> sizes, Queue<String> bonds, Queue<String> alphas)
+							throws FileNotFoundException, RuntimeException {
+		Scanner scanner = new Scanner(sourceFile).useLocale(Locale.ROOT); 	// dot decimal separator instead of comma
+		
+		Vector3 midCoords = getAtoms(scanner, names, positions, orientations, sizes, alphas);
+
+		
+//		while(!scanner.nextLine().matches("MOLECULAR POLARIZABILITY TENSOR CARTESIAN SYSTEM"));
+//		scanner.nextLine(); scanner.nextLine(); scanner.nextLine();
+//		alpha.setQuick(0,0, scanner.nextDouble());
+//		alpha.setQuick(1,1, scanner.nextDouble());
+//		alpha.setQuick(2,2, scanner.nextDouble());
+//		double d01 = scanner.nextDouble();
+//		double d02 = scanner.nextDouble();
+//		double d12 = scanner.nextDouble();
+//		alpha.setQuick(0,1, d01);
+//		alpha.setQuick(1,0, d01);
+//		alpha.setQuick(0,2, d02);
+//		alpha.setQuick(2,0, d02);
+//		alpha.setQuick(1,2, d12);
+//		alpha.setQuick(2,1, d12);
+		
 		
 		while(!scanner.nextLine().matches("BOND PROPERTIES"));
-		while(!scanner.nextLine().matches("\\s+A.B.*")); scanner.nextLine();
+		while(!scanner.nextLine().matches("\\s+A.B.*"));
+		scanner.nextLine();
 		while(scanner.hasNext("[A-Z][a-z]?\\d*")) {
 			bonds.add(scanner.next());
 			bonds.add(scanner.next());
@@ -203,6 +241,7 @@ public class MainEngine implements ApplicationListener {
 			scanner.nextLine(); }
 		scanner.close(); }
 	
+		
 	private Vector3 atomFactory() {
 		Vector3 shift = new Vector3(1000, 1000, 1000);
 		Queue<String> names = new LinkedList<String>();
@@ -229,7 +268,6 @@ public class MainEngine implements ApplicationListener {
 			else if(name.matches("[A-Z].*")) {
 				color = new Color(atomColors.get(name.substring(0,1))); }
 			if(color == null) {
-				
 				color = Color.WHITE; }
 			Vector3 position = positions.poll();
 			shift.x = position.x < shift.x ? position.x : shift.x;
