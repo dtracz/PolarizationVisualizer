@@ -16,7 +16,7 @@ public class ModelSubframe extends JInternalFrame {
 	private static final int xOffset = 30, yOffset = 30;
 	private static int frameCounter = 0;
 	MainEngine engine;
-	private LwjglAWTCanvas canvas;
+	LwjglAWTCanvas canvas;
 	//private GWTBridge gwtBridge; // ?!
 	
 	public ModelSubframe(String name, int width, int height, final File sourceFile) {
@@ -67,10 +67,12 @@ public class ModelSubframe extends JInternalFrame {
 		catch(java.beans.PropertyVetoException e) {
 			e.printStackTrace(); }
 		
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
+//		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
 				engine = new MainEngine(sourceFile);
 				canvas = new LwjglAWTCanvas(engine);
-				add(canvas.getCanvas()); } });
-		setVisible(true); }
+				add(canvas.getCanvas());
+//			} });
+		setVisible(true);
+	}
 }

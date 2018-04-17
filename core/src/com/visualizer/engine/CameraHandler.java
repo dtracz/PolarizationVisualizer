@@ -67,7 +67,8 @@ public class CameraHandler {
 		return camera; }
 	
 	public void updateCamera() {
-		camera.update(); }
+		camera.update();
+	}
 	
 	/* - SETTINGS- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	

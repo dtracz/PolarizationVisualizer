@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainWindow extends JFrame {
-	private final static int[] mainWindowSizes = new int[]{1280, 960};
-	private final static int[] modelSubframeSizes = new int[]{800, 600};
+	private final static int[] mainWindowSizes = new int[]{1680, 1050};
+	private final static int[] modelSubframeSizes = new int[]{1280, 720};
 	private final static int[] northPanelSizes = new int[]{10, 105};
 	private final static int[] eastPanelSizes = new int[]{245, 10};
 	private final static int[] southPanelSizes = new int[]{10, 205};
@@ -41,10 +41,11 @@ public class MainWindow extends JFrame {
 		itemImport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				try {
-					addModel(selectFile()); }
+					topSubframe = addModel(selectFile()); }
 				catch(FileNotFoundException fnfe) {
 					fnfe.printStackTrace(); }
-				MainWindow.getInstance().validate(); }
+//				MainWindow.getInstance().validate();
+			}
 		});
 		
 		final JMenuItem itemExport = new JMenuItem("Export as png");
@@ -123,6 +124,7 @@ public class MainWindow extends JFrame {
 		menuView.add(itemSubroutine);
 		return menuView; }
 		
+		
 	private void createMenu() {
 		bar = new JMenuBar();
 		JMenu menuFile = createMenuFile("File");
@@ -183,6 +185,7 @@ public class MainWindow extends JFrame {
 		validate();
 	}
 	
+	
 	public static MainWindow getInstance() {
 		if(instance == null) {
 			instance = new MainWindow(mainWindowSizes[0], mainWindowSizes[1]); }
@@ -199,6 +202,7 @@ public class MainWindow extends JFrame {
 		else {
 			throw new FileNotFoundException("No file selected"); } }
 		
+			
 	private String selectDirectory() throws FileNotFoundException {
 		final JFileChooser jFC = new JFileChooser(new File("."));						// set default Directory!!!
 		jFC.setDialogTitle("Save as..");
@@ -216,18 +220,25 @@ public class MainWindow extends JFrame {
 		else {
 			throw new FileNotFoundException("No file selected"); } }
 	
+			
 	private ModelSubframe addModel(File sourceFile) {
 		ModelSubframe subframe = new ModelSubframe("subframe", modelSubframeSizes[0], modelSubframeSizes[1], sourceFile);
 		desktop.add(subframe);
 		subframe.toFront();
-		return subframe; }
+		return subframe;
+	}
 	
+	public void resetTopSubframe() {
+		setTopSubframe(topSubframe);
+	}
+		
 	public void setTopSubframe(ModelSubframe subframe) {
 		topSubframe = subframe;
 		if(showPanels) {
 			setCurrPanels(getControlPanel()); }
 		MainWindow.getInstance().validate(); }
 	
+		
 	public void deleteSubframe(ModelSubframe subframe) {
 		if(topSubframe == subframe) {
 			topSubframe = null;

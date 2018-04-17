@@ -93,7 +93,12 @@ public class EastPanel extends JScrollPane {
 				oneAtomOpacity.setValue((int)(atoms.get(row).opacity*100));
 			}
 		});
-		return table; }
+		
+		table.setValueAt(false, 0, 1);
+		table.setValueAt(false, 0, 2);
+		table.setValueAt(false, 0, 3);
+		return table;
+	}
 	
 		
 	private JTable createBondTable(final ArrayList<Bond> bonds) {
@@ -156,6 +161,7 @@ public class EastPanel extends JScrollPane {
 		});
 		return table; }
 	
+		
 	private JPanel createOneAtomPanel() {
 		JPanel oneAtomPanel = new JPanel();
 		
@@ -189,7 +195,8 @@ public class EastPanel extends JScrollPane {
 		oneAtomPanel.add(sliderLabel);
 		return oneAtomPanel;
 	}
-		
+	
+	
 	public EastPanel(ModelSubframe subframe, int xSize, int ySize) {
 		atoms = subframe.engine.models.atoms;
 		bonds = subframe.engine.models.bonds;

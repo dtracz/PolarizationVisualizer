@@ -6,12 +6,17 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.DefaultRenderableSorter;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.RenderableSorter;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 
+import javax.swing.text.DefaultCaret;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -39,13 +44,25 @@ public class ModelSet extends ModelBatch {
 	public boolean visibleAtoms;
 	
 	private final SpriteBatch batch = new SpriteBatch();
-	private final BitmapFont font;
+	BitmapFont font;
 	public boolean visibleLabels;
 	
 	private float startWidth;
 	private float startHeight;
 	
+	FreeTypeFontGenerator generator;
+	FreeTypeFontGenerator.FreeTypeFontParameter parameter;
+	
 	public ModelSet(ModelBuilder builder) {
+		super(new DefaultRenderableSorter() { // make last instance (molecular sphere being render at the end, co everything inside could be visible;
+			@Override
+			public void sort(Camera camera, Array<Renderable> renderables) {
+				Renderable last = renderables.pop();
+				super.sort(camera, renderables);
+				renderables.add(last);
+			}
+		});
+		
 		atoms = new ArrayList<Atom>();
 		bonds = new ArrayList<Bond>();
 		sphere = builder.createSphere(1,1,1, sphereDivisionsU, sphereDivisionsV, new Material(),
@@ -58,13 +75,20 @@ public class ModelSet extends ModelBatch {
 		cone = builder.createCone(1, 1, 1, cylindricalDivisions, new Material(),
 								  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 		
-		font = new BitmapFont(Gdx.files.internal("FreeSerif.fnt"));
+		generator = new FreeTypeFontGenerator(Gdx.files.internal("/home/dawid/Desktop/TitilliumWeb-SemiBold.ttf"));
+		parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		parameter.size = 24;
+		font = generator.generateFont(parameter);
+		
+//		font = new BitmapFont(Gdx.files.internal("TitilliumWeb-SemiBold.fnt"));
 		font.setColor(Color.BLACK);
 		startWidth = Gdx.graphics.getWidth();
 		startHeight = Gdx.graphics.getHeight();
 		visibleAtoms = true;
 		visibleBonds = true;
-		visibleLabels = true; }
+		visibleLabels = true;
+		
+	}
 	
 	/* - ADDITIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
@@ -149,21 +173,36 @@ public class ModelSet extends ModelBatch {
 		this.begin(camera);
 		if(axes.renderable()) {
 			for(ModelInstance instance: axes.getInstances()) {
-				this.render(instance, environment); } }
-		if(visibleAtoms) {
-			for(Atom atom: atoms) {
-				if(atom.renderable()) {
-					for(ModelInstance instance: atom.getInstances()) {
-						this.render(instance, environment); }
-					if(atom.visibleAxes) {
-						for(ModelInstance instance: atom.axInstances) {
-							this.render(instance, environment); } } } } }
+				this.render(instance, environment); }
+		}
 		if(visibleBonds) {
 			for(Bond bond : bonds) {
 				if(bond.renderable) {
 					for(ModelInstance instance: bond.getInstances()) {
-						this.render(instance, environment); } } } }
+						this.render(instance, environment); } } }
+		}
+		if(visibleAtoms) {
+			// all except first (MOL)
+			for(int i=1; i<atoms.size(); i++) {
+				if(atoms.get(i).renderable()) {
+					for(ModelInstance instance: atoms.get(i).getInstances()) {
+						this.render(instance, environment); }
+					if(atoms.get(i).visibleAxes) {
+						for(ModelInstance instance: atoms.get(i).axInstances) {
+							this.render(instance, environment); } } } }
+		}
+		if(atoms.get(0).renderable()) {
+			if(atoms.get(0).visibleAxes) {
+				for(ModelInstance instance: atoms.get(0).axInstances) {
+					this.render(instance, environment); } }
+			// // set molecular sphere as last element to simplify popping it in RenderableSorter;
+			// ModelInstance[] instances = atoms.get(0).getInstances();
+			// for(int i=instances.length-1; i>=0; i--) {
+			// 	this.render(instances[i], environment); }
+			this.render(atoms.get(0).getInstances()[0], environment);
+		}
 		this.end();
+		
 		if(visibleLabels) {
 			batch.begin();
 			for(Atom atom: atoms) {
@@ -171,6 +210,8 @@ public class ModelSet extends ModelBatch {
 					atom.getCenter(helper.set(0,0,0));
 					camera.project(helper, 0, 0, startWidth, startHeight);
 					font.draw(batch, atom.name, helper.x, helper.y); } }
-			batch.end(); } }
+			batch.end();
+		}
+	}
 
 }

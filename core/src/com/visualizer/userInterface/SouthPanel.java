@@ -53,13 +53,13 @@ public class SouthPanel extends JScrollPane {
 	}
 	
 	
-	private JButton createRunButton(String name, final int index) {
+	private JButton createRunButton(final String name, final int index) {
 		JButton runButton = new JButton(name);
 		runButton.addActionListener(new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(processes.get(index) == null) {
-					runSubroutine("./test.x", index);
+					runSubroutine(name, index);
 				}
 				else {
 					System.out.println("is not null");
@@ -92,7 +92,6 @@ public class SouthPanel extends JScrollPane {
 		paths.add("./FG_assign.exe");
 		paths.add("./FG_calc.exe");
 		processes = new ArrayList<Process>(Collections.<Process>nCopies(paths.size(), null));
-		System.out.print(processes.size());
 		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();

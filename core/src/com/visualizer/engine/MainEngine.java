@@ -152,13 +152,12 @@ public class MainEngine implements ApplicationListener {
 	}
 	
 	
-	private Vector3 getAtoms(Scanner scanner, Queue<String> names, Queue<Vector3> positions,
-	                      Queue<Quaternion> orientations, Queue<Vector3> sizes, Queue<String> alphas) {
-		DoubleMatrix2D alpha = DoubleFactory2D.dense.make(3,3);
+	private Vector3 getAtoms(Scanner scanner, DoubleMatrix2D alpha, Algebra algebra,
+	                         Queue<String> names, Queue<Vector3> positions, Queue<Quaternion> orientations,
+	                         Queue<Vector3> sizes, Queue<String> alphas) {
 		String name;
-		Vector3 helper = new Vector3();
-		Algebra algebra = new Algebra();
 		Vector3 midCoords = new Vector3(0, 0, 0);
+		Vector3 helper = new Vector3();
 		
 		while(!scanner.nextLine().matches("ATOMIC COORDINATES \\(ORTHOGONAL SYSTEM\\)"));
 		scanner.nextLine(); scanner.nextLine(); scanner.nextLine();
@@ -196,50 +195,77 @@ public class MainEngine implements ApplicationListener {
 			float weight = scanner.nextFloat();
 			sumWeights += weight;
 			Vector3 coords = positions.poll();
-			midCoords.add(coords.x*weight, coords.y*weight, coords.x*weight);
+			midCoords.add(coords.x*weight, coords.y*weight, coords.z*weight);
 			positions.add(coords);
 			scanner.nextFloat();
 		}
-		return midCoords;
+		return midCoords.scl(1f/sumWeights);
 	}
 	
+	private String getMolecule(Scanner scanner, DoubleMatrix2D alpha, Algebra algebra,
+	                           Vector3 size, Quaternion orientation) {
+		while(!scanner.nextLine().matches("MOLECULAR POLARIZABILITY TENSOR CARTESIAN SYSTEM"));
+		scanner.nextLine(); scanner.nextLine(); scanner.nextLine();
+		alpha.setQuick(0,0, scanner.nextDouble());
+		alpha.setQuick(1,1, scanner.nextDouble());
+		alpha.setQuick(2,2, scanner.nextDouble());
+		double d01 = scanner.nextDouble();
+		double d02 = scanner.nextDouble();
+		double d12 = scanner.nextDouble();
+		alpha.setQuick(0,1, d01);
+		alpha.setQuick(1,0, d01);
+		alpha.setQuick(0,2, d02);
+		alpha.setQuick(2,0, d02);
+		alpha.setQuick(1,2, d12);
+		alpha.setQuick(2,1, d12);
+		
+		EigenvalueDecomposition eigenDecomp = new EigenvalueDecomposition(alpha);
+		DoubleMatrix2D eigenValues = eigenDecomp.getD();
+		orientation.set(getAngle(eigenDecomp.getV(), size, algebra)); // size here only as helper
+		size.set((float)eigenValues.getQuick(0,0), (float)eigenValues.getQuick(1,1), (float)eigenValues.getQuick(2,2));
+		return alpha.toString();
+	}
 	
-	private void fileReader(Queue<String> names, Queue<Vector3> positions, Queue<Quaternion> orientations,
-	                        Queue<Vector3> sizes, Queue<String> bonds, Queue<String> alphas)
-							throws FileNotFoundException, RuntimeException {
-		Scanner scanner = new Scanner(sourceFile).useLocale(Locale.ROOT); 	// dot decimal separator instead of comma
-		
-		Vector3 midCoords = getAtoms(scanner, names, positions, orientations, sizes, alphas);
-
-		
-//		while(!scanner.nextLine().matches("MOLECULAR POLARIZABILITY TENSOR CARTESIAN SYSTEM"));
-//		scanner.nextLine(); scanner.nextLine(); scanner.nextLine();
-//		alpha.setQuick(0,0, scanner.nextDouble());
-//		alpha.setQuick(1,1, scanner.nextDouble());
-//		alpha.setQuick(2,2, scanner.nextDouble());
-//		double d01 = scanner.nextDouble();
-//		double d02 = scanner.nextDouble();
-//		double d12 = scanner.nextDouble();
-//		alpha.setQuick(0,1, d01);
-//		alpha.setQuick(1,0, d01);
-//		alpha.setQuick(0,2, d02);
-//		alpha.setQuick(2,0, d02);
-//		alpha.setQuick(1,2, d12);
-//		alpha.setQuick(2,1, d12);
-		
-		
+	private void getBonds(Scanner scanner, Queue<String> bonds) {
 		while(!scanner.nextLine().matches("BOND PROPERTIES"));
 		while(!scanner.nextLine().matches("\\s+A.B.*"));
 		scanner.nextLine();
 		while(scanner.hasNext("[A-Z][a-z]?\\d*")) {
 			bonds.add(scanner.next());
 			bonds.add(scanner.next());
-			for(int _=0; _<3; _++) { scanner.next(); }
+			for(int i=0; i<3; i++) { scanner.next(); }
 			bonds.add(Boolean.toString(scanner.nextFloat() < 0.1));
-			for(int _=0; _<5; _++) { scanner.next(); }
+			for(int i=0; i<5; i++) { scanner.next(); }
 			bonds.add(scanner.next());
-			scanner.nextLine(); }
-		scanner.close(); }
+			scanner.nextLine();
+		}
+	}
+	
+	private String fileReader(Queue<String> names, Queue<Vector3> positions, Queue<Quaternion> orientations,
+	                        Queue<Vector3> sizes, Queue<String> bonds, Queue<String> alphas,
+	                          Vector3 molecularCoords, Vector3 molecularSize, Quaternion molecularOrintation) {
+		String molecularAlpha;
+		try {
+			Scanner scanner = new Scanner(sourceFile).useLocale(Locale.ROOT); 	// dot decimal separator instead of comma
+			DoubleMatrix2D alpha = DoubleFactory2D.dense.make(3,3);
+			Algebra algebra = new Algebra();
+			
+			molecularCoords.set(getAtoms(scanner, alpha, algebra, names, positions, orientations, sizes, alphas));
+			molecularAlpha = getMolecule(scanner, alpha, algebra, molecularSize, molecularOrintation);
+			getBonds(scanner, bonds);
+			
+			scanner.close(); }
+		catch(FileNotFoundException fnfe) {
+			fnfe.printStackTrace();
+			showMessage(fnfe.getMessage(), "Error");
+			return null; }
+		catch(RuntimeException re) {
+			re.printStackTrace();
+			showMessage(re.getMessage(), "Error");
+			return null; }
+		
+		return molecularAlpha;
+		}
 	
 		
 	private Vector3 atomFactory() {
@@ -250,16 +276,15 @@ public class MainEngine implements ApplicationListener {
 		Queue<Vector3> sizes = new LinkedList<Vector3>();
 		Queue<String> bonds = new LinkedList<String>();
 		Queue<String> alphas = new LinkedList<String>();
-		try {
-			fileReader(names, positions, orientations, sizes, bonds, alphas); }
-		catch(FileNotFoundException fnfe) {
-			fnfe.printStackTrace();
-			showMessage(fnfe.getMessage(), "Error");
-			return shift; }
-		catch(RuntimeException re) {
-			re.printStackTrace();
-			showMessage(re.getMessage(), "Error");
-			return shift; }
+		
+		Vector3 molecularPosition = new Vector3(); // position of the center of molecule
+		Vector3 molecularSize = new Vector3();
+		Quaternion molecularOrintation = new Quaternion();
+		String molecularAlpha = fileReader(names, positions, orientations, sizes, bonds, alphas, molecularPosition, molecularSize, molecularOrintation);
+		if(molecularAlpha == null) return shift;
+		
+		models.addAtom("MOL", new Color(093f/255f, 198f/255f, 023f/255f, 1f), molecularPosition, molecularOrintation, molecularSize, molecularAlpha);
+		
 		while(!sizes.isEmpty()) {
 			String name = names.poll();
 			Color color = null;
@@ -273,13 +298,15 @@ public class MainEngine implements ApplicationListener {
 			shift.x = position.x < shift.x ? position.x : shift.x;
 			shift.y = position.y < shift.y ? position.y : shift.y;
 			shift.z = position.z < shift.z ? position.z : shift.z;
-			models.addAtom(name, color, position, orientations.poll(), sizes.poll(), alphas.poll()); }
+			models.addAtom(name, color, position, orientations.poll(), sizes.poll(), alphas.poll());
+		}
 		while(!bonds.isEmpty()) {
 			try {
 				models.addBond(bonds.poll(), bonds.poll(), Boolean.parseBoolean(bonds.poll()), bonds.poll()); }
 			catch(NoSuchElementException nsee) {
 				showMessage(nsee.getMessage(), "Error");
-				nsee.printStackTrace(); } }
+				nsee.printStackTrace(); }
+		}
 		for(Atom atom: models.atoms) {
 			atom.setTexture(false); }
 		return shift; }
@@ -293,7 +320,8 @@ public class MainEngine implements ApplicationListener {
 			atomColors = (TreeMap<String, Integer>)xmlDecoder.readObject();
 			xmlDecoder.close(); }
 		catch(FileNotFoundException fnfe) {
-			fnfe.printStackTrace(); } }
+			fnfe.printStackTrace(); }
+	}
 	
 	/* - PUBLIC OPERATIONS - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
@@ -346,7 +374,8 @@ public class MainEngine implements ApplicationListener {
 		listener = new Listener(this, cameraHandler, models);
 		Gdx.input.setInputProcessor(listener);
 		
-		
+		// setting top subframe needs to wait for this thread to have finished; this is the simplest way
+		MainWindow.getInstance().resetTopSubframe();
 	}
 	
 	@Override
@@ -375,8 +404,19 @@ public class MainEngine implements ApplicationListener {
 	
 	@Override
 	public void resize(int width, int height) {
+//		models.parameter.size = (int)(24);
+//		models.font = models.generator.generateFont(models.parameter);
+//
+//		System.out.println(Gdx.graphics.getDensity() +" "+ Gdx.graphics.getWidth() +" "+ Gdx.graphics.getHeight());
+//		viewport.setScreenSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//		viewport.setWorldSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+//		perspectiveCamera = new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//		orthographicCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
 		viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		listener.resize(width, height);
-		cameraHandler.updateCamera(); }
+		cameraHandler.updateCamera();
+	}
 	
 }
