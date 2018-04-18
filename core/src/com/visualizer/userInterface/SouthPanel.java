@@ -95,6 +95,7 @@ public class SouthPanel extends JScrollPane {
 		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridy = 0;
 		gbc.gridx = 0;
 		JButton button;

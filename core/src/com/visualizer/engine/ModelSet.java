@@ -50,6 +50,8 @@ public class ModelSet extends ModelBatch {
 	private float startWidth;
 	private float startHeight;
 	
+	volatile boolean fontChanged = false;
+	
 	FreeTypeFontGenerator generator;
 	FreeTypeFontGenerator.FreeTypeFontParameter parameter;
 	
@@ -113,14 +115,14 @@ public class ModelSet extends ModelBatch {
 	public int getNumberOfAtoms() {
 		return atoms.size(); }
 	
-	public Vector3 getMoleculeCenter() {
-		Vector3 center = new Vector3();
-		for(Atom atom: atoms) {
-			helper.set(0,0,0);
-			atom.getCenter(helper);
-			center.add(helper); }
-		center.scl(1f/atoms.size());
-		return center; }
+//	public Vector3 getMoleculeCenter() {
+//		Vector3 center = new Vector3();
+//		for(Atom atom: atoms) {
+//			helper.set(0,0,0);
+//			atom.getCenter(helper);
+//			center.add(helper); }
+//		center.scl(1f/atoms.size());
+//		return center; }
 		
 	/* - CONFIGURATIONS- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
@@ -130,25 +132,28 @@ public class ModelSet extends ModelBatch {
 		if(objects.equals("BONDS")) {
 			visibleBonds = isVisible; }
 		if(objects.equals("AXES")) {
-			axes.setRenderable(isVisible); } }
+			axes.setRenderable(isVisible); }
+	}
 	
 	public void scale(float factor, String objects) {
 		if(objects.equals("ATOMS")) {
-			for(SpatialObject atom: atoms) {
-				atom.scale(factor); } }
+			for(int i=1; i<atoms.size(); i++) {
+				atoms.get(i).scale(factor); } }
 		if(objects.equals("BONDS")) {
-			for(SpatialObject atom: bonds) {
-				atom.scale(factor); } }
+			for(SpatialObject bond: bonds) {
+				bond.scale(factor); } }
 		if(objects.equals("AXES")) {
-			axes.scale(factor); } }
+			axes.scale(factor); }
+	}
 	
 	public void changeOpacity(float opacity, String objects) {
 		if(objects.equals("ATOMS")) {
-			for(SpatialObject atom: atoms) {
-				atom.changeOpacity(opacity); } }
+			for(int i=1; i<atoms.size(); i++) {
+				atoms.get(i).changeOpacity(opacity); } }
 		if(objects.equals("BONDS")) {
-			for(SpatialObject atom: bonds) {
-				atom.changeOpacity(opacity); } } }
+			for(SpatialObject bond: bonds) {
+				bond.changeOpacity(opacity); } }
+	}
 	
 	public void scaleAtoms(float factor) {
 		for(SpatialObject atom: atoms) {
@@ -156,10 +161,12 @@ public class ModelSet extends ModelBatch {
 	
 	public void scaleBounds(float factor) {
 		for(SpatialObject atom: bonds) {
-			atom.scale(factor); } }
+			atom.scale(factor); }
+	}
 
 	public void setAxesPosition(Vector3 position) {
-		axes.translateTo(position); }
+		axes.translateTo(position);
+	}
 	
 	public void spreadAll(float factor) {
 	
@@ -204,6 +211,10 @@ public class ModelSet extends ModelBatch {
 		this.end();
 		
 		if(visibleLabels) {
+			if(fontChanged) {
+				font = generator.generateFont(parameter);
+				fontChanged = false;
+			}
 			batch.begin();
 			for(Atom atom: atoms) {
 				if(atom.visibleLabel) {

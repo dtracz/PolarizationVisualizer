@@ -25,7 +25,7 @@ public class MainWindow extends JFrame {
 	private JDesktopPane desktop;
 	
 	private Map<ModelSubframe, JScrollPane[]> projects;
-	private ModelSubframe topSubframe;
+	public ModelSubframe topSubframe;
 	private boolean showPanels; //////////////////////////////////////////////////////////////////////////////////
 	private boolean showSouth;
 	private JScrollPane currEastPanel;
@@ -230,6 +230,7 @@ public class MainWindow extends JFrame {
 	
 	public void resetTopSubframe() {
 		setTopSubframe(topSubframe);
+		topSubframe.setSize(modelSubframeSizes[0], modelSubframeSizes[1]);
 	}
 		
 	public void setTopSubframe(ModelSubframe subframe) {

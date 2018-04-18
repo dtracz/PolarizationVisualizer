@@ -21,14 +21,17 @@ public class ModelSubframe extends JInternalFrame {
 	
 	public ModelSubframe(String name, int width, int height, final File sourceFile) {
 		super(sourceFile.getName() + " ("+(++frameCounter)+')', true, true, true, false);
-		setSize(width, height);
+		setSize(4*width, 4*height);
 		setLocation(xStart + xOffset*(frameCounter-1), yStart + yOffset*(frameCounter-1));
 		
 		final ModelSubframe self = this;
 		addComponentListener(new ComponentListener() {
 			@Override
 			public void componentResized(ComponentEvent componentEvent) {
-				MainWindow.getInstance().validate(); }
+//				System.out.println(Gdx.graphics.getWidth() +" "+ Gdx.graphics.getHeight());
+//				setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				MainWindow.getInstance().validate();
+			}
 			@Override
 			public void componentMoved(ComponentEvent componentEvent) {
 				MainWindow.getInstance().validate(); }

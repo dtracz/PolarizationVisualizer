@@ -50,6 +50,8 @@ public class MainEngine implements ApplicationListener {
 	private Map<String, Integer> atomColors;
 	public ModelSet models;
 	
+	private int fontSize = 24;
+	
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	void showMessage(final String text, final String type) {
@@ -345,6 +347,15 @@ public class MainEngine implements ApplicationListener {
 		PixmapIO.writePNG(Gdx.files.external(filename), pixmap);
 		pixmap.dispose(); }
 	
+	
+	public void setFont(int fontSize) {
+		this.fontSize = fontSize;
+		models.parameter.size = (int)(4*fontSize*Math.min(720f/Gdx.graphics.getHeight(), 1280f/Gdx.graphics.getWidth()));
+		models.parameter.color = Color.BLACK;
+		models.fontChanged = true;
+	}
+	
+	
 	/* - APPLICATION LISTENER- - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	@Override
@@ -359,7 +370,8 @@ public class MainEngine implements ApplicationListener {
 		Vector3 origin = atomFactory();
 		models.createAxes(origin.sub(ONES), 5, 0.8f, 0.1f);
 		
-		Vector3 center = models.getMoleculeCenter();
+		Vector3 center = new Vector3(0,0,0);
+		models.atoms.get(0).getCenter(center);
 		perspectiveCamera = new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		orthographicCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cameraHandler = new CameraHandler(perspectiveCamera, center, defaultUpAxis);
@@ -404,17 +416,11 @@ public class MainEngine implements ApplicationListener {
 	
 	@Override
 	public void resize(int width, int height) {
-//		models.parameter.size = (int)(24);
-//		models.font = models.generator.generateFont(models.parameter);
-//
-//		System.out.println(Gdx.graphics.getDensity() +" "+ Gdx.graphics.getWidth() +" "+ Gdx.graphics.getHeight());
-//		viewport.setScreenSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-//		viewport.setWorldSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		models.parameter.size = (int)(4*fontSize*Math.min(720f/Gdx.graphics.getHeight(), 1280f/Gdx.graphics.getWidth()));
+		models.parameter.color = Color.BLACK;
+		models.font = models.generator.generateFont(models.parameter);
 		
-//		perspectiveCamera = new PerspectiveCamera(50, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-//		orthographicCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		
-		viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 		listener.resize(width, height);
 		cameraHandler.updateCamera();
 	}

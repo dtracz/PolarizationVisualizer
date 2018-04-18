@@ -2,8 +2,10 @@ package com.visualizer.desktop;
 
 import com.badlogic.gdx.graphics.Color;
 import com.visualizer.userInterface.MainWindow;
+import org.lwjgl.Sys;
 
 import java.beans.XMLEncoder;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Map;
@@ -11,7 +13,17 @@ import java.util.TreeMap;
 
 public class DesktopLauncher {
 	
+	public static boolean setCurrentDirectory(String directory_name) {
+		boolean result = false;
+		File directory = new File(directory_name).getAbsoluteFile();
+		if (directory.exists() || directory.mkdirs()) {
+			result = (System.setProperty("user.dir", directory.getAbsolutePath()) != null);
+		}
+		return result;
+	}
+	
 	public static void main(String[] arg) {
+		setCurrentDirectory("/home/dawid/Documents/polaber/core/assets");
 		MainWindow.getInstance();
 	/*
 		Map atomColors = new TreeMap<String, Integer>();

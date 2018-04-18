@@ -17,7 +17,7 @@ public class CameraHandler {
 	private Camera camera;
 	private float theta;                            // degrees
 	
-	private float scroll2D_a =  0.855f;             // HARDCODED!!!
+	private float scroll2D_a =  5.855f;             // HARDCODED!!!
 	private float scroll2D_b = -0.062f;             // HARDCODED!!!
 	private float scroll2D_c =  4.56f;              // HARDCODED!!!
 	private float scroll2D_d =  8.0f;               // HARDCODED!!!
@@ -143,7 +143,8 @@ public class CameraHandler {
 		else {
 			helper.set(upAxis).crs(camera.direction).scl(-1);
 			camera.rotateAround(center, helper, dir);
-			theta += dir; } }
+			theta += dir; }
+	}
 	
 	public void moveForward(float displacement) {
 		camera.position.add(helper.set(camera.direction).scl(-displacement));

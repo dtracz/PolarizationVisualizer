@@ -1,5 +1,6 @@
 package com.visualizer.userInterface;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 import com.visualizer.engine.Atom;
 import com.visualizer.engine.CameraHandler;
@@ -19,7 +20,8 @@ import java.util.NoSuchElementException;
 
 public class NorthPanel extends JScrollPane {
 	private final static String floatMatch = "-?\\d+\\.?\\d*";
-	private final static String atomMatch = "[A-Z][a-z]?\\d*";
+	private final static String atomMatch = "([A-Z][a-z]?\\d*|MOL)";
+//	private final static String atomMatch = "[A-Z][a-z]?\\d*";
 	private final Vector3 position = new Vector3();
 	private final Vector3 position2 = new Vector3();
 	private final Vector3 position3 = new Vector3();
@@ -63,7 +65,7 @@ public class NorthPanel extends JScrollPane {
 		sliderPane.add(slider);
 		sliderPane.add(sliderLabel);
 		return sliderPane; }
-		
+	
 	private JPanel createSizeSpinner(final String objects) {
 		JPanel sizePanel = new JPanel();
 		JLabel label = new JLabel("Size factor: ");
@@ -83,7 +85,57 @@ public class NorthPanel extends JScrollPane {
 		if(objects.equals("ATOMS")) {
 			spinner.setValue(0.2); }
 		sizePanel.add(spinner);
-		return sizePanel; }
+		return sizePanel;
+	}
+	
+	private JPanel createMoleculeSpinner() {
+		JPanel sizePanel = new JPanel();
+		JLabel label = new JLabel("MOL size:  ");
+		sizePanel.add(label);
+		final JSpinner spinner = new JSpinner(new SpinnerNumberModel(1, 0, 10, 0.01));
+		try {
+			JFormattedTextField textField = ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField();
+			textField.setColumns(4);
+			//textField.setFont(textField.getFont().deriveFont(12f));
+			textField.setHorizontalAlignment(JTextField.RIGHT); }
+		catch(Exception e) {
+			e.printStackTrace(); }
+		spinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent changeEvent) {
+				models.atoms.get(0).scale(((Double)spinner.getValue()).floatValue()); } });
+		spinner.setValue(0.2);
+		sizePanel.add(spinner);
+		return sizePanel;
+	}
+	
+	private JPanel createFontSpinner() {
+		JPanel sizePanel = new JPanel();
+		JLabel label = new JLabel("Font size: ");
+		sizePanel.add(label);
+		final JSpinner spinner = new JSpinner(new SpinnerNumberModel(24, 8, 60, 1));
+		try {
+			JFormattedTextField textField = ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField();
+			textField.setColumns(4);
+			//textField.setFont(textField.getFont().deriveFont(12f));
+			textField.setHorizontalAlignment(JTextField.RIGHT); }
+		catch(Exception e) {
+			e.printStackTrace(); }
+		spinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent changeEvent) {
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						engine.setFont((Integer)spinner.getValue());
+					}
+				});
+			}
+		});
+		spinner.setValue(24);
+		sizePanel.add(spinner);
+		return sizePanel;
+	}
 
 	private JPanel createAxesSetter() {
 		JPanel panel = new JPanel();
@@ -150,7 +202,7 @@ public class NorthPanel extends JScrollPane {
 		reset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
-				position.set(models.getMoleculeCenter());
+				models.atoms.get(0).getCenter(position);
 				cameraHandler.lookAt(position); }
 		});
 		return reset; }
@@ -169,17 +221,33 @@ public class NorthPanel extends JScrollPane {
 					position.set(Float.parseFloat(sPos[0]), Float.parseFloat(sPos[1]), Float.parseFloat(sPos[2]));
 					cameraHandler.lookAt(position);
 					textField.setText(""); }
-				else if(input.matches("[ ]*" +atomMatch+ "[;, ]+" +atomMatch+ "[;, ]+" +atomMatch+ "[;, ]*")) {
-					String[] atoms = input.split("[;, ]+");
-					Vector3 at1pos = models.getAtom(atoms[0]).getCenter(position.set(0,0,0));
-					Vector3 at2pos = models.getAtom(atoms[1]).getCenter(position2.set(0,0,0));
-					Vector3 at3pos = models.getAtom(atoms[2]).getCenter(position3.set(0,0,0));
+				else if(input.matches("[ ]*" +atomMatch+ "[;, ]*")) {
+						String[] atoms = input.split("[;, ]+");
 					try {
-						cameraHandler.lookAt(at1pos, at2pos, at3pos);
+						models.getAtom(atoms[0]).getCenter(position.set(0,0,0));
+						cameraHandler.lookAt(position);
 						textField.setText(""); }
 					catch(IllegalArgumentException iae) {
-						JOptionPane.showMessageDialog(MainWindow.getInstance(), iae.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); } }
+						JOptionPane.showMessageDialog(MainWindow.getInstance(), iae.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); }
+					catch(NoSuchElementException nsee) {
+						JOptionPane.showMessageDialog(MainWindow.getInstance(), nsee.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); }
+				}
+				else if(input.matches("[ ]*" +atomMatch+ "[;, ]+" +atomMatch+ "[;, ]+" +atomMatch+ "[;, ]*")) {
+					String[] atoms = input.split("[;, ]+");
+					try {
+						models.getAtom(atoms[0]).getCenter(position.set(0,0,0));
+						models.getAtom(atoms[1]).getCenter(position2.set(0,0,0));
+						models.getAtom(atoms[2]).getCenter(position3.set(0,0,0));
+						cameraHandler.lookAt(position, position2, position3);
+						textField.setText(""); }
+					catch(IllegalArgumentException iae) {
+						JOptionPane.showMessageDialog(MainWindow.getInstance(), iae.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); }
+					catch(NoSuchElementException nsee) {
+						JOptionPane.showMessageDialog(MainWindow.getInstance(), nsee.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); }
+				}
 				else {
+					System.out.println(input);
+					System.out.println("[ ]*" +atomMatch+ "[;, ]+" +atomMatch+ "[;, ]+" +atomMatch+ "[;, ]*");
 					JOptionPane.showMessageDialog(MainWindow.getInstance(), "Cannot resolve input", "Error", JOptionPane.ERROR_MESSAGE); } }
 		});
 		
@@ -234,7 +302,6 @@ public class NorthPanel extends JScrollPane {
 			{
 				super.paint(g);
 				int[][] dims = layout.getLayoutDimensions();
-				//g.setColor(Color.BLUE);
 				int x = 0;
 				for(int i=0; i<dims[0].length; i++) {
 					x += dims[0][i];
@@ -271,6 +338,10 @@ public class NorthPanel extends JScrollPane {
 		gbc.insets.left = sideSpace/2;
 		Component lookAt = createLookAt();
 		optionsPane.add(lookAt, gbc);
+		gbc.gridx++;
+		gbc.insets.right = 0;
+		Component fontSpinner = createFontSpinner();
+		optionsPane.add(fontSpinner, gbc);
 		
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -298,6 +369,10 @@ public class NorthPanel extends JScrollPane {
 		gbc.insets.left = sideSpace/2;
 		Component lookAlong = createLookAlong();
 		optionsPane.add(lookAlong, gbc);
+		gbc.gridx++;
+		gbc.insets.right = 0;
+		Component moleculeSpinner = createMoleculeSpinner();
+		optionsPane.add(moleculeSpinner, gbc);
 		
 		viewPanel.add(optionsPane);
 		setViewportView(viewPanel); }
