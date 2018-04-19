@@ -20,6 +20,7 @@ public class MainWindow extends JFrame {
 	private final static int[] southPanelSizes = new int[]{10, 205};
 	private final JScrollPane[] emptyPanels; // {east, north}
 	
+	public static String selfPath;
 	private static MainWindow instance;
 	private JMenuBar bar;
 	private JDesktopPane desktop;

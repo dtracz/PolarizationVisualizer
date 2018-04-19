@@ -8,6 +8,7 @@ import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -23,7 +24,14 @@ public class DesktopLauncher {
 	}
 	
 	public static void main(String[] arg) {
-		setCurrentDirectory("/home/dawid/Documents/polaber/core/assets");
+		//setCurrentDirectory("/home/dawid/Documents/polaber/core/assets");
+		File file = null;
+		try {
+			file = new File(DesktopLauncher.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()); }
+		catch(URISyntaxException e) {
+			e.printStackTrace(); }
+		MainWindow.selfPath = file.getParentFile().getAbsolutePath();
+		System.out.println(file.getParentFile().getAbsolutePath());
 		MainWindow.getInstance();
 	/*
 		Map atomColors = new TreeMap<String, Integer>();
