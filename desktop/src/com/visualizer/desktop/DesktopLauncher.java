@@ -145,7 +145,7 @@ public class DesktopLauncher {
 		atomColors.put("Hs", Color.rgba8888(230f/255f,000f/255f,046f/255f, 1));
 		atomColors.put("Mt", Color.rgba8888(235f/255f,000f/255f,038f/255f, 1));
 		try {
-			XMLEncoder xmlEncoder = new XMLEncoder(new FileOutputStream("atomColors.xml"));
+			XMLEncoder xmlEncoder = new XMLEncoder(new FileOutputStream(MainWindow.selfPath+"atomColors.xml"));
 			xmlEncoder.writeObject(atomColors);
 			xmlEncoder.close(); }
 		catch(FileNotFoundException fnfe) {

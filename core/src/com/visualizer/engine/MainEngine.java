@@ -51,6 +51,7 @@ public class MainEngine implements ApplicationListener {
 	public ModelSet models;
 	
 	private int fontSize = 24;
+	private final boolean longImport;
 	
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
@@ -314,11 +315,13 @@ public class MainEngine implements ApplicationListener {
 		return shift; }
 	
 		
-	public MainEngine(File file) {
+	public MainEngine(File file, boolean longImport) {
+		this.longImport = longImport;
 		sourceFile = file;
 		mode2d = false;
 		try {
-			XMLDecoder xmlDecoder = new XMLDecoder(new FileInputStream("atomColors.xml"));
+			System.out.println(MainWindow.selfPath);
+			XMLDecoder xmlDecoder = new XMLDecoder(new FileInputStream(MainWindow.selfPath+"/atomColors.xml"));
 			atomColors = (TreeMap<String, Integer>)xmlDecoder.readObject();
 			xmlDecoder.close(); }
 		catch(FileNotFoundException fnfe) {
@@ -376,12 +379,15 @@ public class MainEngine implements ApplicationListener {
 		orthographicCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cameraHandler = new CameraHandler(perspectiveCamera, center, defaultUpAxis);
 		
-		pointLights = new LinkedList<PointLight>();
-		pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-20, -10, 20), 400f));
-		//pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-10,   0, 10), 150f));
-		pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-20,  10, 20), 150f));
-		for(PointLight pointLight: pointLights) {
-			environment.add(pointLight); }
+//		pointLights = new LinkedList<PointLight>();
+//		pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-20, -10, 20), 400f));
+//		//pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-10,   0, 10), 150f));
+//		pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-20,  10, 20), 150f));
+//		for(PointLight pointLight: pointLights) {
+//			environment.add(pointLight); }
+		cameraHandler.pointLight = new PointLight().set(Color.WHITE, origin.cpy().add(0, 0, 0), 1200f);
+		environment.add(cameraHandler.pointLight);
+		cameraHandler.updatePointLight();
 		
 		listener = new Listener(this, cameraHandler, models);
 		Gdx.input.setInputProcessor(listener);

@@ -1,6 +1,8 @@
 package com.visualizer.userInterface;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -42,12 +44,23 @@ public class MainWindow extends JFrame {
 		itemImport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				try {
-					topSubframe = addModel(selectFile()); }
+					topSubframe = addModel(selectFile(), false); }
 				catch(FileNotFoundException fnfe) {
 					fnfe.printStackTrace(); }
 //				MainWindow.getInstance().validate();
 			}
 		});
+		
+//		final JMenuItem longImport = new JMenuItem("Long import...");
+//		itemImport.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent ev) {
+//				try {
+//					topSubframe = addModel(selectFile(), true); }
+//				catch(FileNotFoundException fnfe) {
+//					fnfe.printStackTrace(); }
+////				MainWindow.getInstance().validate();
+//			}
+//		});
 		
 		final JMenuItem itemExport = new JMenuItem("Export as png");
 		itemExport.addActionListener(new ActionListener() {
@@ -71,6 +84,7 @@ public class MainWindow extends JFrame {
 		});
 		
 		menuFile.add(itemImport);
+//		menuFile.add(longImport);
 		menuFile.add(itemExport);
 		menuFile.addSeparator();
 		menuFile.add(itemExit);
@@ -222,8 +236,8 @@ public class MainWindow extends JFrame {
 			throw new FileNotFoundException("No file selected"); } }
 	
 			
-	private ModelSubframe addModel(File sourceFile) {
-		ModelSubframe subframe = new ModelSubframe("subframe", modelSubframeSizes[0], modelSubframeSizes[1], sourceFile);
+	private ModelSubframe addModel(File sourceFile, boolean longImport) {
+		ModelSubframe subframe = new ModelSubframe("subframe", modelSubframeSizes[0], modelSubframeSizes[1], sourceFile, longImport);
 		desktop.add(subframe);
 		subframe.toFront();
 		return subframe;

@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.visualizer.userInterface.MainWindow;
 
 public class Bond implements SpatialObject {
 	private final Atom[] connectedAtoms;
@@ -35,7 +36,7 @@ public class Bond implements SpatialObject {
 	
 	Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean dashed, String bondpol) {
 		if(dashedTexture == null) {
-			dashedTexture = TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle("stripes.jpg", Files.FileType.Internal)));
+			dashedTexture = TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle(MainWindow.selfPath+"/stripes.jpg", Files.FileType.Internal)));
 		}
 		connectedAtoms = new Atom[]{atom1, atom2};
 		scale = 1f;

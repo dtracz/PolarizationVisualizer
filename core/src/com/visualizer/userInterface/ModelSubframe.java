@@ -19,7 +19,7 @@ public class ModelSubframe extends JInternalFrame {
 	LwjglAWTCanvas canvas;
 	//private GWTBridge gwtBridge; // ?!
 	
-	public ModelSubframe(String name, int width, int height, final File sourceFile) {
+	public ModelSubframe(String name, int width, int height, final File sourceFile, boolean longImport) {
 		super(sourceFile.getName() + " ("+(++frameCounter)+')', true, true, true, false);
 		setSize(4*width, 4*height);
 		setLocation(xStart + xOffset*(frameCounter-1), yStart + yOffset*(frameCounter-1));
@@ -72,7 +72,7 @@ public class ModelSubframe extends JInternalFrame {
 		
 //		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 //			public void run() {
-				engine = new MainEngine(sourceFile);
+				engine = new MainEngine(sourceFile, longImport);
 				canvas = new LwjglAWTCanvas(engine);
 				add(canvas.getCanvas());
 //			} });

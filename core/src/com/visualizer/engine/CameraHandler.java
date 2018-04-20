@@ -2,7 +2,9 @@ package com.visualizer.engine;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 import java.lang.reflect.Field;
@@ -11,6 +13,9 @@ import java.lang.reflect.Field;
  * Created by dawid on 04.03.17.
  */
 public class CameraHandler {
+	final Quaternion rotRight = new Quaternion();
+	PointLight pointLight;
+	
 	private final Vector3 helper;
 	private final Vector3 center;                   // x, y, z
 	private final Vector3 upAxis;                   // always normalized!!!
@@ -45,7 +50,8 @@ public class CameraHandler {
 		camera.near = 0.1f;
 		camera.far = 3000f;
 		camera.lookAt(center);
-		recalculateTheta(); }
+		recalculateTheta();
+	}
 	
 	public void setCamera(Camera newCamera) {
 		if(newCamera instanceof OrthographicCamera) {
@@ -70,12 +76,23 @@ public class CameraHandler {
 		camera.update();
 	}
 	
+	void updatePointLight() {
+		helper.set(camera.direction);
+		pointLight.position.set(camera.position);
+		pointLight.position.sub(helper.nor().scl(10));
+		rotRight.set(helper, 300);
+		helper.set(camera.up).nor().scl(50);
+		pointLight.position.add(rotRight.transform(helper));
+	}
+	
 	/* - SETTINGS- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	public void setUpAxis(Vector3 upAxis) {
 		this.upAxis.set(upAxis).nor();
 		if(!camera.direction.isOnLine(upAxis)) {
-			camera.up.set(upAxis); } }
+			camera.up.set(upAxis); }
+		updatePointLight();
+	}
 	
 	public void setPosition(Vector3 position) {
 		camera.position.set(position);
@@ -83,7 +100,9 @@ public class CameraHandler {
 		recalculateTheta();
 		if(!camera.direction.isOnLine(upAxis)) {
 			camera.up.set(upAxis); }
-		setZoom2D(); }
+		setZoom2D();
+		updatePointLight();
+	}
 	
 	public void lookAt(Vector3 center) {
 		this.center.set(center);
@@ -91,7 +110,9 @@ public class CameraHandler {
 		recalculateTheta();
 		if(!camera.direction.isOnLine(upAxis)) {
 			camera.up.set(upAxis); }
-		setZoom2D(); }
+		setZoom2D();
+		updatePointLight();
+	}
 	
 	public void lookAt(Vector3 x1, Vector3 x2, Vector3 x3) throws IllegalArgumentException {
 		center.set(x3).sub(x1);
@@ -101,25 +122,32 @@ public class CameraHandler {
 		helper.crs(center).nor().scl(-20);                                      // hardcoded distance!!
 		center.set(x1).add(x2).add(x3).scl(1f/3f);
 		setPosition(helper.add(center));
-		setZoom2D(); }
+		setZoom2D();
+		updatePointLight();
+	}
 		
 	public void lookAlong(Vector3 x1, Vector3 x2) throws IllegalArgumentException {
 		if(x1.equals(x2)) {
 			throw new IllegalArgumentException("Given points does not determinate an axis"); }
 		center.set(x2);
 		setPosition(x1);
-		moveForward(20);	                                             // hardcoded distance!!
+		moveForward(20);
+		updatePointLight();		                                             // hardcoded distance!!
 	}
 	
 	public void lookAlong(Vector3 direction) {
 		helper.set(direction).nor().scl(-20);
 		helper.add(center);
-		setPosition(helper); }
+		setPosition(helper);
+		updatePointLight();
+	}
 	
 	/* - ROTATIONS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	public void rotArUp(float dir) {
-		camera.rotateAround(center, upAxis, dir); }
+		camera.rotateAround(center, upAxis, dir);
+		updatePointLight();
+	}
 	
 	public void rotUpDown(float dir) {
 		if(theta + dir <= -90) {									// lock on down
@@ -144,11 +172,14 @@ public class CameraHandler {
 			helper.set(upAxis).crs(camera.direction).scl(-1);
 			camera.rotateAround(center, helper, dir);
 			theta += dir; }
+		updatePointLight();
 	}
 	
 	public void moveForward(float displacement) {
 		camera.position.add(helper.set(camera.direction).scl(-displacement));
-		setZoom2D(); }
+		setZoom2D();
+		updatePointLight();
+	}
 	
 	public void movePlanar(float dx, float dy) {
 		helper.set(camera.up).scl(-dy);
@@ -156,10 +187,14 @@ public class CameraHandler {
 		center.add(helper);
 		helper.set(camera.direction).crs(camera.up).scl(-dx);
 		camera.position.add(helper);
-		center.add(helper); }
+		center.add(helper);
+		updatePointLight();
+	}
 		
 	public void rotArDir(float dir) {
 		camera.rotate(camera.direction, dir);
-		upAxis.rotate(camera.direction, dir); }
+		upAxis.rotate(camera.direction, dir);
+		updatePointLight();
+	}
 
 }

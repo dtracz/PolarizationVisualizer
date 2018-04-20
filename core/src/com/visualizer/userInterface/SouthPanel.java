@@ -59,7 +59,7 @@ public class SouthPanel extends JScrollPane {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(processes.get(index) == null) {
-					runSubroutine(name, index);
+					runSubroutine(MainWindow.selfPath+"/"+name, index);
 				}
 				else {
 					System.out.println("is not null");
@@ -88,9 +88,9 @@ public class SouthPanel extends JScrollPane {
 		viewPanel = new JPanel(new BorderLayout());
 		
 		paths = new ArrayList<String>();
-		paths.add("./PolaberExe.exe");
-		paths.add("./FG_assign.exe");
-		paths.add("./FG_calc.exe");
+		paths.add("PolaberExe.exe");
+		paths.add("FG_assign.exe");
+		paths.add("FG_calc.exe");
 		processes = new ArrayList<Process>(Collections.<Process>nCopies(paths.size(), null));
 		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());
