@@ -38,7 +38,7 @@ public class Atom implements SpatialObject {
 	public boolean visibleLabel;
 	public boolean visibleAxes;
 	public float opacity = 1;
-	public boolean isGray = false;
+	public String currentColour = "default";
 
 	Atom(String name, Model sphereModel, Model axisModel, Attribute colour, Vector3 position, Quaternion orientation, Vector3 sizes, String alpha) {
 		this.mainColour = colour;
@@ -135,16 +135,20 @@ public class Atom implements SpatialObject {
 	public Material getMaterial() {
 		return instances[0].materials.get(0); }
 		
-	public void setGray(boolean gray) {
-		if(gray && ! this.isGray) {
+	public void setColour(String colour) {
+		if(colour.equals("gray")) {
 			instances[0].materials.get(0).set(ModelSet.GRAY);
 			instances[1].materials.get(0).set(ModelSet.GRAY);
 		}
-		else if(!gray && this.isGray) {
+		else if(colour.equals("green")) {
+			instances[0].materials.get(0).set(ModelSet.GREEN);
+			instances[1].materials.get(0).set(ModelSet.GREEN);
+		}
+		else {
 			instances[0].materials.get(0).set(mainColour);
 			instances[1].materials.get(0).set(mainColour);
 		}
-		this.isGray = gray;
+		this.currentColour = colour;
 	}
 		
 }

@@ -25,9 +25,11 @@ import java.util.NoSuchElementException;
  * Created by dawid on 11.07.17.
  */
 public class ModelSet extends ModelBatch {
+	public final static Attribute GRAY = ColorAttribute.createDiffuse(0.5f,0.5f,0.5f,1);
+	public final static Attribute GREEN = ColorAttribute.createDiffuse(093f/255f, 198f/255f, 023f/255f, 1f);
+	
 	private final Vector3 helper = new Vector3();
 	final static Material BLACK_MATERIAL = new Material(ColorAttribute.createDiffuse(0,0,0,1));
-	final static Attribute GRAY = ColorAttribute.createDiffuse(0.5f,0.5f,0.5f,1);
 	private float boundDiameter = 0.064f;										// parameters !!!
 	private int cylindricalDivisions = 16;
 	private int sphereDivisionsU = 32;

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,7 +25,8 @@ public class DesktopLauncher {
 	}
 	
 	public static void main(String[] arg) {
-		//setCurrentDirectory("/home/dawid/Documents/polaber/core/assets");
+		Locale.setDefault(new Locale("en", "US"));
+		
 		File file = null;
 		try {
 			file = new File(DesktopLauncher.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()); }

@@ -1,16 +1,20 @@
 package com.visualizer.userInterface;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector3;
+import com.visualizer.engine.MainEngine;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,6 +96,7 @@ public class MainWindow extends JFrame {
 	
 	private JMenu createMenuView(String name) {
 		JMenu menuView = new JMenu(name);
+		
 		final JMenuItem itemMode = new JMenuItem("Mode 2D/3D");
 		itemMode.addActionListener(new ActionListener() {
 			@Override
@@ -137,8 +142,48 @@ public class MainWindow extends JFrame {
 		//menuView.add(itemCamera);
 		menuView.add(itemControl);
 		menuView.add(itemSubroutine);
-		return menuView; }
+		return menuView;
+	}
+	
+	private JMenu createMenuHelp(String name) {
+		JMenu menuHelp = new JMenu(name);
 		
+		final JMenuItem itemDoc = new JMenuItem("Documentation");
+		itemDoc.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					if (Desktop.isDesktopSupported()) {
+						Desktop.getDesktop().open(new File(MainWindow.selfPath +"/documentation.pdf")); }
+					else {
+						JOptionPane.showMessageDialog(MainWindow.getInstance(), "Not supported on Your computer", "Error", JOptionPane.ERROR_MESSAGE); }
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(MainWindow.getInstance(), "No documentation found", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		
+		final JMenuItem itemWeb = new JMenuItem("Website");
+		itemWeb.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					if (Desktop.isDesktopSupported()) {
+						Desktop.getDesktop().browse(new URI("http://www.example.com")); }
+					else {
+						JOptionPane.showMessageDialog(MainWindow.getInstance(), "Not supported on Your computer", "Error", JOptionPane.ERROR_MESSAGE); }
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(MainWindow.getInstance(), e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				} catch (URISyntaxException e1) {
+					JOptionPane.showMessageDialog(MainWindow.getInstance(), e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		
+		menuHelp.add(itemDoc);
+		menuHelp.add(itemWeb);
+		return menuHelp;
+	}
 		
 	private void createMenu() {
 		bar = new JMenuBar();
@@ -150,12 +195,23 @@ public class MainWindow extends JFrame {
 		bar.add(menuView);
 		//JMenu menuSettings = new JMenu("Settings");
 		//bar.add(menuSettings);
+		JMenu menuHelp = createMenuHelp("Help");
+		bar.add(menuHelp);
 		setJMenuBar(bar);
 	}
 	
 	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	protected MainWindow(int width, int height) {
+		addMouseListener(new MouseAdapter() { // show tooltips forever
+			public void mouseEntered(MouseEvent me) {
+				ToolTipManager.sharedInstance().setDismissDelay(0);
+			}
+			public void mouseExited(MouseEvent me) {
+				ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
+			}
+		});
+		
 		showPanels = true;
 		
 		emptyPanels = new JScrollPane[2];
@@ -173,22 +229,6 @@ public class MainWindow extends JFrame {
 		setSize(width, height);
 		createMenu();
 		projects = new HashMap<ModelSubframe, JScrollPane[]>();
-		/*addComponentListener(new ComponentListener() {
-			@Override
-			public void componentResized(ComponentEvent e) {
-				if(currEastPanel != null) {
-					//	currEastPanel.updateBounds(getWidth(), getHeight());
-				} }
-			
-			@Override
-			public void componentMoved(ComponentEvent e) { }
-			
-			@Override
-			public void componentShown(ComponentEvent e) { }
-			
-			@Override
-			public void componentHidden(ComponentEvent e) { }
-		});*/
 		setVisible(true);
 		setCurrPanels(emptyPanels);
 		

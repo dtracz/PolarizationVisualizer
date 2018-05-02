@@ -11,10 +11,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 
@@ -139,7 +136,7 @@ public class NorthPanel extends JScrollPane {
 
 	private JPanel createAxesSetter() {
 		JPanel panel = new JPanel();
-		JLabel label = new JLabel("set pos:");
+		JLabel label = new JLabel("Set pos:");
 		
 		final JTextField textField = new JTextField(7);
 		textField.setMinimumSize(new Dimension(70, 20));
@@ -171,7 +168,7 @@ public class NorthPanel extends JScrollPane {
 		return panel; }
 		
 	private JCheckBox createCameraBox() {
-		JCheckBox checkBox = new JCheckBox("mode 2D");
+		JCheckBox checkBox = new JCheckBox("Mode 2D");
 		checkBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -189,7 +186,7 @@ public class NorthPanel extends JScrollPane {
 		return checkBox; }
 		
 	private JButton createResetUpButton() {
-		JButton reset = new JButton("res. up");
+		JButton reset = new JButton("Res. up");
 		reset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
@@ -198,7 +195,7 @@ public class NorthPanel extends JScrollPane {
 		return reset; }
 		
 	private JButton createResetCenterButton() {
-		JButton reset = new JButton("res. cent.");
+		JButton reset = new JButton("Res. cent.");
 		reset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
@@ -209,9 +206,17 @@ public class NorthPanel extends JScrollPane {
 	
 	private JPanel createLookAt() {
 		JPanel panel = new JPanel();
-		JLabel label = new JLabel("look at:      ");
+		JLabel label = new JLabel("Look at:      ");
+		
+		final String description = "<html>Possible inputs:<br>"
+				                  +"1. A point You want to look at, described as:<br>"
+				                  +"&nbsp&nbsp&nbsp a) an atom name. (ex. \"C5\")<br>"
+				                  +"&nbsp&nbsp&nbsp b) coordinates with dot (\".\") as delimiter (ex. \"1.4, 2.46, 0\")<br>"
+				                  +"2. A planar You want to look at, described as 3 atom names (ex. \"C4, N1, H6\")<br><br>"
+				                  +"Delimiter between next coordinates or atoms could be any combination of any number of: {';', ',', ' '}.</html>";
 		
 		final JTextField textField = new JTextField(9);
+		textField.setToolTipText(description);
 		textField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
@@ -248,7 +253,7 @@ public class NorthPanel extends JScrollPane {
 				else {
 					System.out.println(input);
 					System.out.println("[ ]*" +atomMatch+ "[;, ]+" +atomMatch+ "[;, ]+" +atomMatch+ "[;, ]*");
-					JOptionPane.showMessageDialog(MainWindow.getInstance(), "Cannot resolve input", "Error", JOptionPane.ERROR_MESSAGE); } }
+					JOptionPane.showMessageDialog(MainWindow.getInstance(), "Cannot resolve input\n\n" + description, "Error", JOptionPane.ERROR_MESSAGE); } }
 		});
 		
 		panel.add(label);
@@ -257,9 +262,15 @@ public class NorthPanel extends JScrollPane {
 		
 	private JPanel createLookAlong() {
 		JPanel panel = new JPanel();
-		JLabel label = new JLabel("look along:");
+		JLabel label = new JLabel("Look along:");
+		
+		final String description = "<html>Possible inputs:<br>"
+				                  +"1. Names of two atoms describing direction (ex. \"C4, C5\")<br>"
+				                  +"2. Axes You want to look along (ex. \"1.4, 2.46, 0\")<br><br>"
+				                  +"Delimiter between next coordinates or atoms could be any combination of any number of: {';', ',', ' '}.</html>";
 		
 		final JTextField textField = new JTextField(9);
+		textField.setToolTipText(description);
 		textField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
@@ -279,7 +290,7 @@ public class NorthPanel extends JScrollPane {
 					catch(IllegalArgumentException iae) {
 						JOptionPane.showMessageDialog(MainWindow.getInstance(), iae.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); } }
 				else {
-					JOptionPane.showMessageDialog(MainWindow.getInstance(), "Cannot resolve input", "Error", JOptionPane.ERROR_MESSAGE); } }
+					JOptionPane.showMessageDialog(MainWindow.getInstance(), "Cannot resolve input\n\n"+ description, "Error", JOptionPane.ERROR_MESSAGE); } }
 		});
 		
 		panel.add(label);

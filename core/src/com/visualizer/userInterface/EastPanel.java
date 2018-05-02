@@ -2,6 +2,7 @@ package com.visualizer.userInterface;
 
 import com.visualizer.engine.Atom;
 import com.visualizer.engine.Bond;
+import com.visualizer.engine.ModelSet;
 import com.visualizer.engine.SpatialObject;
 
 import javax.swing.*;
@@ -9,6 +10,7 @@ import javax.swing.event.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ public class EastPanel extends JScrollPane {
 	
 	private JPanel viewPanel;
 	private JPanel windowsPanel;
-	private JCheckBox oneAtomGray;
+	private JComboBox oneAtomColour;
 	private JSlider oneAtomOpacity;
 	private int xSize;
 	
@@ -89,7 +91,7 @@ public class EastPanel extends JScrollPane {
 				textArea.setText(description);
 				
 				selected = atoms.get(row);
-				oneAtomGray.setSelected(atoms.get(row).isGray);
+				oneAtomColour.setSelectedItem(atoms.get(row).currentColour);
 				oneAtomOpacity.setValue((int)(atoms.get(row).opacity*100));
 			}
 		});
@@ -165,16 +167,17 @@ public class EastPanel extends JScrollPane {
 	private JPanel createOneAtomPanel() {
 		JPanel oneAtomPanel = new JPanel();
 		
-		oneAtomGray = new JCheckBox("gray");
-		oneAtomGray.setHorizontalTextPosition(SwingConstants.RIGHT);
-		oneAtomGray.addItemListener(new ItemListener() {
+		String[] colours = {"default", "gray", "green"};
+		oneAtomColour = new JComboBox(colours);
+		oneAtomColour.addActionListener(new AbstractAction() {
 			@Override
-			public void itemStateChanged(ItemEvent e) {
-				((Atom)selected).setGray(e.getStateChange() == ItemEvent.SELECTED); } });
-		oneAtomGray.setSelected(false);
+			public void actionPerformed(ActionEvent e) {
+				((Atom)selected).setColour((String)oneAtomColour.getSelectedItem());
+			}
+		});
 		
 		oneAtomOpacity = new JSlider(0, 100, 100);
-		oneAtomOpacity.setPreferredSize(new Dimension(100, 30));
+		oneAtomOpacity.setPreferredSize(new Dimension(80, 30));
 		oneAtomOpacity.setMajorTickSpacing(50);
 		oneAtomOpacity.setMinorTickSpacing(10);
 		oneAtomOpacity.setPaintTicks(true);
@@ -190,7 +193,7 @@ public class EastPanel extends JScrollPane {
 				//MainWindow.getInstance().validate();                                                        //????
 			} });
 		
-		oneAtomPanel.add(oneAtomGray);
+		oneAtomPanel.add(oneAtomColour);
 		oneAtomPanel.add(oneAtomOpacity);
 		oneAtomPanel.add(sliderLabel);
 		return oneAtomPanel;
@@ -213,7 +216,7 @@ public class EastPanel extends JScrollPane {
 		textAreaPane.add(textArea);
 		atomTable = createAtomTable(atoms);
 		bondTable = createBondTable(bonds);
-		JPanel opacitySlider = createOneAtomPanel();
+		JPanel oneAtomPanel = createOneAtomPanel();
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(15,9,5,9);
@@ -221,7 +224,7 @@ public class EastPanel extends JScrollPane {
 		gbc.gridy = 0;
 		windowsPanel.add(new JScrollPane(atomTable), gbc);
 		gbc.gridy++;
-		windowsPanel.add(opacitySlider, gbc);
+		windowsPanel.add(oneAtomPanel, gbc);
 		gbc.gridy++;
 		windowsPanel.add(new JScrollPane(bondTable), gbc);
 		gbc.gridy++;
