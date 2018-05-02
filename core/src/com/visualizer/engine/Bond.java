@@ -17,9 +17,9 @@ import com.visualizer.userInterface.MainWindow;
 public class Bond implements SpatialObject {
 	private final Atom[] connectedAtoms;
 	
-	private static TextureAttribute dashedTexture;
 	private final Vector3 helper = new Vector3();
 	private BlendingAttribute blendingAttribute;
+	private final TextureAttribute dashedTexture;
 	private final ModelInstance[] instances;
 	
 	private Vector3[] positions;
@@ -34,10 +34,8 @@ public class Bond implements SpatialObject {
 	
 	public final String description;
 	
-	Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean dashed, String bondpol) {
-		if(dashedTexture == null) {
-			dashedTexture = TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle(MainWindow.selfPath+"/stripes.jpg", Files.FileType.Internal)));
-		}
+	Bond(Model atomCenter, Model halfBound, Atom atom1, Atom atom2, float diameter, boolean dashed, String bondpol, TextureAttribute dashedTexture) {
+		this.dashedTexture = dashedTexture;
 		connectedAtoms = new Atom[]{atom1, atom2};
 		scale = 1f;
 		stretch = 1f;

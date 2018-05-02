@@ -176,6 +176,12 @@ public class CameraHandler {
 	}
 	
 	public void moveForward(float displacement) {
+		if(displacement < 0) {
+			helper.set(center);
+			helper.sub(camera.position);
+			if(helper.len() <= -displacement) {
+				return; }
+		}
 		camera.position.add(helper.set(camera.direction).scl(-displacement));
 		setZoom2D();
 		updatePointLight();

@@ -1,14 +1,17 @@
 package com.visualizer.engine;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultRenderableSorter;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.RenderableSorter;
@@ -25,8 +28,9 @@ import java.util.NoSuchElementException;
  * Created by dawid on 11.07.17.
  */
 public class ModelSet extends ModelBatch {
-	public final static Attribute GRAY = ColorAttribute.createDiffuse(0.5f,0.5f,0.5f,1);
-	public final static Attribute GREEN = ColorAttribute.createDiffuse(093f/255f, 198f/255f, 023f/255f, 1f);
+	final static Attribute GRAY = ColorAttribute.createDiffuse(0.5f,0.5f,0.5f,1);
+	final static Attribute GREEN = ColorAttribute.createDiffuse(093f/255f, 198f/255f, 023f/255f, 1f);
+	final TextureAttribute dashedTexture = TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle(MainWindow.selfPath+"/stripes.jpg", Files.FileType.Internal)));
 	
 	private final Vector3 helper = new Vector3();
 	final static Material BLACK_MATERIAL = new Material(ColorAttribute.createDiffuse(0,0,0,1));
@@ -102,7 +106,7 @@ public class ModelSet extends ModelBatch {
 	}
 	
 	public void addBond(String atomName1, String atomName2, boolean striped, String bondpol) throws NoSuchElementException {
-		bonds.add(new Bond(sphere, cylinder, getAtom(atomName1), getAtom(atomName2), boundDiameter, striped, bondpol)); }
+		bonds.add(new Bond(sphere, cylinder, getAtom(atomName1), getAtom(atomName2), boundDiameter, striped, bondpol, dashedTexture)); }
 	
 	public void createAxes(Vector3 origin, float length, float headLength, float diameter) {
 		axes = new Axes(cylinder, cone, origin, length, headLength, diameter); }
