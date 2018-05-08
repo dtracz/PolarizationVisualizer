@@ -2,6 +2,7 @@ package com.visualizer.userInterface;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglAWTCanvas;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.visualizer.engine.MainEngine;
 
 import javax.swing.*;
@@ -70,10 +71,14 @@ public class ModelSubframe extends JInternalFrame {
 		catch(java.beans.PropertyVetoException e) {
 			e.printStackTrace(); }
 		
+		
+		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.samples = 3;
+		
 //		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 //			public void run() {
 				engine = new MainEngine(sourceFile, longImport);
-				canvas = new LwjglAWTCanvas(engine);
+				canvas = new LwjglAWTCanvas(engine, config);
 				add(canvas.getCanvas());
 //			} });
 		setVisible(true);
