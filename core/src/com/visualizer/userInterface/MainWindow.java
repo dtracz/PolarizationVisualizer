@@ -169,7 +169,7 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					if (Desktop.isDesktopSupported()) {
-						Desktop.getDesktop().browse(new URI("http://www.example.com")); }
+						Desktop.getDesktop().browse(new URI("http://www.chemcrys.unibe.ch/PolaBer.html")); }
 					else {
 						JOptionPane.showMessageDialog(MainWindow.getInstance(), "Not supported on Your computer", "Error", JOptionPane.ERROR_MESSAGE); }
 				} catch (IOException e1) {
@@ -180,8 +180,30 @@ public class MainWindow extends JFrame {
 			}
 		});
 		
+		final JMenuItem itemRef = new JMenuItem("References");
+		itemRef.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				final String references = "<html>"
+						                          +"1. A. Krawczuk, D. Perez, P. Macchi  <i>J.Appl. Cryst.</i> (2014) <b>47</b>, 1452–1458<br>"
+						                          +"&nbsp&nbsp&nbsp PolaBer : a program to calculate and visualize distributed atomic polarizabilities based on electron density partitioning<br>"
+						                          +"2. A. Krawczuk, D. Perez, K. Stadnicka, P. Macchi, P. Trans.  <i>Am. Crystallogr. Assoc.</i> (2011) 1–25<br>"
+						                          +"&nbsp&nbsp&nbsp Distributed atomic polarizabilities from electron density. 1. Motivations and Theory<br>"
+						                          +"3. P. Macchi, A. Krawczuk  <i>Comput. Theor. Chem.</i> (2015) <b>1053</b>, 165–172<br>"
+						                          +"&nbsp&nbsp&nbsp The polarizability of organometallic bond<br>"
+						                          +"4. L.H.R. Dos Santos, A. Krawczuk, P. Macchi  <i>J. Phys. Chem. A</i> (2015) <b>119</b>, 3285−3298<br>"
+						                          +"&nbsp&nbsp&nbsp Distributed Atomic Polarizabilities of Amino Acids and their Hydrogen-Bonded Aggregates<br>"
+						                          +"</html>";
+				
+				JLabel label = new JLabel(references);
+				label.setFont(new Font(null, Font.PLAIN, 14));
+				JOptionPane.showMessageDialog(MainWindow.getInstance(), label, "References", JOptionPane.PLAIN_MESSAGE);
+			}
+		});
+		
 		menuHelp.add(itemDoc);
 		menuHelp.add(itemWeb);
+		menuHelp.add(itemRef);
 		return menuHelp;
 	}
 		

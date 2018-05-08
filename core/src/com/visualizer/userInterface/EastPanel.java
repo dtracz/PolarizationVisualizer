@@ -172,7 +172,9 @@ public class EastPanel extends JScrollPane {
 		oneAtomColour.addActionListener(new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				((Atom)selected).setColour((String)oneAtomColour.getSelectedItem());
+				try {
+					((Atom)selected).setColour((String)oneAtomColour.getSelectedItem()); }
+				catch(NullPointerException npe) { }
 			}
 		});
 		

@@ -138,7 +138,15 @@ public class NorthPanel extends JScrollPane {
 		JPanel panel = new JPanel();
 		JLabel label = new JLabel("Set pos:");
 		
+		final String description = "<html>Possible inputs:<br>"
+				                  +"1. Atom name (e.g. C3) - moves the origin of a global coordinate system to the chosen atom.<br>"
+				                  +"2. Coordinates of any point (x,y,z) in cartesian system (e.g. 3.5, 4.0, 1.35) - moves the origin of a global coordinate system the that point<br><br>"
+				                  +"Note:<br>"
+				                  +"&nbsp&nbsp For values use dots as decimal point.<br>"
+				                  +"&nbsp&nbsp Delimiter between coordinates or atom names can be any combination and number of comas, semicolons and/or spaces.</html>";
+		
 		final JTextField textField = new JTextField(7);
+		textField.setToolTipText(description);
 		textField.setMinimumSize(new Dimension(70, 20));
 		textField.addActionListener(new ActionListener() {
 			@Override
@@ -157,7 +165,7 @@ public class NorthPanel extends JScrollPane {
 					String[] sPos = input.split("[;, ]+");
 					position.set(Float.parseFloat(sPos[0]), Float.parseFloat(sPos[1]), Float.parseFloat(sPos[2])); }
 				else {
-					JOptionPane.showMessageDialog(MainWindow.getInstance(), "Cannot resolve input", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(MainWindow.getInstance(), "Cannot resolve input\n\n"+description, "Error", JOptionPane.ERROR_MESSAGE);
 					return; }
 				models.setAxesPosition(position);
 				textField.setText(""); }
@@ -209,11 +217,13 @@ public class NorthPanel extends JScrollPane {
 		JLabel label = new JLabel("Look at:      ");
 		
 		final String description = "<html>Possible inputs:<br>"
-				                  +"1. A point You want to look at, described as:<br>"
-				                  +"&nbsp&nbsp&nbsp a) an atom name. (ex. \"C5\")<br>"
-				                  +"&nbsp&nbsp&nbsp b) coordinates with dot (\".\") as delimiter (ex. \"1.4, 2.46, 0\")<br>"
-				                  +"2. A planar You want to look at, described as 3 atom names (ex. \"C4, N1, H6\")<br><br>"
-				                  +"Delimiter between next coordinates or atoms could be any combination of any number of: {';', ',', ' '}.</html>";
+				                  +"1. Any point you want to look at:<br>"
+				                  +"&nbsp&nbsp&nbsp a) enter an atom name (e.g. C5)<br>"
+				                  +"&nbsp&nbsp&nbsp b) enter coordinates of a point (x,y,z) in cartesian system (e.g. 1.46, 2.46, 0)<br>"
+								  +"2. A plane you want to look on defined by three atoms (e.g. C1, O2, C3)<br><br>"
+				                  +"Note:<br>"
+				                  +"&nbsp&nbsp For values use dots as decimal point.<br>"
+				                  +"&nbsp&nbsp Delimiter between coordinates or atom names can be any combination and number of comas, semicolons and/or spaces.</html>";
 		
 		final JTextField textField = new JTextField(9);
 		textField.setToolTipText(description);
@@ -265,9 +275,11 @@ public class NorthPanel extends JScrollPane {
 		JLabel label = new JLabel("Look along:");
 		
 		final String description = "<html>Possible inputs:<br>"
-				                  +"1. Names of two atoms describing direction (ex. \"C4, C5\")<br>"
-				                  +"2. Axes You want to look along (ex. \"1.4, 2.46, 0\")<br><br>"
-				                  +"Delimiter between next coordinates or atoms could be any combination of any number of: {';', ',', ' '}.</html>";
+				                  +"1. Atom names defining direction (e.g. C4, C5)<br>"
+				                  +"2. Miller indices (uvw) (e.g. -1 2 0)<br><br>"
+				                  +"Note:<br>"
+				                  +"&nbsp&nbsp For values use dots as decimal point.<br>"
+				                  +"&nbsp&nbsp Delimiter between coordinates or atom names can be any combination and number of comas, semicolons and/or spaces.</html>";
 		
 		final JTextField textField = new JTextField(9);
 		textField.setToolTipText(description);
@@ -277,7 +289,7 @@ public class NorthPanel extends JScrollPane {
 				String input = textField.getText();
 				if(input.matches("[ ]*" +floatMatch+ "[;, ]+" +floatMatch+ "[;, ]+" +floatMatch+ "[;, ]*")) {
 					String[] sPos = input.split("[;, ]+");
-					position.set(Float.parseFloat(sPos[0]), Float.parseFloat(sPos[1]), Float.parseFloat(sPos[2]));
+					position.set(-Float.parseFloat(sPos[0]), -Float.parseFloat(sPos[1]), -Float.parseFloat(sPos[2]));
 					cameraHandler.lookAlong(position);
 					textField.setText(""); }
 				else if(input.matches("[ ]*" +atomMatch+ "[;, ]+" +atomMatch+ "[;, ]*")) {

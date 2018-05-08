@@ -227,7 +227,22 @@ public class ModelSet extends ModelBatch {
 				if(atom.visibleLabel) {
 					atom.getCenter(helper.set(0,0,0));
 					camera.project(helper, 0, 0, startWidth, startHeight);
-					font.draw(batch, atom.name, helper.x, helper.y); } }
+					font.draw(batch, atom.name, helper.x, helper.y); }
+			}
+			if(axes.renderable()) {
+				helper.set(axes.origin);
+				helper.add(axes.lengths[0], 0, 0);
+				camera.project(helper, 0, 0, startWidth, startHeight);
+				font.draw(batch, "X", helper.x, helper.y);
+				helper.set(axes.origin);
+				helper.add(0, axes.lengths[1], 0);
+				camera.project(helper, 0, 0, startWidth, startHeight);
+				font.draw(batch, "Y", helper.x, helper.y);
+				helper.set(axes.origin);
+				helper.add(0, 0, axes.lengths[2]);
+				camera.project(helper, 0, 0, startWidth, startHeight);
+				font.draw(batch, "Z", helper.x, helper.y);
+			}
 			batch.end();
 		}
 	}

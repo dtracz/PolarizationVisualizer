@@ -17,8 +17,8 @@ public class Axes implements SpatialObject {
 	private BlendingAttribute blendingAttribute;
 	private final ModelInstance[] instances;
 	
-	private Vector3 origin;
-	private float[] lengths;
+	Vector3 origin;
+	float[] lengths;
 	private float headLength;
 	private float diameter;
 	private Quaternion[] orientations;
@@ -41,7 +41,9 @@ public class Axes implements SpatialObject {
 		instances = new ModelInstance[6];
 		createAxes(cylinder, cone);
 		setTransforms();
-		renderable = true; }
+		renderable = true;
+		System.out.println(lengths[0] +" "+ lengths[1] +" "+ lengths[2]);
+	}
 		
 	private void createAxes(Model cylinder, Model cone) {
 		int i=0;
@@ -51,7 +53,8 @@ public class Axes implements SpatialObject {
             instances[2*i].materials.get(0).set(material);
             instances[2*i+1] = new ModelInstance(cone);
             instances[2*i+1].materials.get(0).set(material);
-			i++; } }
+			i++; }
+	}
 	
 	private void setTransforms() {
 		for(int i=0; i<3; i++) {
@@ -60,7 +63,8 @@ public class Axes implements SpatialObject {
 			position.add(origin);
 			instances[2*i].transform.set(position, orientations[i], new Vector3(diameter, lengths[i], diameter));
             position.sub(origin).scl(2f).add(origin);
-            instances[2*i+1].transform.set(position, orientations[i], new Vector3(3*diameter, headLength, 3*diameter)); } }
+            instances[2*i+1].transform.set(position, orientations[i], new Vector3(3*diameter, headLength, 3*diameter)); }
+	}
 			
 	@Override
 	public boolean renderable() {
