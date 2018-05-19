@@ -203,7 +203,12 @@ public class ModelSet extends ModelBatch {
 						this.render(instance, environment); }
 					if(atoms.get(i).visibleAxes) {
 						for(ModelInstance instance: atoms.get(i).axInstances) {
-							this.render(instance, environment); } } } }
+							System.out.print("|");
+							this.render(instance, environment); } }
+					System.out.print("\n");
+				}
+			}
+			System.out.print("\n");
 		}
 		if(atoms.get(0).renderable()) {
 			if(atoms.get(0).visibleAxes) {

@@ -7,6 +7,7 @@ import cern.colt.matrix.linalg.EigenvalueDecomposition;
 import cern.jet.math.Functions;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
@@ -85,9 +86,9 @@ public class MainEngine implements ApplicationListener {
 		}
 		double phi = Math.acos((algebra.trace(eigenVecs)-1.)/2.);
 		
-		double nx = Math.sqrt((eigenVecs.getQuick(0,0) - Math.cos(phi))/(1.-Math.cos(phi)));
-		double ny = Math.sqrt((eigenVecs.getQuick(1,1) - Math.cos(phi))/(1.-Math.cos(phi)));
-		double nz = Math.sqrt((eigenVecs.getQuick(2,2) - Math.cos(phi))/(1.-Math.cos(phi)));
+		double nx = Math.sqrt((eigenVecs.getQuick(0,0) - Math.cos(phi))/(1.00000001-Math.cos(phi)));
+		double ny = Math.sqrt((eigenVecs.getQuick(1,1) - Math.cos(phi))/(1.00000001-Math.cos(phi)));
+		double nz = Math.sqrt((eigenVecs.getQuick(2,2) - Math.cos(phi))/(1.00000001-Math.cos(phi)));
 		
 		if(isClose(getX01(phi, nx, ny, nz), eigenVecs.getQuick(0,1)) &&
 		   isClose(getX02(phi, nx, ny, nz), eigenVecs.getQuick(0,2)) &&
@@ -145,11 +146,6 @@ public class MainEngine implements ApplicationListener {
 			//System.out.println("Sth's very wrong");
 		}
 		
-		double x01 = getX01(phi, nx, ny, nz);
-		double x02 = getX02(phi, nx, ny, nz);
-		double x12 = getX12(phi, nx, ny, nz);
-		
-		helper.set((float)getX01(phi, nx, ny, nz), (float)getX02(phi, nx, ny, nz), (float)getX12(phi, nx, ny, nz));
 		helper.set((float)nx, (float)ny, (float)nz);
 		return new Quaternion(helper.nor(), (float)Math.toDegrees(phi));
 	}
@@ -361,6 +357,7 @@ public class MainEngine implements ApplicationListener {
 	
 	/* - APPLICATION LISTENER- - - - - - - - - - - - - - - - - - - - - - - - */
 	
+	
 	@Override
 	public void create() {
 		environment = new Environment();
@@ -394,12 +391,17 @@ public class MainEngine implements ApplicationListener {
 		
 		// setting top subframe needs to wait for this thread to have finished; this is the simplest way
 		MainWindow.getInstance().resetTopSubframe();
+		
+//		Gdx.graphics.setResizable(true);
+		System.out.println(Gdx.graphics.getBufferFormat().coverageSampling);
+		System.out.println(Gdx.graphics.getBufferFormat().samples);
 	}
 	
 	@Override
 	public void render() {
 		Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		// Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
 		//viewport.apply();
 		cameraHandler.updateCamera();
 		models.renderAll(cameraHandler.getCamera(), environment); }
