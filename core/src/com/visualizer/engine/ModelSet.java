@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.DefaultRenderableSorter;
@@ -67,8 +68,14 @@ public class ModelSet extends ModelBatch {
 			@Override
 			public void sort(Camera camera, Array<Renderable> renderables) {
 				Renderable last = renderables.pop();
-				super.sort(camera, renderables);
-				renderables.add(last);
+				if(last.userData != null && last.userData.equals("MOL")) {
+					super.sort(camera, renderables);
+					renderables.add(last);
+				}
+				else {
+					renderables.add(last);
+					super.sort(camera, renderables);
+				}
 			}
 		});
 		
@@ -203,12 +210,9 @@ public class ModelSet extends ModelBatch {
 						this.render(instance, environment); }
 					if(atoms.get(i).visibleAxes) {
 						for(ModelInstance instance: atoms.get(i).axInstances) {
-							System.out.print("|");
 							this.render(instance, environment); } }
-					System.out.print("\n");
 				}
 			}
-			System.out.print("\n");
 		}
 		if(atoms.get(0).renderable()) {
 			if(atoms.get(0).visibleAxes) {

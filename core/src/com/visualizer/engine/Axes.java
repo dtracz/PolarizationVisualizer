@@ -31,6 +31,7 @@ public class Axes implements SpatialObject {
 		scale = 1f;
 		stretch = 1f;
 		this.blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1);
+		System.out.println(">>>>>> " + blendingAttribute.type);
 		this.origin = origin;
 		lengths = new float[]{length, length, length};
 		this.headLength = headLength;

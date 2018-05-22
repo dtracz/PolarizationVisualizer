@@ -51,6 +51,8 @@ public class Atom implements SpatialObject {
 		scale = 1f;
 		stretch = 1f;
 		ModelInstance sphereInstance = new ModelInstance(sphereModel, new Matrix4(position, orientation, sizes));
+		if(name.equals("MOL")) {
+			sphereInstance.userData = "MOL"; }
 		ModelInstance centerInstance = new ModelInstance(sphereModel, new Matrix4(position, new Quaternion(), new Vector3(0.15f,0.15f,0.15f)));
 		
 		float axThickness = 0.015f;
