@@ -33,6 +33,8 @@ public class MainEngine implements ApplicationListener {
 	public final static Vector3 ONES = new Vector3(1,1,1);
 	public final static Quaternion Q_ZERO = new Quaternion();
 	
+	public String name;
+	
 	public List<PointLight> pointLights;
 	private Environment environment;
 	private Viewport viewport;
@@ -314,6 +316,7 @@ public class MainEngine implements ApplicationListener {
 	public MainEngine(File file, boolean longImport) {
 		this.longImport = longImport;
 		sourceFile = file;
+		name = file.getName();
 		mode2d = false;
 		try {
 			System.out.println(MainWindow.selfPath);
@@ -340,6 +343,8 @@ public class MainEngine implements ApplicationListener {
 	}
 	
 	public void exportImage(String filename) {
+		viewport.apply();
+		cameraHandler.updateCamera();
 		byte[] pixels = ScreenUtils.getFrameBufferPixels(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 		Pixmap pixmap = new Pixmap(Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), Pixmap.Format.RGBA8888);
 		BufferUtils.copy(pixels, 0, pixmap.getPixels(), pixels.length);

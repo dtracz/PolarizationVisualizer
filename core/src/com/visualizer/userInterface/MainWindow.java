@@ -71,6 +71,7 @@ public class MainWindow extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				try {
+					System.out.println(">>"+ topSubframe.engine.name);
 					final String filename = selectDirectory();
 					Gdx.app.postRunnable(new Runnable() {
 						@Override
@@ -314,7 +315,9 @@ public class MainWindow extends JFrame {
 		topSubframe = subframe;
 		if(showPanels) {
 			setCurrPanels(getControlPanel()); }
-		MainWindow.getInstance().validate(); }
+		System.out.println(topSubframe.engine.name);
+		MainWindow.getInstance().validate();
+	}
 	
 		
 	public void deleteSubframe(ModelSubframe subframe) {
