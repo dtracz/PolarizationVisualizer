@@ -1,7 +1,6 @@
 package com.visualizer.userInterface;
 
 import com.badlogic.gdx.Gdx;
-import com.visualizer.engine.MainEngine;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -27,6 +26,8 @@ public class MainWindow extends JFrame {
 	private final JScrollPane[] emptyPanels; // {east, north}
 	
 	public static String selfPath;
+	private String lastImportPath;
+	private String lastExportPath;
 	private static MainWindow instance;
 	private JMenuBar bar;
 	private JDesktopPane desktop;
@@ -77,7 +78,8 @@ public class MainWindow extends JFrame {
 						@Override
 						public void run() {
 							topSubframe.engine.exportImage(filename); }
-					}); }
+					});
+					lastExportPath = filename; }
 				catch(FileNotFoundException fnfe) {
 					fnfe.printStackTrace(); } }
 		});
@@ -273,16 +275,19 @@ public class MainWindow extends JFrame {
 	
 	private File selectFile() throws FileNotFoundException {
 		final JFileChooser jFC = new JFileChooser();
-		jFC.setCurrentDirectory(new File("."));											// set default Directory!!!
+		jFC.setCurrentDirectory(new File(lastImportPath == null ? "." : lastImportPath));
 		int result = jFC.showOpenDialog(null);
 		if(result == JFileChooser.APPROVE_OPTION) {
-			return jFC.getSelectedFile(); }
+			File fileToLoad = jFC.getSelectedFile();
+			lastImportPath = fileToLoad.getAbsolutePath();
+			return fileToLoad; }
 		else {
-			throw new FileNotFoundException("No file selected"); } }
+			throw new FileNotFoundException("No file selected"); }
+	}
 		
 			
 	private String selectDirectory() throws FileNotFoundException {
-		final JFileChooser jFC = new JFileChooser(new File("."));						// set default Directory!!!
+		final JFileChooser jFC = new JFileChooser(new File(lastExportPath==null ? "." : lastExportPath));
 		jFC.setDialogTitle("Save as..");
 		jFC.setFileFilter(new FileFilter() {
 			@Override
@@ -293,8 +298,7 @@ public class MainWindow extends JFrame {
 				return "Image file (*.png)"; } });
 		int result = jFC.showSaveDialog(null);
 		if(result == JFileChooser.APPROVE_OPTION) {
-			int homelength = System.getProperty("user.home").length();
-			return jFC.getSelectedFile().getAbsolutePath().substring(homelength); }
+			return jFC.getSelectedFile().getAbsolutePath(); }
 		else {
 			throw new FileNotFoundException("No file selected"); } }
 	
