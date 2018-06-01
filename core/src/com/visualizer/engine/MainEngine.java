@@ -35,7 +35,6 @@ public class MainEngine implements ApplicationListener {
 	
 	public String name;
 	
-	public List<PointLight> pointLights;
 	private Environment environment;
 	private Viewport viewport;
 	private Listener listener;
@@ -48,289 +47,26 @@ public class MainEngine implements ApplicationListener {
 	public final static Matrix3 rotationMatrix = new Matrix3(new float[] { 0, 0, 1,
 																		   1, 0, 0,
 																		   0, 1, 0 });
-	
 	private File sourceFile;
-	private Map<String, Integer> atomColors;
+	private AtomFactory atomFactory;
 	public ModelSet models;
 	
 	private int fontSize = 24;
 	private final boolean longImport;
 	
-	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	/* - PUBLIC OPERATIONS - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
-	void showMessage(final String text, final String type) {
+	public void showMessage(final String text, final String type) {
 		Thread messageThread = new Thread(new Runnable(){
 			@Override
 			public void run() {
 				JOptionPane.showMessageDialog(MainWindow.getInstance(), text, type, JOptionPane.ERROR_MESSAGE); } } );
-		messageThread.start(); }
-	
-	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-	
-	private boolean isClose(double x1, double x2) {
-		return Math.abs(x1 - x2) < 0.0001;
+		messageThread.start();
 	}
-	
-	private double getX01(double phi, double nx, double ny, double nz) {
-		return nz*Math.sin(phi) + nx*ny*(1.-Math.cos(phi));
-	}
-	private double getX02(double phi, double nx, double ny, double nz) {
-		return -ny*Math.sin(phi) + nx*nz*(1.-Math.cos(phi));
-	}
-	private double getX12(double phi, double nx, double ny, double nz) {
-		return nx*Math.sin(phi) + ny*nz*(1.-Math.cos(phi));
-	}
-	
-	private Quaternion getAngle(DoubleMatrix2D eigenVecs, Vector3 helper, Algebra algebra) {
-		eigenVecs = algebra.transpose(eigenVecs);
-		if(algebra.det(eigenVecs) < 0) {
-			eigenVecs.assign(Functions.mult(-1));
-		}
-		double phi = Math.acos((algebra.trace(eigenVecs)-1.)/2.);
-		
-		double nx = Math.sqrt((eigenVecs.getQuick(0,0) - Math.cos(phi))/(1.00000001-Math.cos(phi)));
-		double ny = Math.sqrt((eigenVecs.getQuick(1,1) - Math.cos(phi))/(1.00000001-Math.cos(phi)));
-		double nz = Math.sqrt((eigenVecs.getQuick(2,2) - Math.cos(phi))/(1.00000001-Math.cos(phi)));
-		
-		if(isClose(getX01(phi, nx, ny, nz), eigenVecs.getQuick(0,1)) &&
-		   isClose(getX02(phi, nx, ny, nz), eigenVecs.getQuick(0,2)) &&
-		   isClose(getX12(phi, nx, ny, nz), eigenVecs.getQuick(1,2)) ) {
-			//System.out.println("OK");
-		}
-		else if(isClose(getX01(phi, nx, ny, -nz), eigenVecs.getQuick(0,1)) &&
-				isClose(getX02(phi, nx, ny, -nz), eigenVecs.getQuick(0,2)) &&
-				isClose(getX12(phi, nx, ny, -nz), eigenVecs.getQuick(1,2)) ) {
-			//System.out.println("#Z");
-			nz *= -1;
-		}
-		else if(isClose(getX01(phi, nx, -ny, nz), eigenVecs.getQuick(0,1)) &&
-				isClose(getX02(phi, nx, -ny, nz), eigenVecs.getQuick(0,2)) &&
-				isClose(getX12(phi, nx, -ny, nz), eigenVecs.getQuick(1,2)) ) {
-			//System.out.println("#Y");
-			ny *= -1;
-		}
-		else if(isClose(getX01(phi, -nx, ny, nz), eigenVecs.getQuick(0,1)) &&
-				isClose(getX02(phi, -nx, ny, nz), eigenVecs.getQuick(0,2)) &&
-				isClose(getX12(phi, -nx, ny, nz), eigenVecs.getQuick(1,2)) ) {
-			//System.out.println("#X");
-			nx *= -1;
-		}
-		else if(isClose(getX01(phi, nx, -ny, -nz), eigenVecs.getQuick(0,1)) &&
-				isClose(getX02(phi, nx, -ny, -nz), eigenVecs.getQuick(0,2)) &&
-				isClose(getX12(phi, nx, -ny, -nz), eigenVecs.getQuick(1,2)) ) {
-			//System.out.println("#YZ");
-			ny *= -1;
-			nz *= -1;
-		}
-		else if(isClose(getX01(phi, -nx, ny, -nz), eigenVecs.getQuick(0,1)) &&
-				isClose(getX02(phi, -nx, ny, -nz), eigenVecs.getQuick(0,2)) &&
-				isClose(getX12(phi, -nx, ny, -nz), eigenVecs.getQuick(1,2)) ) {
-			//System.out.println("#XZ");
-			nx *= -1;
-			nz *= -1;
-		}
-		else if(isClose(getX01(phi, -nx, -ny, nz), eigenVecs.getQuick(0,1)) &&
-				isClose(getX02(phi, -nx, -ny, nz), eigenVecs.getQuick(0,2)) &&
-				isClose(getX12(phi, -nx, -ny, nz), eigenVecs.getQuick(1,2)) ) {
-			//System.out.println("#XY");
-			nx *= -1;
-			ny *= -1;
-		}
-		else if(isClose(getX01(phi, -nx, -ny, -nz), eigenVecs.getQuick(0,1)) &&
-				isClose(getX02(phi, -nx, -ny, -nz), eigenVecs.getQuick(0,2)) &&
-				isClose(getX12(phi, -nx, -ny, -nz), eigenVecs.getQuick(1,2)) ) {
-			//System.out.println("#XYZ");
-			nx *= -1;
-			ny *= -1;
-			nz *= -1;
-		}
-		else {
-			//System.out.println("Sth's very wrong");
-		}
-		
-		helper.set((float)nx, (float)ny, (float)nz);
-		return new Quaternion(helper.nor(), (float)Math.toDegrees(phi));
-	}
-	
-	
-	private Vector3 getAtoms(Scanner scanner, DoubleMatrix2D alpha, Algebra algebra,
-	                         Queue<String> names, Queue<Vector3> positions, Queue<Quaternion> orientations,
-	                         Queue<Vector3> sizes, Queue<String> alphas) {
-		String name;
-		Vector3 midCoords = new Vector3(0, 0, 0);
-		Vector3 helper = new Vector3();
-		
-		while(!scanner.nextLine().matches("ATOMIC COORDINATES \\(ORTHOGONAL SYSTEM\\)"));
-		scanner.nextLine(); scanner.nextLine(); scanner.nextLine();
-		while((name = scanner.next()).matches("[A-Z][a-z]?.*")) {
-			names.add(name);
-			positions.add(new Vector3(scanner.nextFloat(), scanner.nextFloat(), scanner.nextFloat()));
-		}
-		while(!scanner.nextLine().matches("ATOMIC PROPERTIES"));
-		while(!scanner.nextLine().matches("Atom.*"));
-		scanner.nextLine();
-		float sumWeights = 0;
-		while(scanner.next().matches("[A-Z][a-z]?.*")) {
-			scanner.nextFloat();
-			alpha.setQuick(0,0, scanner.nextDouble());
-			alpha.setQuick(1,1, scanner.nextDouble());
-			alpha.setQuick(2,2, scanner.nextDouble());
-			double d01 = scanner.nextDouble();
-			double d02 = scanner.nextDouble();
-			double d12 = scanner.nextDouble();
-			alpha.setQuick(0,1, d01);
-			alpha.setQuick(1,0, d01);
-			alpha.setQuick(0,2, d02);
-			alpha.setQuick(2,0, d02);
-			alpha.setQuick(1,2, d12);
-			alpha.setQuick(2,1, d12);
-			
-			// calculating ellipsoid
-			EigenvalueDecomposition eigenDecomp = new EigenvalueDecomposition(alpha);
-			DoubleMatrix2D eigenValues = eigenDecomp.getD();
-			sizes.add(new Vector3((float)eigenValues.getQuick(0,0), (float)eigenValues.getQuick(1,1), (float)eigenValues.getQuick(2,2)));
-			orientations.add(getAngle(eigenDecomp.getV(), helper, algebra));
-			alphas.add(alpha.toString());
-			
-			// calculating center of molecule
-			float weight = scanner.nextFloat();
-			sumWeights += weight;
-			Vector3 coords = positions.poll();
-			midCoords.add(coords.x*weight, coords.y*weight, coords.z*weight);
-			positions.add(coords);
-			scanner.nextFloat();
-		}
-		return midCoords.scl(1f/sumWeights);
-	}
-	
-	private String getMolecule(Scanner scanner, DoubleMatrix2D alpha, Algebra algebra,
-	                           Vector3 size, Quaternion orientation) {
-		while(!scanner.nextLine().matches("MOLECULAR POLARIZABILITY TENSOR CARTESIAN SYSTEM"));
-		scanner.nextLine(); scanner.nextLine(); scanner.nextLine();
-		alpha.setQuick(0,0, scanner.nextDouble());
-		alpha.setQuick(1,1, scanner.nextDouble());
-		alpha.setQuick(2,2, scanner.nextDouble());
-		double d01 = scanner.nextDouble();
-		double d02 = scanner.nextDouble();
-		double d12 = scanner.nextDouble();
-		alpha.setQuick(0,1, d01);
-		alpha.setQuick(1,0, d01);
-		alpha.setQuick(0,2, d02);
-		alpha.setQuick(2,0, d02);
-		alpha.setQuick(1,2, d12);
-		alpha.setQuick(2,1, d12);
-		
-		EigenvalueDecomposition eigenDecomp = new EigenvalueDecomposition(alpha);
-		DoubleMatrix2D eigenValues = eigenDecomp.getD();
-		orientation.set(getAngle(eigenDecomp.getV(), size, algebra)); // size here only as helper
-		size.set((float)eigenValues.getQuick(0,0), (float)eigenValues.getQuick(1,1), (float)eigenValues.getQuick(2,2));
-		return alpha.toString();
-	}
-	
-	private void getBonds(Scanner scanner, Queue<String> bonds) {
-		while(!scanner.nextLine().matches("BOND PROPERTIES"));
-		while(!scanner.nextLine().matches("\\s+A.B.*"));
-		scanner.nextLine();
-		while(scanner.hasNext("[A-Z][a-z]?\\d*")) {
-			bonds.add(scanner.next());
-			bonds.add(scanner.next());
-			for(int i=0; i<3; i++) { scanner.next(); }
-			bonds.add(Boolean.toString(scanner.nextFloat() < 0.1));
-			for(int i=0; i<5; i++) { scanner.next(); }
-			bonds.add(scanner.next());
-			scanner.nextLine();
-		}
-	}
-	
-	private String fileReader(Queue<String> names, Queue<Vector3> positions, Queue<Quaternion> orientations,
-	                        Queue<Vector3> sizes, Queue<String> bonds, Queue<String> alphas,
-	                          Vector3 molecularCoords, Vector3 molecularSize, Quaternion molecularOrintation) {
-		String molecularAlpha;
-		try {
-			Scanner scanner = new Scanner(sourceFile).useLocale(Locale.ROOT); 	// dot decimal separator instead of comma
-			DoubleMatrix2D alpha = DoubleFactory2D.dense.make(3,3);
-			Algebra algebra = new Algebra();
-			
-			molecularCoords.set(getAtoms(scanner, alpha, algebra, names, positions, orientations, sizes, alphas));
-			molecularAlpha = getMolecule(scanner, alpha, algebra, molecularSize, molecularOrintation);
-			getBonds(scanner, bonds);
-			
-			scanner.close(); }
-		catch(FileNotFoundException fnfe) {
-			fnfe.printStackTrace();
-			showMessage(fnfe.getMessage(), "Error");
-			return null; }
-		catch(RuntimeException re) {
-			re.printStackTrace();
-			showMessage(re.getMessage(), "Error");
-			return null; }
-		
-		return molecularAlpha;
-		}
-	
-		
-	private Vector3 atomFactory() {
-		Vector3 shift = new Vector3(1000, 1000, 1000);
-		Queue<String> names = new LinkedList<String>();
-		Queue<Vector3> positions = new LinkedList<Vector3>();
-		Queue<Quaternion> orientations = new LinkedList<Quaternion>();
-		Queue<Vector3> sizes = new LinkedList<Vector3>();
-		Queue<String> bonds = new LinkedList<String>();
-		Queue<String> alphas = new LinkedList<String>();
-		
-		Vector3 molecularPosition = new Vector3(); // position of the center of molecule
-		Vector3 molecularSize = new Vector3();
-		Quaternion molecularOrintation = new Quaternion();
-		String molecularAlpha = fileReader(names, positions, orientations, sizes, bonds, alphas, molecularPosition, molecularSize, molecularOrintation);
-		if(molecularAlpha == null) return shift;
-		
-		models.addAtom("MOL", new Color(093f/255f, 198f/255f, 023f/255f, 1f), molecularPosition, molecularOrintation, molecularSize, molecularAlpha);
-		
-		while(!sizes.isEmpty()) {
-			String name = names.poll();
-			Color color = null;
-			if(name.matches("[A-Z][a-z].*")) {
-				color = new Color(atomColors.get(name.substring(0,2))); }
-			else if(name.matches("[A-Z].*")) {
-				color = new Color(atomColors.get(name.substring(0,1))); }
-			if(color == null) {
-				color = Color.WHITE; }
-			Vector3 position = positions.poll();
-			shift.x = position.x < shift.x ? position.x : shift.x;
-			shift.y = position.y < shift.y ? position.y : shift.y;
-			shift.z = position.z < shift.z ? position.z : shift.z;
-			models.addAtom(name, color, position, orientations.poll(), sizes.poll(), alphas.poll());
-		}
-		while(!bonds.isEmpty()) {
-			try {
-				models.addBond(bonds.poll(), bonds.poll(), Boolean.parseBoolean(bonds.poll()), bonds.poll()); }
-			catch(NoSuchElementException nsee) {
-				showMessage(nsee.getMessage(), "Error");
-				nsee.printStackTrace(); }
-		}
-		for(Atom atom: models.atoms) {
-			atom.setTexture(false); }
-		return shift; }
-	
-		
-	public MainEngine(File file, boolean longImport) {
-		this.longImport = longImport;
-		sourceFile = file;
-		name = file.getName();
-		mode2d = false;
-		try {
-			System.out.println(MainWindow.selfPath);
-			XMLDecoder xmlDecoder = new XMLDecoder(new FileInputStream(MainWindow.selfPath+"/atomColors.xml"));
-			atomColors = (TreeMap<String, Integer>)xmlDecoder.readObject();
-			xmlDecoder.close(); }
-		catch(FileNotFoundException fnfe) {
-			fnfe.printStackTrace(); }
-	}
-	
-	/* - PUBLIC OPERATIONS - - - - - - - - - - - - - - - - - - - - - - - - - */
 	
 	public void changeMode() {
-		setMode2D(!mode2d); }
+		setMode2D(!mode2d);
+	}
 	
 	public void setMode2D(boolean m2d) {
 		if(mode2d^m2d) {
@@ -349,8 +85,8 @@ public class MainEngine implements ApplicationListener {
 		Pixmap pixmap = new Pixmap(Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), Pixmap.Format.RGBA8888);
 		BufferUtils.copy(pixels, 0, pixmap.getPixels(), pixels.length);
 		PixmapIO.writePNG(Gdx.files.absolute(filename), pixmap);
-		pixmap.dispose(); }
-	
+		pixmap.dispose();
+	}
 	
 	public void setFont(int fontSize) {
 		this.fontSize = fontSize;
@@ -360,7 +96,14 @@ public class MainEngine implements ApplicationListener {
 	}
 	
 	
-	/* - APPLICATION LISTENER- - - - - - - - - - - - - - - - - - - - - - - - */
+	/* - CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	
+	public MainEngine(File file, boolean longImport) {
+		this.longImport = longImport;
+		sourceFile = file;
+		name = file.getName();
+		mode2d = false;
+	}
 	
 	
 	@Override
@@ -372,7 +115,13 @@ public class MainEngine implements ApplicationListener {
 		
 		ModelBuilder builder = new ModelBuilder();
 		models = new ModelSet(builder);
-		Vector3 origin = atomFactory();
+		atomFactory = new AtomFactory(models);
+		Vector3 origin = null;
+		try {
+			origin = atomFactory.parseFile(sourceFile); }
+		catch(Exception e) {
+			showMessage(e.getMessage(), "Error");
+			e.printStackTrace(); }
 		models.createAxes(origin.sub(ONES), 5, 0.8f, 0.1f);
 		
 		Vector3 center = new Vector3(0,0,0);
@@ -381,12 +130,6 @@ public class MainEngine implements ApplicationListener {
 		orthographicCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cameraHandler = new CameraHandler(perspectiveCamera, center, defaultUpAxis);
 		
-//		pointLights = new LinkedList<PointLight>();
-//		pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-20, -10, 20), 400f));
-//		//pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-10,   0, 10), 150f));
-//		pointLights.add(new PointLight().set(Color.WHITE, origin.cpy().add(-20,  10, 20), 150f));
-//		for(PointLight pointLight: pointLights) {
-//			environment.add(pointLight); }
 		cameraHandler.pointLight = new PointLight().set(Color.WHITE, origin.cpy().add(0, 0, 0), 1200f);
 		environment.add(cameraHandler.pointLight);
 		cameraHandler.updatePointLight();
@@ -396,11 +139,13 @@ public class MainEngine implements ApplicationListener {
 		
 		// setting top subframe needs to wait for this thread to have finished; this is the simplest way
 		MainWindow.getInstance().resetTopSubframe();
-		
+
 //		Gdx.graphics.setResizable(true);
 		System.out.println(Gdx.graphics.getBufferFormat().coverageSampling);
 		System.out.println(Gdx.graphics.getBufferFormat().samples);
 	}
+	
+	/* - FORWARD APPLICATION LISTENER- - - - - - - - - - - - - - - - - - - - */
 	
 	@Override
 	public void render() {

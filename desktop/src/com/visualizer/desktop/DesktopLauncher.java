@@ -32,11 +32,13 @@ public class DesktopLauncher {
 			file = new File(DesktopLauncher.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()); }
 		catch(URISyntaxException e) {
 			e.printStackTrace(); }
-		MainWindow.selfPath = file.getParentFile().getAbsolutePath();
-		System.out.println(file.getParentFile().getAbsolutePath());
+		MainWindow.selfPath = file.getParentFile().getAbsolutePath() + "/";
+		System.out.println(MainWindow.selfPath);
 		MainWindow.getInstance();
 	/*
 		Map atomColors = new TreeMap<String, Integer>();
+		atomColors.put("MOL", Color.rgba8888(090f/255f,240f/255f,120f/255f, 1));
+		
 		atomColors.put("H",  Color.rgba8888(0.90f,0.90f,0.90f, 1));
 		atomColors.put("He", Color.rgba8888(217f/255f,255f/255f,255f/255f, 1));
 		atomColors.put("Li", Color.rgba8888(204f/255f,128f/255f,255f/255f, 1));

@@ -75,15 +75,13 @@ public class Atom implements SpatialObject {
 		this.scale(0.2f);
 	}
 	
-	void setTexture(boolean showGrid) {
-		if(showGrid) {
-			instances[0].materials.get(0).set(TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle("grid.png", Files.FileType.Internal))));
-		}
-	}
+//	void setTexture(boolean showGrid) {
+//		if(showGrid) {
+//			instances[0].materials.get(0).set(TextureAttribute.createDiffuse(new Texture(Gdx.files.getFileHandle("grid.png", Files.FileType.Internal))));
+//		}
+//	}
 	
-	// @Override
-	public String getDescription() {
-		return description; }
+	//----------------------------------------------------------------
 	
 	@Override
 	public boolean renderable() {
@@ -99,7 +97,8 @@ public class Atom implements SpatialObject {
 		blendingAttribute.opacity = opacity;
 		instances[0].materials.get(0).set(blendingAttribute);
 		//for(ModelInstance instance: instances) {
-		//	instance.materials.get(0).set(blendingAttribute); }
+		//	instance.materials.get(0).set(blendingAttribute);
+		//}
 	}
 	
 	@Override
@@ -119,24 +118,36 @@ public class Atom implements SpatialObject {
 		factor = factor <= 0 ? 0.001f : factor;
 		for(ModelInstance instance: instances) {
             Vector3 position = instance.transform.getTranslation(helper.set(0,0,0));
-			instance.transform.setTranslation(position.scl(factor/stretch)); }
-		stretch = factor; }
+			instance.transform.setTranslation(position.scl(factor/stretch));
+		}
+		stretch = factor;
+	}
 	
 	@Override
 	public void translateTo(Vector3 translation) {
 		for(ModelInstance instance: instances) {
-			instance.transform.setTranslation(translation); } }
+			instance.transform.setTranslation(translation);
+		}
+	}
 	
 	@Override
 	public ModelInstance[] getInstances() {
 		return instances; }
 		
 	public Vector3 getCenter(Vector3 origin) {
-		return instances[0].transform.getTranslation(origin); }
+		return instances[0].transform.getTranslation(origin);
+	}
 		
 	public Material getMaterial() {
-		return instances[0].materials.get(0); }
-		
+		return instances[0].materials.get(0);
+	}
+	
+	//----------------------------------------------------------------
+	
+	// @Override
+	public String getDescription() {
+		return description; }
+	
 	public void setColour(String colour) {
 		if(colour.equals("gray")) {
 			instances[0].materials.get(0).set(ModelSet.GRAY);

@@ -91,7 +91,7 @@ public class ModelSet extends ModelBatch {
 		cone = builder.createCone(1, 1, 1, cylindricalDivisions, new Material(),
 								  VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 		
-		generator = new FreeTypeFontGenerator(Gdx.files.internal(MainWindow.selfPath + "/font.ttf"));
+		generator = new FreeTypeFontGenerator(Gdx.files.internal(MainWindow.selfPath + "font.ttf"));
 		parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 		parameter.size = 24;
 		font = generator.generateFont(parameter);
