@@ -424,7 +424,7 @@ public class MainEngine implements ApplicationListener {
 	@Override
 	public void dispose() {
 		System.out.println("ApplicationListener::dispose()");
-		models.dispose();
+		// models.dispose(); // it should be here but if it is sometimes app crushes when one multiple subframe is closed
 	}
 	
 	@Override
